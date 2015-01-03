@@ -1,0 +1,218 @@
+{ "divisions": [
+    {
+        "id": "C1", "name": "Alsace",
+        "divisions": [
+            { "id": "67", "name": "Bas-Rhin" },
+            { "id": "68", "name": "Haut-Rhin" }
+        ]
+    },
+    {
+        "id": "97", "name": "Aquitaine",
+        "divisions": [
+            { "id": "24", "name": "Dordogne" },
+            { "id": "33", "name": "Gironde" },
+            { "id": "40", "name": "Landes" },
+            { "id": "47", "name": "Lot-et-Garonne" },
+            { "id": "64", "name": "Pyrénées-Atlantiques" }
+        ]
+    },
+    {
+        "id": "98", "name": "Auvergne",
+        "divisions": [
+            { "id": "03", "name": "Allier" },
+            { "id": "15", "name": "Cantal" },
+            { "id": "43", "name": "Haute-Loire" },
+            { "id": "63", "name": "Puy-de-Dôme" }
+        ]
+    },
+    {
+        "id": "99", "name": "Basse-Normandie" ,
+        "divisions": [
+            { "id": "14", "name": "Calvados" },
+            { "id": "50", "name": "Manche" },
+            { "id": "61", "name": "Orne" }
+        ]
+    },
+    {
+        "id": "A1", "name": "Bourgogne",
+        "divisions": [
+            { "id": "21", "name": "Côte-d'Or" },
+            { "id": "58", "name": "Nièvre" },
+            { "id": "71", "name": "Saône-et-Loire" },
+            { "id": "89", "name": "Yonne" }
+        ]
+    },
+    {
+        "id": "A2", "name": "Bretagne",
+        "divisions": [
+            { "id": "22", "name": "Côtes-d'Armor" },
+            { "id": "29", "name": "Finistère" },
+            { "id": "35", "name": "Ille-et-Vilaine" },
+            { "id": "56", "name": "Morbihan" }
+        ]
+    },
+    {
+        "id": "A3", "name": "Centre",
+        "divisions": [
+            { "id": "18", "name": "Cher" },
+            { "id": "28", "name": "Eure-et-Loir" },
+            { "id": "36", "name": "Indre" },
+            { "id": "37", "name": "Indre-et-Loire" },
+            { "id": "41", "name": "Loir-et-Cher" },
+            { "id": "45", "name": "Loiret" }
+        ]
+    },
+    {
+        "id": "A4", "name": "Champagne-Ardenne",
+        "divisions": [
+            { "id": "08", "name": "Ardennes" },
+            { "id": "10", "name": "Aube" },
+            { "id": "51", "name": "Marne" },
+            { "id": "52", "name": "Haute-Marne" }
+        ]
+    },
+    {
+        "id": "A5", "name": "Corse",
+        "divisions": [
+            { "id": "2A", "name": "Corse-du-Sud" },
+            { "id": "2B", "name": "Haute-Corse" }
+        ]
+    },
+    {
+        "id": "A6", "name": "Franche-Comté",
+        "divisions": [
+            { "id": "25", "name": "Doubs" },
+            { "id": "39", "name": "Jura" },
+            { "id": "70", "name": "Haute-Saône" },
+            { "id": "90", "name": "Territoire de Belfort" }
+        ]
+    },
+    {
+        "id": "A7", "name": "Haute-Normandie",
+        "divisions": [
+            { "id": "27", "name": "Eure" },
+            { "id": "76", "name": "Seine-Maritime" }
+        ]
+    },
+    {
+        "id": "A8", "name": "Ile-de-France",
+        "divisions": [
+            { "id": "75", "name": "Paris" },
+            { "id": "77", "name": "Seine-et-Marne" },
+            { "id": "78", "name": "Yvelines" },
+            { "id": "91", "name": "Essonne" },
+            { "id": "92", "name": "Hauts-de-Seine" },
+            { "id": "93", "name": "Seine-Saint-Denis" },
+            { "id": "94", "name": "Val-de-Marne" },
+            { "id": "95", "name": "Val-d'Oise" }
+        ]
+    },
+    {
+        "id": "A9", "name": "Languedoc-Roussillon",
+        "divisions": [
+            { "id": "11", "name": "Aude" },
+            { "id": "30", "name": "Gard" },
+            { "id": "34", "name": "Hérault" },
+            { "id": "48", "name": "Lozère" },
+            { "id": "66", "name": "Pyrénées-Orientales" }
+        ]
+    },
+    {
+        "id": "B1", "name": "Limousin",
+        "divisions": [
+            { "id": "19", "name": "Corrèze" },
+            { "id": "23", "name": "Creuse" },
+            { "id": "87", "name": "Haute-Vienne" }
+        ]
+    },
+    {
+        "id": "B2", "name": "Lorraine",
+        "divisions": [
+            { "id": "54", "name": "Meurthe-et-Moselle" },
+            { "id": "55", "name": "Meuse" },
+            { "id": "57", "name": "Moselle" },
+            { "id": "88", "name": "Vosges" }
+        ]
+    },
+    {
+        "id": "B3", "name": "Midi-Pyrénées",
+        "divisions": [
+            { "id": "09", "name": "Ariège" },
+            { "id": "12", "name": "Aveyron" },
+            { "id": "31", "name": "Haute-Garonne" },
+            { "id": "32", "name": "Gers" },
+            { "id": "46", "name": "Lot" },
+            { "id": "65", "name": "Hautes-Pyrénées" },
+            { "id": "81", "name": "Tarn" },
+            { "id": "82", "name": "Tarn-et-Garonne" }
+        ]
+    },
+    {
+        "id": "B4", "name": "Nord-Pas-de-Calais",
+        "divisions": [
+            { "id": "59", "name": "Nord" },
+            { "id": "62", "name": "Pas-de-Calais" }
+        ]
+    },
+    {
+        "id": "B5", "name": "Pays de la Loire",
+        "divisions": [
+            { "id": "44", "name": "Loire-Atlantique" },
+            { "id": "49", "name": "Maine-et-Loire" },
+            { "id": "53", "name": "Mayenne" },
+            { "id": "72", "name": "Sarthe" },
+            { "id": "85", "name": "Vendée" }
+        ]
+    },
+    {
+        "id": "B6", "name": "Picardie",
+        "divisions": [
+            { "id": "02", "name": "Aisne" },
+            { "id": "60", "name": "Oise" },
+            { "id": "80", "name": "Somme" }
+        ]
+    },
+    {
+        "id": "B7", "name": "Poitou-Charentes",
+        "divisions": [
+            { "id": "16", "name": "Charente" },
+            { "id": "17", "name": "Charente-Maritime" },
+            { "id": "79", "name": "Deux-Sèvres" },
+            { "id": "86", "name": "Vienne" }
+        ]
+    },
+    {
+        "id": "B8", "name": "Provence-Alpes-Côte-d'Azur",
+        "divisions": [
+            { "id": "04", "name": "Alpes-de-Haute-Provence" },
+            { "id": "05", "name": "Hautes-Alpes" },
+            { "id": "06", "name": "Alpes-Maritimes" },
+            { "id": "13", "name": "Bouches-du-Rhône" },
+            { "id": "83", "name": "Var" },
+            { "id": "84", "name": "Vaucluse" }
+        ]
+    },
+    {
+        "id": "B9", "name": "Rhône-Alpes",
+        "divisions": [
+            { "id": "01", "name": "Ain" },
+            { "id": "07", "name": "Ardèche" },
+            { "id": "26", "name": "Drôme" },
+            { "id": "38", "name": "Isère" },
+            { "id": "42", "name": "Loire" },
+            { "id": "69", "name": "Rhône" },
+            { "id": "73", "name": "Savoie" },
+            { "id": "74", "name": "Haute-Savoie" }
+        ]
+    },
+    {
+        "id": "C2", "name": "Outre-mer",
+        "divisions": [
+            { "id": "971", "name": "Guadeloupe" },
+            { "id": "972", "name": "Martinique" },
+            { "id": "973", "name": "Guyane" },
+            { "id": "974", "name": "La Réunion" },
+            { "id": "976", "name": "Mayotte" }
+        ]
+    }
+]}

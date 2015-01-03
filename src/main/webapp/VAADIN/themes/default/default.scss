@@ -1,0 +1,38 @@
+@import "../valo/valo";
+@import "common";
+@import "views/dashboardview";
+
+// Optimize the CSS output
+$v-included-components: remove($v-included-components, accordion);
+$v-included-components: remove($v-included-components, colorpicker);
+$v-included-components: remove($v-included-components, grid);
+$v-included-components: remove($v-included-components, popupview);
+$v-included-components: remove($v-included-components, progressbar);
+$v-included-components: remove($v-included-components, slider);
+$v-included-components: remove($v-included-components, splitpanel);
+$v-included-components: remove($v-included-components, tree);
+$v-included-components: remove($v-included-components, treetable);
+$v-included-components: remove($v-included-components, twincolselect);
+
+// Main layout padding
+$view-padding: round($v-unit-size / 1.5) !default;
+
+// Slight adjustment to menu background-color
+$valo-menu-background-color: #414B56;
+
+@mixin default {
+  @include valo;
+  @include dashboard-common;
+  @include dashboard-dashboard-view;
+
+  $color1: hsl(220, 5%, 38%);
+  $color2: #5d73c0;
+  $color3: #3dbc1a;
+  $color4: #d2f4f3;
+  $color5: #fe902a;
+  $colors: $color1, $color2, $color3, $color4, $color5;
+
+  .v-menubar-color1 {
+    @include valo-menubar-style($background-color: $v-selection-color, $unit-size: null);
+  }
+}

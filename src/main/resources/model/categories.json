@@ -1,0 +1,154 @@
+{ "categories": [
+    {
+        "name": "Maison",
+        "categories": [
+            { "name": "Electricité"},
+            { "name": "Jardinage"},
+            { "name": "Peinture"},
+            { "name": "Rénovation"},
+            { "name": "Plomberie"},
+            { "name": "Maçonnerie"},
+            { "name": "Montage de Meubles"},
+            { "name": "Réparations"},
+            { "name": "Maçonnerie"},
+            { "name": "Vide Grenier"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Déménagement",
+        "categories": [
+            { "name": "Aide au déménagement"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Baby Sitting",
+        "categories": [
+            { "name": "Garde d'Enfant"},
+            { "name": "Accompagnement d'Enfant"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Animaux",
+        "categories": [
+            { "name": "Garde d'Animaux"},
+            { "name": "Toilettage d'Animaux"},
+            { "name": "Promenade d'Animaux"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Aide Ménagère",
+        "categories": [
+            { "name": "Ménage"},
+            { "name": "Repassage"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Soin & Beauté",
+        "categories": [
+            { "name": "Coiffure"},
+            { "name": "Massage"},
+            { "name": "Manucure"},
+            { "name": "Pédicure"},
+            { "name": "Épilation"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Véhicule",
+        "categories": [
+            { "name": "Lavage"},
+            { "name": "Réparation"},
+            { "name": "Vidange"},
+            { "name": "Carrosserie"},
+            { "name": "Co-voiturage"},
+            { "name": "Transport de Personnes"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Cours Particuliers",
+        "categories": [
+            { "name": "Langue Étrangère"},
+            { "name": "Français"},
+            { "name": "Histoire"},
+            { "name": "Géographie"},
+            { "name": "Mathématiques"},
+            { "name": "Physiques"},
+            { "name": "Musique"},
+            { "name": "Yoga"},
+            { "name": "Danse"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Administratif",
+        "categories": [
+            { "name": "Déclaration de Revenus"},
+            { "name": "Démarches Administratives"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Informatiques",
+        "categories": [
+            { "name": "Cours d'Informatique"},
+            { "name": "Installation de Logiciels"},
+            { "name": "Dépannage"},
+            { "name": "Création de Sites / Blogs"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Evenementiel",
+        "categories": [
+            { "name": "Animation Musicale"},
+            { "name": "DJ"},
+            { "name": "Création d'Evenements"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Coaching",
+        "categories": [
+            { "name": "Sport"},
+            { "name": "Nutrition"},
+            { "name": "Design & Décoration"},
+            { "name": "Cuisine"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Courses",
+        "categories": [
+            { "name": "Aide aux Courses"},
+            { "name": "Shopping"},
+            { "name": "Rangement Courses"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Cuisine",
+        "categories": [
+            { "name": "Cours"},
+            { "name": "Service"},
+            { "name": "Chef à Domicile"},
+            { "name": "Préparation de Repas"},
+            { "name": "Livraison de Repas"},
+            { "name": "Autres"}
+        ]
+    },
+    {
+        "name": "Dons"
+    },
+    {
+        "name": "Troc"
+    },
+    {
+        "name": "Autres"
+    }
+]}
