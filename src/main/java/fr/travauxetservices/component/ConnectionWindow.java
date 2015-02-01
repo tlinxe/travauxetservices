@@ -7,7 +7,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 
@@ -36,7 +36,7 @@ public class ConnectionWindow extends Window {
         content.addComponent(loginForm);
         content.setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
 
-//        Notification notification = new Notification("Welcome to Dashboard Demo");
+//        Notification notification = new Notification("Welcome to mytheme Demo");
 //        notification.setDescription("<span>This application is not real, it only demonstrates an application built with the <a href=\"https://vaadin.com\">Vaadin framework</a>.</span> <span>No username or password is required, just click the <b>Sign In</b> button to continue.</span>");
 //        notification.setHtmlContentAllowed(true);
 //        notification.setStyleName("tray dark small closable login-help");
@@ -49,7 +49,7 @@ public class ConnectionWindow extends Window {
         loginPanel.setSizeUndefined();
         loginPanel.setSpacing(true);
         Responsive.makeResponsive(loginPanel);
-        loginPanel.addStyleName("login-panel");
+        //loginPanel.addStyleName("login-panel");
 
         Component component = buildButtonFB();
         loginPanel.addComponent(component);
@@ -65,15 +65,15 @@ public class ConnectionWindow extends Window {
         fields.setSpacing(true);
         fields.addStyleName("fields");
 
-        final TextField username = new TextField(MyVaadinUI.I18N.getString("user.email"));
+        final TextField username = new TextField(AppUI.I18N.getString("user.email"));
         username.setIcon(FontAwesome.USER);
         username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
         username.setValue("tlinxe@email.fr");
 
-        final PasswordField password = new PasswordField(MyVaadinUI.I18N.getString("user.password"));
+        final PasswordField password = new PasswordField(AppUI.I18N.getString("user.password"));
         password.setIcon(FontAwesome.LOCK);
         password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        password.setValue("tlinxe");
+        password.setValue("motdepasse");
 
         final Button signin = new Button("Se connecter");
         signin.addStyleName(ValoTheme.BUTTON_PRIMARY);

@@ -1,0 +1,144 @@
+@import "../valo/valo";
+@import "common";
+@import "views/login";
+@import "views/mythemeview";
+@import "views/schedule";
+@import "views/sales";
+@import "views/transactions";
+@import "views/reports";
+
+// Optimize the CSS output
+$v-included-components: remove($v-included-components, accordion);
+$v-included-components: remove($v-included-components, colorpicker);
+$v-included-components: remove($v-included-components, grid);
+$v-included-components: remove($v-included-components, popupview);
+$v-included-components: remove($v-included-components, progressbar);
+$v-included-components: remove($v-included-components, slider);
+$v-included-components: remove($v-included-components, splitpanel);
+$v-included-components: remove($v-included-components, tree);
+$v-included-components: remove($v-included-components, treetable);
+$v-included-components: remove($v-included-components, twincolselect);
+
+// Main layout padding
+$view-padding: round($v-unit-size / 1.5) !default;
+
+// Slight adjustment to menu background-color
+$valo-menu-background-color: #414B56;
+
+@mixin mytheme {
+  @include valo;
+  @include mytheme-common;
+  @include mytheme-login-view;
+  @include mytheme-mytheme-view;
+  @include mytheme-schedule-view;
+  @include mytheme-sales-view;
+  @include mytheme-transactions-view;
+  @include mytheme-reports-view;
+
+  $color1: hsl(220, 5%, 38%);
+  $color2: #5d73c0;
+  $color3: #3dbc1a;
+  $color4: #d2f4f3;
+  $color5: #fe902a;
+  $colors: $color1, $color2, $color3, $color4, $color5;
+
+  .wrapperLayout {
+    padding: 1px 0 1px round($v-unit-size / 1.8);
+    background: transparent;
+  }
+
+  .v-filterselect-suggestpopup-hierarchical .gwt-MenuItem {
+    white-space: pre;
+  }
+
+  .v-menubar-color1 {
+    @include valo-menubar-style($background-color: $v-selection-color, $unit-size: null);
+  }
+
+  .v-panel-caption-color1 {
+    @include valo-panel-caption-style($background-color: $color1);
+  }
+
+  .v-panel-caption-color2 {
+    @include valo-panel-caption-style($background-color: $color3);
+  }
+
+  .v-panel-caption-color3 {
+    @include valo-panel-caption-style($background-color: $color5);
+  }
+
+  .v-button-color1 {
+    @include valo-panel-caption-style($background-color: $color1);
+  }
+
+  .v-button-color2 {
+    @include valo-panel-caption-style($background-color: $color2);
+  }
+
+  .v-button-color3 {
+    @include valo-panel-caption-style($background-color: $color3);
+  }
+
+  .v-button-color4 {
+    @include valo-panel-caption-style($background-color: $color4);
+  }
+
+  .v-button-color5 {
+    @include valo-panel-caption-style($background-color: $color5);
+  }
+
+  .v-formlayout [class*="margin-top"] > tbody > [class*="firstrow"] > td {
+    padding-top: 12px !important;
+  }
+
+  .v-formlayout [class*="margin-bottom"] > tbody > [class*="lastrow"] > td {
+    padding-bottom: 12px !important;
+  }
+
+  .v-link {
+    white-space: nowrap;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0;
+    width: 600px;
+    height: 39px; /* Height of the footer */
+  }
+
+  .dark {
+    background-color: #414B56;
+    color: #ecedee;
+    border-radius: 4px;
+    border: 1px solid #303739;
+    -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+    padding: 5px;
+  }
+
+  .notes {
+    border-top: valo-border($strength: 0.5);
+    padding: 20px 20px 0;
+    line-height: 20px;
+    font-size: 13px;
+    background: #fffdf2 url(img/notes-bg.png) repeat;
+    background-attachment: local;
+    color: #545145;
+    overflow: auto;
+  }
+
+  .dark:focus:after {
+    border: inherit;
+    -webkit-box-shadow: 0 0 3px 2px #197de1;
+    box-shadow: 0 0 3px 2px #197de1;
+  }
+
+  .dark .v-menubar-menuitem-checked {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-color: #197de1;
+    background-image: -webkit-linear-gradient(top, #1b87e3 2%, #166ed5 98%);
+    background-image: linear-gradient(to bottom, #1b87e3 2%, #166ed5 98%);
+    color: #eceded;
+  }
+}

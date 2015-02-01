@@ -1,6 +1,13 @@
 package fr.travauxetservices.views;
 
 import com.google.common.eventbus.Subscribe;
+import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.filter.JoinFilter;
+import com.vaadin.data.Container;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
@@ -11,18 +18,24 @@ import com.vaadin.server.Responsive;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
+import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
+import fr.travauxetservices.model.City;
+import fr.travauxetservices.model.Division;
 import fr.travauxetservices.model.Notice;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import fr.travauxetservices.model.Offer;
+import fr.travauxetservices.services.Geonames;
+import fr.travauxetservices.services.Location;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Phobos on 12/12/14.
@@ -30,9 +43,11 @@ import java.util.Iterator;
 @SuppressWarnings("serial")
 public final class HomeView extends Panel implements View {
     private NotificationsButton notificationsButton;
-    private CssLayout dashboardPanels;
+    private CssLayout mythemePanels;
     private final VerticalLayout root;
     private Window notificationsWindow;
+    private GoogleMap map;
+    private AdTable table;
 
     public HomeView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -42,14 +57,12 @@ public final class HomeView extends Panel implements View {
         root = new VerticalLayout();
         root.setSizeFull();
         root.setMargin(true);
-        root.addStyleName("dashboard-view");
+        root.addStyleName("mytheme-view");
         setContent(root);
         Responsive.makeResponsive(root);
 
         root.addComponent(buildHeader());
-
         root.addComponent(buildSparklines());
-
         Component content = buildContent();
         root.addComponent(content);
         root.setExpandRatio(content, 1);
@@ -62,6 +75,11 @@ public final class HomeView extends Panel implements View {
                 CustomEventBus.post(new CustomEvent.CloseOpenWindowsEvent());
             }
         });
+    }
+
+    public void attach() {
+        super.attach();
+        setPostion(Location.getLocation());
     }
 
     private Component buildSparklines() {
@@ -95,7 +113,7 @@ public final class HomeView extends Panel implements View {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label titleLabel = new Label(MyVaadinUI.I18N.getString("menu.welcome"));
+        Label titleLabel = new Label(AppUI.I18N.getString("menu.home"));
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -122,86 +140,126 @@ public final class HomeView extends Panel implements View {
     }
 
     private Component buildContent() {
-        dashboardPanels = new CssLayout();
-        dashboardPanels.addStyleName("dashboard-panels");
-        Responsive.makeResponsive(dashboardPanels);
+        mythemePanels = new CssLayout();
+        mythemePanels.addStyleName("mytheme-panels");
+        Responsive.makeResponsive(mythemePanels);
 
-        dashboardPanels.addComponent(buildGoogleMap());
-        dashboardPanels.addComponent(buildTable());
+        mythemePanels.addComponent(buildGoogleMap());
+        mythemePanels.addComponent(buildTable());
 
-        return dashboardPanels;
+        return mythemePanels;
     }
 
     private Component buildGoogleMap() {
-        final GoogleMap map = new GoogleMap(null, null, null);
+        map = new GoogleMap(null, null, null);
         map.setCenter(new LatLon(46.80, 1.70));
         map.setZoom(5);
         map.setSizeFull();
-        map.addMarker("France", new LatLon(46.80, 1.70), true, null);
         map.setMinZoom(4);
         map.setMaxZoom(16);
-
-        JavaScript.getCurrent().addFunction("onGeolocationFunction",
-                new JavaScriptFunction() {
-                    @Override
-                    public void call(JSONArray arguments) {
-                        if (arguments != null && arguments.length() > 0) {
-                            try {
-                                JSONObject position = arguments.getJSONObject(0);
-                                JSONObject coords = position.getJSONObject("coords");
-                                if (coords != null) {
-                                    double longitude = coords.getDouble("longitude");
-                                    double latitude = coords.getDouble("latitude");
-                                    LatLon point = new LatLon(latitude, longitude);
-                                    map.setCenter(point);
-                                    map.setZoom(11);
-                                    map.addMarker("Votre position actuelle", point, true, null);
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
-
-        JavaScript.getCurrent().execute("javascript:navigator.geolocation.getCurrentPosition(onGeolocationFunction)");
+        LatLon postion = Location.getLocation();
+        if (postion != null) {
+            map.setCenter(postion);
+            map.setZoom(11);
+        }
         return createContentWrapper(map);
     }
 
+    @Subscribe
+    public void currentPostionEvent(final CustomEvent.currentPostionEvent event) {
+        setPostion(event.getPostion());
+    }
+
+    public void setPostion(LatLon postion) {
+        if (postion != null) {
+            map.setCenter(postion);
+            map.setZoom(11);
+            String region = Geonames.getRegion(postion.getLat(), postion.getLon());
+            if (region != null) {
+                EntityItem<Division> item = AppUI.getDataProvider().getDivition(region);
+                applyFilters(item != null ? item.getEntity() : null);
+            }
+        }
+    }
+
+    public void applyFilters(Division division) {
+        JPAContainer container = getContainer();
+        container.removeAllContainerFilters();
+        container.addContainerFilter(new Compare.Equal("validated", true));
+        if (division != null) {
+            List<Container.Filter> filters = new ArrayList<Container.Filter>();
+            filters.add(new Compare.Equal("division", division));
+            filters.add(new JoinFilter("city", new Compare.Equal("region", division.getId())));
+            container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
+        }
+        else container.addContainerFilter(new Compare.Equal("division", null));
+        table.refreshRowCache();
+        table.firePagedChangedEvent();
+
+        int index = 1;
+        for (Object itemId : container.getItemIds()) {
+            EntityItem<Offer> item = container.getItem(itemId);
+            City city = item.getEntity().getCity();
+            if (city != null) {
+                double latitude = city.getLatitude();
+                double longitude = city.getLongitude();
+                if (latitude != 0 && longitude != 0) {
+                    GoogleMapMarker marker = new GoogleMapMarker(index + ". " + item.getEntity().getTitle(), new LatLon(latitude, longitude), false, null);
+                    if (!map.hasMarker(marker)) map.addMarker(marker);
+                }
+            }
+        }
+    }
 
     private Component buildTable() {
-        Table table = new AdTable(40);
-        table.setCaption("Top 20 des offres près de chez vous");
+        table = new AdTable(10, true);
+        table.setCaption("Top 10 des offres près de chez vous");
         table.addStyleName(ValoTheme.TABLE_BORDERLESS);
         table.addStyleName(ValoTheme.TABLE_NO_HORIZONTAL_LINES);
         table.addStyleName(ValoTheme.TABLE_COMPACT);
         table.addStyleName(ValoTheme.TABLE_SMALL);
 
-        //table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
+        table.setNullSelectionAllowed(true);
+        table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
         table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
         table.setSizeFull();
-        table.setContainerDataSource(MyVaadinUI.getDataProvider().getOfferContainer());
+        JPAContainer container = getContainer();
+        applyFilters(null);
+        table.setContainerDataSource(container);
 
-        table.setVisibleColumns("user", "title", "rate");
-        table.setColumnHeaders("User", "Title", "Rate");
-        //table.setColumnExpandRatio("title", 2);
-        table.setColumnExpandRatio("title", 2);
+        table.setVisibleColumns("user", "title", "division");
+        table.setColumnHeaders("User", "Title", "Division");
+        table.setColumnExpandRatio("title", 1);
 
-        return createContentWrapper(table);
+        table.addValueChangeListener(new Property.ValueChangeListener() {
+            public void valueChange(Property.ValueChangeEvent e) {
+                Object value = e.getProperty().getValue();
+                if (value != null)
+                    UI.getCurrent().getNavigator().navigateTo(ViewType.OFFER.getViewName() + "/" + value);
+            }
+        });
+
+        Component contentWrapper = createContentWrapper(table);
+        contentWrapper.addStyleName("top10-ad");
+        return contentWrapper;
+    }
+
+    private JPAContainer getContainer() {
+        return AppUI.getDataProvider().getOfferContainer();
     }
 
 
     private Component createContentWrapper(final Component content) {
         final CssLayout slot = new CssLayout();
         slot.setWidth("100%");
-        slot.addStyleName("dashboard-panel-slot");
+        slot.addStyleName("mytheme-panel-slot");
 
         CssLayout card = new CssLayout();
         card.setWidth("100%");
         card.addStyleName(ValoTheme.LAYOUT_CARD);
 
         HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.addStyleName("dashboard-panel-toolbar");
+        toolbar.addStyleName("mytheme-panel-toolbar");
         toolbar.setWidth("100%");
 
         Label caption = new Label(content.getCaption());
@@ -261,7 +319,7 @@ public final class HomeView extends Panel implements View {
         title.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         notificationsLayout.addComponent(title);
 
-        Collection<Notice> notices = MyVaadinUI.getDataProvider().getNotices();
+        Collection<Notice> notices = AppUI.getDataProvider().getNotices();
         CustomEventBus.post(new CustomEvent.NotificationsCountUpdatedEvent());
 
         for (Notice notice : notices) {
@@ -325,9 +383,9 @@ public final class HomeView extends Panel implements View {
         for (Iterator<Component> it = root.iterator(); it.hasNext(); ) {
             it.next().setVisible(!maximized);
         }
-        dashboardPanels.setVisible(true);
+        mythemePanels.setVisible(true);
 
-        for (Iterator<Component> it = dashboardPanels.iterator(); it.hasNext(); ) {
+        for (Iterator<Component> it = mythemePanels.iterator(); it.hasNext(); ) {
             Component c = it.next();
             c.setVisible(!maximized);
         }
@@ -348,7 +406,7 @@ public final class HomeView extends Panel implements View {
 
     public static final class NotificationsButton extends Button {
         private static final String STYLE_UNREAD = "unread";
-        public static final String ID = "dashboard-notifications";
+        public static final String ID = "mytheme-notifications";
 
         public NotificationsButton() {
             setIcon(FontAwesome.BELL);

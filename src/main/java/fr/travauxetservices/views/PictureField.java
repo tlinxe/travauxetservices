@@ -18,6 +18,7 @@ import fr.travauxetservices.tools.IOToolkit;
  */
 public class PictureField extends CustomField<byte[]> {
     private Image image;
+    private Button upload;
 
     public PictureField(String caption) {
         CustomEventBus.register(this);
@@ -32,7 +33,7 @@ public class PictureField extends CustomField<byte[]> {
         layout.setSizeUndefined();
         layout.setSpacing(true);
         layout.addComponent(image);
-        Button upload = new Button("Change…", new Button.ClickListener() {
+        upload = new Button("Change…", new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 PictureUploadWindow.open(getValue());
@@ -40,6 +41,7 @@ public class PictureField extends CustomField<byte[]> {
         });
         upload.addStyleName(ValoTheme.BUTTON_TINY);
         layout.addComponent(upload);
+        upload.setVisible(!isReadOnly());
         return layout;
     }
 
@@ -53,6 +55,11 @@ public class PictureField extends CustomField<byte[]> {
     public void setValue(byte[] newValue) throws ReadOnlyException, Converter.ConversionException {
         super.setValue(newValue);
         setImage(newValue);
+    }
+
+    public void setReadOnly(boolean b) {
+        super.setReadOnly(b);
+        if (upload != null) upload.setVisible(!b);
     }
 
     private void setImage(final byte[] bytes) {

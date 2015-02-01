@@ -14,12 +14,6 @@ import fr.travauxetservices.model.User;
 @SuppressWarnings("serial")
 public final class ValidationView extends Panel implements View {
     public ValidationView() {
-        final User user = getCurrentUser();
-        if (user == null) {
-            UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
-            return;
-        }
-
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         CustomEventBus.register(this);
@@ -42,6 +36,10 @@ public final class ValidationView extends Panel implements View {
 
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
-        //notificationsButton.updateNotificationsCount(null);
+        final User user = getCurrentUser();
+        if (user == null) {
+            UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
+            return;
+        }
     }
 }

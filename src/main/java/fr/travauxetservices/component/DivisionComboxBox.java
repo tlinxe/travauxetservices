@@ -1,8 +1,8 @@
 package fr.travauxetservices.component;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.AbstractSelect;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.Division;
 
 import java.util.Collection;
@@ -13,23 +13,26 @@ import java.util.Collection;
 public class DivisionComboxBox extends HierarchicalComboBox {
     public DivisionComboxBox(String caption) {
         super(caption);
-        BeanItemContainer<Division> divisionBeanItemContainer = new BeanItemContainer<Division>(Division.class);
-        Collection<Division> divisions = MyVaadinUI.getDataProvider().getDivisions();
-        for (Division element : divisions) {
+        setContainerDataSource(getContainer());
+        setItemCaptionMode(ItemCaptionMode.PROPERTY);
+        setItemCaptionPropertyId("name");
+    }
+
+    public Container getContainer() {
+        BeanItemContainer<Division> container = new BeanItemContainer<Division>(Division.class);
+        Collection<Division> collection = AppUI.getDataProvider().getDivisions();
+        for (Division element : collection) {
             if (element.getParent() != null)
                 continue;
-            divisionBeanItemContainer.addItem(element);
-            for (Division child : divisions) {
+            container.addItem(element);
+            for (Division child : collection) {
                 if (child.getParent() == null)
                     continue;
                 if (element.getId().equals(child.getParent().getId())) {
-                    divisionBeanItemContainer.addItem(child);
+                    container.addItem(child);
                 }
             }
         }
-        setContainerDataSource(divisionBeanItemContainer);
-        setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
-        //region.setContainerDataSource(MyVaadinUI.getDataProvider().getDivisionContainer());
-        setItemCaptionPropertyId("name");
+        return container;
     }
 }

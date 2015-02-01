@@ -2,7 +2,11 @@ package fr.travauxetservices.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by Phobos on 02/12/14.
@@ -12,47 +16,79 @@ import java.io.Serializable;
 @UniqueConstraint(columnNames = {"email"}))
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 255)
+    private UUID id;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date created;
+
     @NotNull
     private Role role;
-    @NotNull
+
     private Gender gender;
-    @NotNull
+
     @Column(length = 255)
     private String firstName;
+
     @NotNull
+    @Size(min=1, max=255)
     @Column(length = 255)
     private String lastName;
+
     @NotNull
+    @Size(min=1, max=255)
     @Column(length = 255)
     private String email;
+
     @NotNull
-    @Column(length = 255, name = "password")
+    @Size(min=6,max=16)
+    @Column(length = 16)
     private String password;
+
+    @Lob
     private byte[] picture;
 
-    public User() {
+    @Pattern(regexp="^((\\+|00)33\\s?|0)[1-9](\\s?\\d{2}){4}$")
+    String phone;
 
+    protected boolean professional;
+    boolean validated;
+
+    public User() {
+        id = UUID.randomUUID();
+        created = new Date(System.currentTimeMillis());
+        role = Role.CUSTOMER;
     }
 
-    public User(Role role, Gender gender, String firstName, String lastName, String email, String password, byte[] picture) {
-        super();
+    public User(UUID id, Date created, Role role, Gender gender, String firstName, String lastName, String email, String password, String phone, byte[] picture, boolean professional, boolean validated) {
+        this.id = id;
+        this.created = created;
         this.role = role;
         this.gender = gender;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.phone = phone;
         this.picture = picture;
+        this.professional = professional;
+        this.validated = validated;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     public Role getRole() {
@@ -103,6 +139,14 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(final String phone) {
+        this.phone = phone;
+    }
+
     public byte[] getPicture() {
         return picture;
     }
@@ -115,8 +159,42 @@ public class User implements Serializable {
         return role == Role.ADMIN;
     }
 
+    public boolean isProfessional() {
+        return professional;
+    }
+
+    public void setProfessional(boolean professional) {
+        this.professional = professional;
+    }
+
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean b) {
+        this.validated = b;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : super.hashCode();
+    }
+
     @Override
     public String toString() {
-        return gender.name() + " " + firstName + " " + lastName;
+        return email;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o != null) {
+            if (o instanceof User) {
+                return o.hashCode() == this.hashCode();
+            }
+        }
+        return false;
     }
 }

@@ -1,0 +1,7 @@
+// Import all the mixins for this theme
+@import "mytheme";
+
+.mytheme {
+  // Output the actual theme selectors
+  @include mytheme;
+}

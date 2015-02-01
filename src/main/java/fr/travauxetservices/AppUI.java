@@ -15,18 +15,41 @@ import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.views.MainView;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-@Theme("default")
+@Theme("mytheme")
 @PreserveOnRefresh
 @SuppressWarnings("serial")
-public class MyVaadinUI extends UI {
+public class AppUI extends UI {
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "fr.travauxetservices.AppWidgetSet")
+    @VaadinServletConfiguration(productionMode = false, ui = AppUI.class, widgetset = "fr.travauxetservices.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
+        private static class MySystemMessagesProvider implements SystemMessagesProvider {
+            @Override
+            public SystemMessages getSystemMessages(SystemMessagesInfo systemMessagesInfo) {
+                CustomizedSystemMessages messages = new CustomizedSystemMessages();
+                messages.setCommunicationErrorCaption("Problème de communication");
+                messages.setCommunicationErrorMessage("Prenez note de toutes les données non sauvegardées, et <u>Cliquez ici</ u> ou appuyez sur Echap pour continuer.");
+                messages.setSessionExpiredCaption("Session expirée");
+                messages.setSessionExpiredMessage("Prenez note de toutes les données non sauvegardées, et <u>Cliquez ici</u> ou appuyez sur Echap pour continuer.");
+                return messages;
+            }
+        }
+
+        @Override
+        public void servletInitialized() throws ServletException {
+            super.servletInitialized();
+            getService().addSessionInitListener(new AppSessionInitListener());
+            getService().addSessionInitListener(new SessionInitListener() {
+                public void sessionInit(SessionInitEvent event) throws ServiceException {
+                    event.getService().setSystemMessagesProvider(new MySystemMessagesProvider());
+                }
+            });
+        }
     }
 
     static {
@@ -44,6 +67,8 @@ public class MyVaadinUI extends UI {
     protected void init(VaadinRequest request) {
         getPage().setTitle(I18N.getString("title"));
         setLocale(Locale.FRANCE);
+
+        System.out.println("I18N " + I18N.getClass().getName());
 
         CustomEventBus.register(this);
         Responsive.makeResponsive(this);
@@ -97,10 +122,17 @@ public class MyVaadinUI extends UI {
      * @return An instance for accessing the (dummy) services layer.
      */
     public static DataProvider getDataProvider() {
-        return ((MyVaadinUI) getCurrent()).dataProvider;
+        return ((AppUI) getCurrent()).dataProvider;
     }
 
     public static CustomEventBus geEventbus() {
-        return ((MyVaadinUI) getCurrent()).eventBus;
+        return ((AppUI) getCurrent()).eventBus;
+    }
+
+    static public String getEncodedUrl() {
+        String host = Page.getCurrent().getLocation().getHost();
+        String path = Page.getCurrent().getLocation().getPath();
+        int port = Page.getCurrent().getLocation().getPort();
+        return "http://" + host + (port != 0 ? ":" + port : "");
     }
 }

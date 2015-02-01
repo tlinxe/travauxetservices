@@ -1,6 +1,6 @@
 package fr.travauxetservices.data;
 
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.*;
 import fr.travauxetservices.tools.IOToolkit;
 import org.json.simple.JSONArray;
@@ -12,17 +12,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Phobos on 13/12/14.
  */
 public class DummyDataGenerator {
     public synchronized static void create() {
-        EntityManager em = Persistence.createEntityManagerFactory(MyVaadinUI.PERSISTENCE_UNIT).createEntityManager();
+        EntityManager em = Persistence.createEntityManagerFactory(AppUI.PERSISTENCE_UNIT).createEntityManager();
         em.getTransaction().begin();
 
         List<Category> categories = getCategories();
@@ -54,28 +51,38 @@ public class DummyDataGenerator {
             }
         }
 
-        User c1 = new User(Role.ADMIN, Gender.MR, "Thierry", "Linxe", "tlinxe@email.fr", "tlinxe", image);
+        City c1 = new City(3031582, "Bordeaux", "97", "33", 44.84044, -0.5805);
         em.persist(c1);
-        User c2 = new User(Role.CUSTOMER, Gender.MR, "Prénom2", "Nom2", "pn2@email.fr", "mdp", null);
-        em.persist(c2);
-        User c3 = new User(Role.CUSTOMER, Gender.MR, "Prénom3", "Nom3", "pn3@email.fr", "mdp", null);
-        em.persist(c3);
 
-        Request r1 = new Request(new Date(System.currentTimeMillis()), c1, "Jardinage", "Recherche un jardinier pour tondre ma pelouse", categories.get(0), divisions.get(0), 0, Rate.EXCHANGE);
+        List<User> users = new ArrayList<User>(3);
+        User u1 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.ADMIN, Gender.MR, "Thierry", "Linxe", "tlinxe@email.fr", "motdepasse", "0614441385", image, true, true);
+        em.persist(u1);
+        users.add(u1);
+        User u2 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.CUSTOMER, Gender.MR, "Prénom2", "Nom2", "pn2@email.fr", "motdepasse", "0612335678", null, true, true);
+        em.persist(u2);
+        users.add(u2);
+        User u3 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.CUSTOMER, Gender.MR, "Prénom3", "Nom3", "pn3@email.fr", "motdepasse", "0542123695", null, false, true);
+        em.persist(u3);
+        users.add(u3);
+
+        Request r1 = new Request(UUID.randomUUID(), new Date(System.currentTimeMillis()), u1, "Jardinage", "Recherche un jardinier pour tondre ma pelouse", categories.get(0), divisions.get(0), c1, 0, Remuneration.EXCHANGE, true, 0);
         em.persist(r1);
-        Request r2 = new Request(new Date(System.currentTimeMillis()), c2, "Peinture", "Recherche un peintre", categories.get(1), divisions.get(3), (double) 30, Rate.TASK);
+        Request r2 = new Request(UUID.randomUUID(), new Date(System.currentTimeMillis()), u2, "Peinture", "Recherche un peintre", categories.get(1), divisions.get(0), c1, (double) 30.50, Remuneration.TASK, true, 0);
         em.persist(r2);
-        Request r3 = new Request(new Date(System.currentTimeMillis()), c3, "Garde", "Garde d'enfant pour un petit con agé de 11 ans qui me pourri la vie", categories.get(0), divisions.get(1), (double) 10, Rate.TIME);
+        Request r3 = new Request(UUID.randomUUID(), new Date(System.currentTimeMillis()), u3, "Garde", "Garde d'enfant pour un petit con agé de 11 ans qui me pourri la vie", categories.get(0), divisions.get(1), null, (double) 10, Remuneration.TIME, true, 0);
         em.persist(r3);
 
-        Offer o1 = new Offer(new Date(System.currentTimeMillis()), c1, "Jardinage", "Jardinier disponible tous les WE pour la tonte de votre pelouse de merde", categories.get(0), divisions.get(5), 0, Rate.TASK);
+        Random random = new Random();
+        String text = "Jarrdinier qualifié,je propose mes services pour l'entretien général des parcs et jardins sur le secteur Nord-Bassin.\n" +
+                "Tonte,rotofil,entretien des massifs,taille et rabattage de haie,petit élagage,débroussaillage,...etc.\n" +
+                "je me déplace avec matériel et assure l'évacuation en déchetterie.Travail soigné.\n" +
+                "Rémunération en CESU acceptée";
+        Offer o1 = new Offer(UUID.randomUUID(), new Date(System.currentTimeMillis()), users.get(random.nextInt(users.size() - 1)), "Offre " + 0, text, categories.get(random.nextInt(categories.size() - 1)), divisions.get(3), c1, 10.50, Remuneration.TIME, true, 5);
         em.persist(o1);
-        Offer o2 = new Offer(new Date(System.currentTimeMillis()), c2, "Peinture", "Offre tout travail de peinture et j'aime particulièrement repeindre les chiotes", categories.get(1), divisions.get(6), (double) 30, Rate.PART);
-        em.persist(o2);
-        Offer o3 = new Offer(new Date(System.currentTimeMillis()), c3, "Garde", "Je garde vos enfants, même les petits cons", categories.get(0), divisions.get(2), (double) 10, Rate.TIME);
-        em.persist(o3);
-        Offer o4 = new Offer(new Date(System.currentTimeMillis()), c3, "Electricité", "Tout travail d'électricité", categories.get(0), divisions.get(9), (double) 10, Rate.TIME);
-        em.persist(o4);
+        for (int i = 1; i < 100; i++) {
+            Offer o2 = new Offer(UUID.randomUUID(), new Date(System.currentTimeMillis()), users.get(random.nextInt(users.size() - 1)), "Offre " + i, text, categories.get(random.nextInt(categories.size() - 1)), divisions.get(random.nextInt(divisions.size() - 1)), null, 1000.50, Remuneration.TIME, true, 0);
+            em.persist(o2);
+        }
 
         em.getTransaction().commit();
     }

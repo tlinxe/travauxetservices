@@ -5,7 +5,7 @@ import com.vaadin.server.*;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
@@ -18,12 +18,10 @@ import fr.travauxetservices.views.ViewType;
 @SuppressWarnings("serial")
 public final class MainMenu extends CustomComponent {
 
-    public static final String ID = "dashboard-menu";
+    public static final String ID = "mytheme-menu";
     public static final String REQUESTS_BADGE_ID = "requests-badge";
     public static final String OFFERS_BADGE_ID = "offers-badge";
     private static final String STYLE_VISIBLE = "valo-menu-visible";
-    private Label offersBadge;
-    private Label requestsBadge;
     private MenuBar.MenuItem settingsItem;
 
     public MainMenu() {
@@ -31,8 +29,8 @@ public final class MainMenu extends CustomComponent {
         setId(ID);
         setSizeUndefined();
 
-        // There's only one DashboardMenu per UI so this doesn't need to be
-        // unregistered from the UI-scoped DashboardEventBus.
+        // There's only one mythemeMenu per UI so this doesn't need to be
+        // unregistered from the UI-scoped mythemeEventBus.
         CustomEventBus.register(this);
 
         setCompositionRoot(buildContent());
@@ -118,17 +116,6 @@ public final class MainMenu extends CustomComponent {
             }
 
             Component menuItemComponent = new ValoMenuItemButton(view);
-            if (view == ViewType.OFFER) {
-                offersBadge = new Label();
-                offersBadge.setId(OFFERS_BADGE_ID);
-                menuItemComponent = buildBadgeWrapper(menuItemComponent, offersBadge);
-            }
-            if (view == ViewType.REQUEST) {
-                requestsBadge = new Label();
-                requestsBadge.setId(REQUESTS_BADGE_ID);
-                menuItemComponent = buildBadgeWrapper(menuItemComponent, requestsBadge);
-            }
-
             menuItemsLayout.addComponent(menuItemComponent);
         }
 
@@ -137,22 +124,22 @@ public final class MainMenu extends CustomComponent {
     }
 
     private Component buildBadgeWrapper(final Component menuItemButton, final Component badgeLabel) {
-        CssLayout dashboardWrapper = new CssLayout(menuItemButton);
-        dashboardWrapper.addStyleName("badgewrapper");
-        dashboardWrapper.addStyleName(ValoTheme.MENU_ITEM);
-        dashboardWrapper.setWidth(100.0f, Unit.PERCENTAGE);
+        CssLayout mythemeWrapper = new CssLayout(menuItemButton);
+        mythemeWrapper.addStyleName("badgewrapper");
+        mythemeWrapper.addStyleName(ValoTheme.MENU_ITEM);
+        mythemeWrapper.setWidth(100.0f, Unit.PERCENTAGE);
         badgeLabel.addStyleName(ValoTheme.MENU_BADGE);
         badgeLabel.setWidthUndefined();
         badgeLabel.setVisible(false);
-        dashboardWrapper.addComponent(badgeLabel);
-        return dashboardWrapper;
+        mythemeWrapper.addComponent(badgeLabel);
+        return mythemeWrapper;
     }
 
     @Override
     public void attach() {
         super.attach();
-        updateOffersCount(null);
-        updateRequestsCount(null);
+//        updateOffersCount(null);
+//        updateRequestsCount(null);
     }
 
     @Subscribe
@@ -161,19 +148,6 @@ public final class MainMenu extends CustomComponent {
         getCompositionRoot().removeStyleName(STYLE_VISIBLE);
     }
 
-    @Subscribe
-    public void updateOffersCount(final CustomEvent.NotificationsCountUpdatedEvent event) {
-        int count = MyVaadinUI.getDataProvider().getOfferContainer().size();
-        offersBadge.setValue(String.valueOf(count));
-        offersBadge.setVisible(count > 0);
-    }
-
-    @Subscribe
-    public void updateRequestsCount(final CustomEvent.ReportsCountUpdatedEvent event) {
-        int count = MyVaadinUI.getDataProvider().getRequestContainer().size();
-        requestsBadge.setValue(String.valueOf(count));
-        requestsBadge.setVisible(count > 0);
-    }
 
     @Subscribe
     public void updateUserName(final CustomEvent.ProfileUpdatedEvent event) {
@@ -214,14 +188,13 @@ public final class MainMenu extends CustomComponent {
             this.view = view;
             setPrimaryStyleName("valo-menu-item");
             setIcon(view.getIcon());
-            setCaption(view.getViewName().substring(0, 1).toUpperCase()
-                    + view.getViewName().substring(1));
+            String caption = AppUI.I18N.getString("menu." + view.getViewName());
+            setCaption(caption.substring(0, 1).toUpperCase() + caption.substring(1));
             CustomEventBus.register(this);
             addClickListener(new ClickListener() {
                 @Override
                 public void buttonClick(final ClickEvent event) {
-                    UI.getCurrent().getNavigator()
-                            .navigateTo(view.getViewName());
+                    UI.getCurrent().getNavigator().navigateTo(view.getViewName());
                 }
             });
 

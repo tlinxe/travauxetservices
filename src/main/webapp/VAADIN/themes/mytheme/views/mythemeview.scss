@@ -1,6 +1,6 @@
-@mixin dashboard-dashboard-view {
+@mixin mytheme-mytheme-view {
 
-  .dashboard-view.dashboard-view {
+  .mytheme-view.mytheme-view {
     padding: $view-padding;
     overflow: visible;
 
@@ -50,7 +50,7 @@
       }
     }
 
-    .dashboard-panel-toolbar {
+    .mytheme-panel-toolbar {
       padding: 1px 0 1px round($v-unit-size / 1.8);
       height: $v-unit-size + 2px;
       position: absolute;
@@ -58,7 +58,7 @@
       left: 0;
     }
 
-    .dashboard-panels {
+    .mytheme-panels {
       display: block;
       height: 100%;
       margin: 0 round($view-padding / -3);
@@ -74,7 +74,7 @@
         }
       }
 
-      .top10-revenue {
+      .top10-ad {
         .card {
           padding-left: 0;
           padding-right: 0;
@@ -102,80 +102,36 @@
         }
       }
 
-      .dashboard-panel-slot {
+      .mytheme-panel-slot {
         padding: round($view-padding / 3);
         min-height: 220px;
       }
 
   	  &[width-range~="0-700px"] {
-  	    .dashboard-panel-slot {
+  	    .mytheme-panel-slot {
   	      width: 100% !important;
   	    }
   	  }
 
   	  &[width-range~="701px-"] {
-  	    .dashboard-panel-slot {
+  	    .mytheme-panel-slot {
   	      width: 50% !important;
   	    }
   	  }
 
       &[height-range~="0-440px"] {
-  	    .dashboard-panel-slot {
+  	    .mytheme-panel-slot {
   	      height: 100%;
   	    }
   	  }
 
   	  &[height-range~="441px-"] {
-  	    .dashboard-panel-slot {
+  	    .mytheme-panel-slot {
   	      height: 50%;
   	    }
   	  }
 
-      .dashboard-panel-slot.max {
-        width: 100% !important;
-        height: 100%;
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-      .dashboard-panel-center {
-        padding: round($view-padding / 3);
-        min-height: 220px;
-        width: 800px;
-      }
-
-      .dashboard-panel-wax {
-        padding: round($view-padding / 3);
-        min-height: 220px;
-        min-width: 600px;
-
-      }
-      /*
-      &[width-range~="0-700px"] {
-        .dashboard-panel-wax {
-          width: 100% !important;
-        }
-      }
-
-      &[width-range~="701px-"] {
-        .dashboard-panel-wax {
-          width: 50% !important;
-        }
-      }
-
-      &[height-range~="0-440px"] {
-        .dashboard-panel-wax {
-          height: 100%;
-        }
-      }
-
-      &[height-range~="441px-"] {
-        .dashboard-panel-wax {
-          height: 50%;
-        }
-      }
-      */
-
-      .dashboard-panel-wax.max {
+      .mytheme-panel-slot.max {
         width: 100% !important;
         height: 100%;
         padding-top: 0;
@@ -200,22 +156,9 @@
       }
     }
 
-    .v-table-cell-content-view {
-      height: 100px;
-    }
-
-    .border {
-      background: white;
-      color: #474747;
-      border-radius: 4px;
-      border: 1px solid #d5d5d5;
-      -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
-      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
-      overflow: visible !important;
-    }
   }
 
-  .dashboard-view {
+  .mytheme-view {
     @include width-range($max: 480px) {
       padding-left: round($view-padding / 2);
       padding-right: round($view-padding / 2);
@@ -298,4 +241,6 @@
       right: round($view-padding / 2);
     }
   }
+
+
 }

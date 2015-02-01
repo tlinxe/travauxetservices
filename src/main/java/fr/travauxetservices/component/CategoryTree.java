@@ -4,7 +4,7 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Tree;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.Category;
 
 /**
@@ -13,7 +13,7 @@ import fr.travauxetservices.model.Category;
 public class CategoryTree extends Tree {
     public CategoryTree(String caption) {
         super(caption);
-        JPAContainer<Category> container = MyVaadinUI.getDataProvider().getCategoryContainer();
+        JPAContainer<Category> container = AppUI.getDataProvider().getCategoryContainer();
         setItemCaptionMode(ItemCaptionMode.PROPERTY);
         setItemCaptionPropertyId("name");
         setContainerDataSource(container);
@@ -26,7 +26,7 @@ public class CategoryTree extends Tree {
     }
 
     public EntityItem<Category> getItem(Property<Category> property) {
-        JPAContainer<Category> container = MyVaadinUI.getDataProvider().getCategoryContainer();
+        JPAContainer<Category> container = AppUI.getDataProvider().getCategoryContainer();
         return container.getItem(property);
     }
 }

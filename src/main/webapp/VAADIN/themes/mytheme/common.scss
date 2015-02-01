@@ -4,55 +4,7 @@
   }
 }
 
-@mixin dashboard-common {
-  .v-filterselect-suggestpopup-hierarchical .gwt-MenuItem {
-    white-space: pre;
-  }
-
-  .v-link { white-space: nowrap; }
-
-  .footer {
-    position:absolute;
-    bottom:0;
-    width: 600px;
-    height:39px;   /* Height of the footer */
-  }
-
-  .dark {
-    background-color: #414B56;
-    color: #ecedee;
-    border-radius: 4px;
-    border: 1px solid #303739;
-    -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
-    padding: 5px;
-  }
-
-  .notes {
-      border-top: valo-border($strength: 0.5);
-      padding: 20px 20px 0;
-      line-height: 20px;
-      font-size: 13px;
-      background: #fffdf2 url(img/notes-bg.png) repeat;
-      background-attachment: local;
-      color: #545145;
-      overflow: auto;
-  }
-
-  .dark:focus:after {
-    border: inherit;
-    -webkit-box-shadow: 0 0 3px 2px #197de1;
-    box-shadow: 0 0 3px 2px #197de1;
-  }
-
-  .dark .v-menubar-menuitem-checked {
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    background-color: #197de1;
-    background-image: -webkit-linear-gradient(top, #1b87e3 2%, #166ed5 98%);
-    background-image: linear-gradient(to bottom, #1b87e3 2%, #166ed5 98%);
-    color: #eceded;
-  }
+@mixin mytheme-common {
 
   .valo-menu {
     border-right: none;
@@ -126,7 +78,7 @@
   }
 
   .valo-menu .valo-menu-badge,
-  .dashboard-view .notifications.unread .v-button-caption {
+  .mytheme-view .notifications.unread .v-button-caption {
     @include valo-badge-style;
     position: absolute;
     right: round($v-unit-size/3);
@@ -134,7 +86,7 @@
     pointer-events: none;
   }
 
-  .dashboard-view .notifications.unread .v-button-caption {
+  .mytheme-view .notifications.unread .v-button-caption {
     display: block;
     top: round($v-unit-size / -5);
     right: round($v-unit-size / -5);
@@ -258,7 +210,7 @@
   }
 
   .vaadin-chart {
-    transform: translateZ(0);
+  	transform: translateZ(0);
   }
 
   .viewheader {

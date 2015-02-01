@@ -8,6 +8,7 @@ import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.UI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
+import fr.travauxetservices.views.CustomView;
 import fr.travauxetservices.views.ViewType;
 import org.vaadin.googleanalytics.tracking.GoogleAnalyticsTracker;
 
@@ -60,7 +61,7 @@ public class CustomNavigator extends Navigator {
 
                 if (tracker != null) {
                     // The view change is submitted as a pageview for GA tracker
-                    tracker.trackPageview("/dashboard/" + event.getViewName());
+                    tracker.trackPageview("/" + event.getViewName());
                 }
             }
         });
@@ -74,21 +75,29 @@ public class CustomNavigator extends Navigator {
                 // This field caches an already initialized view instance if the
                 // view should be cached (stateful views).
                 private View cachedInstance;
+                private String viewAndParameters;
+
+                @Override
+                public String getViewName(String viewAndParameters) {
+                    this.viewAndParameters = viewAndParameters;
+                    return super.getViewName(viewAndParameters);
+                }
 
                 @Override
                 public View getView(final String viewName) {
                     View result = null;
                     if (viewType.getViewName().equals(viewName)) {
-                        if (viewType.isStateful()) {
+                        result = super.getView(viewType.getViewName());
+                        boolean stateFul = viewType.isStateful();
+                        if (result instanceof CustomView) {
+                            stateFul = ((CustomView)result).isStateful(viewAndParameters);
+                        }
+                        if (stateFul) {
                             // Stateful views get lazily instantiated
                             if (cachedInstance == null) {
-                                cachedInstance = super.getView(viewType.getViewName());
+                                cachedInstance = result;
                             }
                             result = cachedInstance;
-                        } else {
-                            // Non-stateful views get instantiated every time
-                            // they're navigated to
-                            result = super.getView(viewType.getViewName());
                         }
                     }
                     return result;

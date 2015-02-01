@@ -3,24 +3,24 @@ package fr.travauxetservices.views;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 
 /**
  * Created by Phobos on 12/12/14.
  */
 public enum ViewType {
-    HOME("menu.welcome", HomeView.class, FontAwesome.HOME, null, true, false, false, false),
-    OFFER("menu.offers", OfferView.class, FontAwesome.SHARE_SQUARE, null, false, false, false, false),
-    REQUEST("menu.requests", RequestView.class, FontAwesome.SHARE_SQUARE_O, null, false, false, false, false),
-    DEPOSI("menu.deposit", DepositView.class, FontAwesome.FILE_TEXT_O, null, true, false, false, false),
-    PROFILE("menu.profile", ProfileView.class, FontAwesome.USER, "submenu.my.account", false, false, true, false),
-    PREFERENCES("menu.preferences", PreferencesView.class, FontAwesome.COGS, null, false, false, true, false),
-    VALIDATION("menu.validation", ValidationView.class, FontAwesome.CHECK, "submenu.administration", false, true, false, false),
-    USER("menu.users", UserView.class, FontAwesome.USERS, null, false, true, false, false),
-    INFORMATION("menu.legal.information", InformationView.class, FontAwesome.INFO_CIRCLE, "submenu.abount", false, false, false, false),
-    ABOUT("menu.about", AboutView.class, FontAwesome.QUESTION, null, false, false, false, false),
-    RULES("menu.rules.broadcasts", RulesView.class, FontAwesome.THUMBS_UP, null, false, false, false, false),
-    TERMS("menu.terms", TermsView.class, FontAwesome.CHECK_CIRCLE_O, null, false, false, false, false);
+    HOME("home", HomeView.class, FontAwesome.HOME, null, true, false, false, false),
+    OFFER("offers", OfferView.class, FontAwesome.SHARE_SQUARE, null, true, false, false, false),
+    REQUEST("requests", RequestView.class, FontAwesome.SHARE_SQUARE_O, null, true, false, false, false),
+    DEPOSI("deposit", DepositView.class, FontAwesome.FILE_TEXT_O, null, true, false, false, false),
+    PROFILE("profile", ProfileView.class, FontAwesome.USER, "submenu.my.account", true, false, true, false),
+    PREFERENCES("preferences", PreferencesView.class, FontAwesome.COGS, null, true, false, true, false),
+    VALIDATION("validation", ValidationView.class, FontAwesome.CHECK, "submenu.administration", true, true, false, false),
+    USER("users", UserView.class, FontAwesome.USERS, null, true, true, false, false),
+    INFORMATION("information", InformationView.class, FontAwesome.INFO_CIRCLE, "submenu.abount", false, false, false, false),
+    ABOUT("about", AboutView.class, FontAwesome.QUESTION, null, false, false, false, false),
+    RULES("rules", RulesView.class, FontAwesome.THUMBS_UP, null, false, false, false, false),
+    TERMS("terms", TermsView.class, FontAwesome.CHECK_CIRCLE_O, null, false, false, false, false);
 
 
     private final String viewName;
@@ -60,11 +60,11 @@ public enum ViewType {
     }
 
     public String getViewName() {
-        return MyVaadinUI.I18N.getString(viewName);
+        return viewName;
     }
 
     public String getSubmenu() {
-        return submenu != null ? MyVaadinUI.I18N.getString(submenu) : null;
+        return submenu != null ? AppUI.I18N.getString(submenu) : null;
     }
 
     public Class<? extends View> getViewClass() {

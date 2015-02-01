@@ -4,9 +4,10 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.data.util.filter.Compare;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.*;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -22,68 +23,97 @@ public class DummyDataProvider implements DataProvider {
     private JPAContainer<User> users;
 
     public DummyDataProvider() {
-        categories = JPAContainerFactory.make(Category.class, MyVaadinUI.PERSISTENCE_UNIT);
+        categories = JPAContainerFactory.make(Category.class, AppUI.PERSISTENCE_UNIT);
         categories.sort(new String[]{"name"}, new boolean[]{true});
         categories.setParentProperty("parent");
 
-        divisions = JPAContainerFactory.make(Division.class, MyVaadinUI.PERSISTENCE_UNIT);
+        divisions = JPAContainerFactory.make(Division.class, AppUI.PERSISTENCE_UNIT);
         divisions.sort(new String[]{"name"}, new boolean[]{true});
         divisions.setParentProperty("parent");
 
-        requests = JPAContainerFactory.make(Request.class, MyVaadinUI.PERSISTENCE_UNIT);
-        offers = JPAContainerFactory.make(Offer.class, MyVaadinUI.PERSISTENCE_UNIT);
-        users = JPAContainerFactory.make(User.class, MyVaadinUI.PERSISTENCE_UNIT);
+        requests = JPAContainerFactory.make(Request.class, AppUI.PERSISTENCE_UNIT);
+        requests.sort(new String[]{"created"}, new boolean[]{true});
+
+        offers = JPAContainerFactory.make(Offer.class, AppUI.PERSISTENCE_UNIT);
+        offers.sort(new String[]{"created"}, new boolean[]{true});
+
+        users = JPAContainerFactory.make(User.class, AppUI.PERSISTENCE_UNIT);
     }
 
     @Override
     public JPAContainer<Request> getRequestContainer() {
+        requests.removeAllContainerFilters();
         return requests;
     }
 
     public EntityItem<Request> getRequest(Object itemId) {
-        return requests.getItem(itemId);
+        return getRequestContainer().getItem(itemId);
     }
 
     @Override
     public Collection<Request> getRequests() {
         Collection<Request> values = new ArrayList<Request>();
-        for (Object itemId : requests.getItemIds()) {
-            EntityItem<Request> item = requests.getItem(itemId);
+        for (Object itemId : getRequestContainer().getItemIds()) {
+            EntityItem<Request> item = getRequestContainer().getItem(itemId);
             values.add(item.getEntity());
         }
         return values;
     }
 
+    public void addRequest(Ad a) throws UnsupportedOperationException {
+        getRequestContainer().addEntity(new Request(a));
+    }
+
     @Override
     public JPAContainer<Offer> getOfferContainer() {
+        offers.removeAllContainerFilters();
         return offers;
     }
 
     public EntityItem<Offer> getOffer(Object itemId) {
-        return offers.getItem(itemId);
+        return getOfferContainer().getItem(itemId);
     }
 
     @Override
     public Collection<Offer> getOffers() {
         Collection<Offer> values = new ArrayList<Offer>();
-        for (Object itemId : offers.getItemIds()) {
-            EntityItem<Offer> item = offers.getItem(itemId);
+        for (Object itemId : getOfferContainer().getItemIds()) {
+            EntityItem<Offer> item = getOfferContainer().getItem(itemId);
             values.add(item.getEntity());
         }
         return values;
     }
 
+    public void addOffer(Ad a) throws UnsupportedOperationException {
+        getOfferContainer().addEntity(new Offer(a));
+    }
+
     @Override
     public JPAContainer<Category> getCategoryContainer() {
+        categories.removeAllContainerFilters();
         return categories;
     }
 
     @Override
     public Collection<Category> getCategories() {
         Collection<Category> values = new ArrayList<Category>();
-        for (Object itemId : categories.getItemIds()) {
-            EntityItem<Category> item = categories.getItem(itemId);
+        for (Object itemId : getCategoryContainer().getItemIds()) {
+            EntityItem<Category> item = getCategoryContainer().getItem(itemId);
             values.add(item.getEntity());
+        }
+        return values;
+    }
+
+    @Override
+    public Collection<Category> getChildren(Category c) {
+        Collection<Category> values = new ArrayList<Category>();
+        if (c != null) {
+            Collection<Category> categories = getCategories();
+            for (Category category : categories) {
+                if (c.equals(category.getParent())) {
+                    values.add(category);
+                }
+            }
         }
         return values;
     }
@@ -95,54 +125,83 @@ public class DummyDataProvider implements DataProvider {
 
     @Override
     public JPAContainer<Division> getDivisionContainer() {
+        divisions.removeAllContainerFilters();
         return divisions;
+    }
+
+    @Override
+    public EntityItem<Division> getDivition(Object itemId){
+        return getDivisionContainer().getItem(itemId);
     }
 
     @Override
     public Collection<Division> getDivisions() {
         Collection<Division> values = new ArrayList<Division>();
-        for (Object itemId : divisions.getItemIds()) {
-            EntityItem<Division> item = divisions.getItem(itemId);
+        for (Object itemId : getDivisionContainer().getItemIds()) {
+            EntityItem<Division> item = getDivisionContainer().getItem(itemId);
             values.add(item.getEntity());
+        }
+        return values;
+    }
+
+    @Override
+    public Collection<Division> getChildren(Division c) {
+        Collection<Division> values = new ArrayList<Division>();
+        if (c != null) {
+            Collection<Division> divisions = getDivisions();
+            for (Division division : divisions) {
+                if (c.equals(division.getParent())) {
+                    values.add(division);
+                }
+            }
         }
         return values;
     }
 
     @Override
     public JPAContainer<User> getUserContainer() {
+        users.removeAllContainerFilters();
         return users;
     }
 
     @Override
     public Collection<User> getUsers() {
         Collection<User> values = new ArrayList<User>();
-        for (Object itemId : users.getItemIds()) {
-            EntityItem<User> item = users.getItem(itemId);
+        for (Object itemId : getUserContainer().getItemIds()) {
+            EntityItem<User> item = getUserContainer().getItem(itemId);
             values.add(item.getEntity());
         }
         return values;
     }
 
     public EntityItem<User> getUser(final User user) {
-        return users.getItem(user.getId());
+        return getUserContainer().getItem(user.getId());
+    }
+
+    public EntityItem<User> getUser(final Object itemId) {
+        return getUserContainer().getItem(itemId);
     }
 
     public void setUser(final User user) {
-        EntityItem<User> item = users.getItem(user.getId());
+        EntityItem<User> item = getUserContainer().getItem(user.getId());
         if (item != null) {
-            users.refreshItem(user.getId());
+            getUserContainer().refreshItem(user.getId());
             item.commit();
-            System.out.println("DummyDataProvider.updateUserName user: " + user + " picture: " + item.getEntity().getPicture());
         }
 
     }
 
+    public void addUser(User u) throws UnsupportedOperationException {
+        getUserContainer().addEntity(u);
+    }
+
     @Override
     public User authenticate(String email, String password) {
-        users.removeAllContainerFilters();
-        users.addContainerFilter(new Compare.Equal("email", email));
-        users.addContainerFilter(new Compare.Equal("password", password));
-        users.applyFilters();
-        return users.size() > 0 ? users.getItem(users.firstItemId()).getEntity() : null;
+        JPAContainer<User> container = getUserContainer();
+        container.addContainerFilter(new Compare.Equal("email", email));
+        container.addContainerFilter(new Compare.Equal("password", password));
+        Object user = container.firstItemId();
+        container.removeAllContainerFilters();
+        return user != null ? container.getItem(user).getEntity() : null;
     }
 }

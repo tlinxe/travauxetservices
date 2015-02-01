@@ -1,10 +1,11 @@
 package fr.travauxetservices.event;
 
+import com.vaadin.tapio.googlemaps.client.LatLon;
 import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.views.ViewType;
 
 /*
- * Event bus events used in Dashboard are listed here as inner classes.
+ * Event bus events used in mytheme are listed here as inner classes.
  */
 public abstract class CustomEvent {
 
@@ -36,18 +37,18 @@ public abstract class CustomEvent {
     public static class NotificationsCountUpdatedEvent {
     }
 
-    public static final class ReportsCountUpdatedEvent {
-        private final int count;
+    public static final class currentPostionEvent {
+        private final LatLon position;
 
-        public ReportsCountUpdatedEvent(final int count) {
-            this.count = count;
+        public currentPostionEvent(final LatLon postion) {
+            this.position = postion;
         }
 
-        public int getCount() {
-            return count;
+        public LatLon getPostion() {
+            return position;
         }
-
     }
+
 
     public static final class PostViewChangeEvent {
         private final ViewType view;

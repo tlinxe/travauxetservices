@@ -12,9 +12,11 @@ public class Division implements Serializable {
     @Id
     @Column(length = 3)
     private String id;
+
     @NotNull
     @Column(length = 255)
     private String name;
+
     @ManyToOne
     @OrderBy("name")
     private Division parent;
@@ -58,7 +60,25 @@ public class Division implements Serializable {
 
 
     @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : super.hashCode();
+    }
+
+    @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o != null) {
+            if (o instanceof Division) {
+                return o.hashCode() == this.hashCode();
+            }
+        }
+        return false;
     }
 }

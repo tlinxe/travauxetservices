@@ -2,144 +2,73 @@ package fr.travauxetservices.views;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.fieldfactory.FieldFactory;
-import com.vaadin.data.Item;
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.navigator.View;
+import com.vaadin.data.Validator;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Like;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Responsive;
+import com.vaadin.server.*;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.*;
 import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.Ad;
-import fr.travauxetservices.model.Category;
-import fr.travauxetservices.model.Division;
+import fr.travauxetservices.model.*;
+import fr.travauxetservices.tools.IOToolkit;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Phobos on 12/12/14.
  */
 @SuppressWarnings("serial")
-public abstract class AdView extends Panel implements View {
-    private String titleLabel;
-    private CssLayout dashboardPanels;
+public abstract class AdView extends Panel implements CustomView {
+    private String viewName;
+    private PagedTable table;
 
-    private Table table;
+    private TextField keynwordField;
+    private ComboBox categoryField;
+    private ComboBox divisionField;
+    private ComboBox cityField;
 
-    public AdView(String titleLabel) {
-        this.titleLabel = titleLabel;
+    public AdView(String viewName) {
+        this.viewName = viewName;
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         CustomEventBus.register(this);
 
-        // All the open sub-windows should be closed whenever the root layout
-        // gets clicked.
-//        root.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
-//            @Override
-//            public void layoutClick(final LayoutEvents.LayoutClickEvent event) {
-//                CustomEventBus.post(new CustomEvent.CloseOpenWindowsEvent());
-//            }
-//        });
-    }
-
-    private Layout buildDetailLayout(EntityItem item) {
         VerticalLayout root = new VerticalLayout();
-        root.setSizeFull();
+        root.addStyleName("mytheme-view");
+        //root.setSizeFull();
         root.setMargin(true);
-        root.addStyleName("dashboard-view");
         root.addComponent(buildHeader());
-
-//        AdFormLayout form = new AdFormLayout();
-//        form.getFieldGroup().setReadOnly(true);
-//        form.getFieldGroup().setItemDataSource((Ad)item.getEntity());
-        Form form = new AdFormFactory(item);
-        form.setReadOnly(true);
-        root.addComponent(form);
-        root.setExpandRatio(form, 1);
-
-        return root;
-    }
-
-    private Layout buildListLayout() {
-        VerticalLayout root = new VerticalLayout();
-        root.setSizeFull();
-        root.setMargin(true);
-        root.addStyleName("dashboard-view");
-        root.addComponent(buildHeader());
-
-        Component component = buildSearchLayout();
-        root.addComponent(component);
-
-        Component content = buildContent();
-        root.addComponent(content);
-        root.setExpandRatio(content, 1);
-
+        root.addComponent(buildSearchLayout());
+        root.addComponent(buildTable());
+        setContent(root);
         Responsive.makeResponsive(root);
-
-        return root;
     }
+
+    protected abstract String getTitleLabel();
+
 
     public abstract JPAContainer getContainer();
 
 
-    public abstract EntityItem getItem(String parameters);
+    public abstract EntityItem<Ad> getItem(String parameters);
 
-
-    private Component buildSearchLayout() {
-        GridLayout layout = new GridLayout(4, 2);
-        //HorizontalLayout layout = new HorizontalLayout();
-        layout.addStyleName("dark");
-        //layout.setMargin(true);
-        layout.setSpacing(true);
-
-        TextField keynword = new TextField();
-        keynword.addStyleName(ValoTheme.TEXTFIELD_TINY);
-        keynword.setWidth("250px");
-        keynword.setInputPrompt(MyVaadinUI.I18N.getString("input.keyword.optional"));
-        layout.addComponent(keynword, 0, 0);
-
-        HierarchicalComboBox category = new CategoryComboxBox(null);
-        category.setInputPrompt(MyVaadinUI.I18N.getString("input.categories"));
-        category.setPageLength(20);
-        category.setScrollToSelectedItem(true);
-        category.addStyleName(ValoTheme.COMBOBOX_TINY);
-                category.setImmediate(true);
-        layout.addComponent(category, 1, 0);
-
-        ComboBox division = new DivisionComboxBox(null);
-        division.setInputPrompt(MyVaadinUI.I18N.getString("input.regions"));
-        division.setPageLength(20);
-        division.setScrollToSelectedItem(true);
-        division.addStyleName(ValoTheme.COMBOBOX_TINY);
-        division.setImmediate(true);
-        layout.addComponent(division, 2, 0);
-
-        final ComboBox city = new CityComboBox(null);
-        city.setInputPrompt(MyVaadinUI.I18N.getString("input.city"));
-        //city.setPageLength(0);
-        city.addStyleName(ValoTheme.TEXTFIELD_TINY);
-        layout.addComponent(city, 2, 1);
-
-        Button search = new Button(MyVaadinUI.I18N.getString("button.search"), FontAwesome.SEARCH);
-        search.addStyleName(ValoTheme.BUTTON_TINY);
-        search.addStyleName(ValoTheme.BUTTON_DANGER);
-        layout.addComponent(search, 3, 0);
-
-        return layout;
-    }
 
     private Component buildHeader() {
         HorizontalLayout header = new HorizontalLayout();
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label label = new Label(titleLabel);
+        Label label = new Label(getTitleLabel());
         label.setSizeUndefined();
         label.addStyleName(ValoTheme.LABEL_H1);
         label.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -148,109 +77,174 @@ public abstract class AdView extends Panel implements View {
         return header;
     }
 
-    private Component buildContent() {
-        dashboardPanels = new CssLayout();
-        dashboardPanels.addStyleName("dashboard-panels");
-        Responsive.makeResponsive(dashboardPanels);
+    private Component buildSearchLayout() {
+        GridLayout layout = new GridLayout(4, 2);
+        layout.addStyleName("dark");
+        layout.setWidth(800, Unit.PIXELS);
+        layout.setSpacing(true);
 
-        dashboardPanels.addComponent(buildTable());
+        keynwordField = new TextField();
+        keynwordField.addStyleName(ValoTheme.TEXTFIELD_TINY);
+        keynwordField.setWidth("250px");
+        keynwordField.setInputPrompt(AppUI.I18N.getString("input.keyword.optional"));
+        layout.addComponent(keynwordField, 0, 0);
 
-        return dashboardPanels;
+        categoryField = new CategoryComboxBox(null);
+        categoryField.setInputPrompt(AppUI.I18N.getString("input.categories"));
+        categoryField.setPageLength(20);
+        categoryField.setScrollToSelectedItem(true);
+        categoryField.addStyleName(ValoTheme.COMBOBOX_TINY);
+        categoryField.setImmediate(true);
+        layout.addComponent(categoryField, 1, 0);
+
+        divisionField = new DivisionComboxBox(null);
+        divisionField.setInputPrompt(AppUI.I18N.getString("input.division"));
+        divisionField.setPageLength(20);
+        divisionField.setScrollToSelectedItem(true);
+        divisionField.addStyleName(ValoTheme.COMBOBOX_TINY);
+        divisionField.setImmediate(true);
+        layout.addComponent(divisionField, 2, 0);
+
+        cityField = new CityComboBox(null);
+        cityField.setInputPrompt(AppUI.I18N.getString("input.city"));
+        //cityField.setPageLength(0);
+        cityField.addStyleName(ValoTheme.TEXTFIELD_TINY);
+        layout.addComponent(cityField, 2, 1);
+
+        Button search = new Button(AppUI.I18N.getString("button.search"), FontAwesome.SEARCH);
+        search.addStyleName(ValoTheme.BUTTON_TINY);
+        search.addStyleName(ValoTheme.BUTTON_DANGER);
+        search.addClickListener(new Button.ClickListener() {
+            public void buttonClick(Button.ClickEvent event) {
+                applyFilters();
+            }
+        });
+        layout.addComponent(search, 3, 0);
+
+        return layout;
+    }
+
+    private void applyFilters() {
+        JPAContainer container = getContainer();
+        container.removeAllContainerFilters();
+        container.addContainerFilter(new Compare.Equal("validated", true));
+
+        if (keynwordField.getValue() != null && keynwordField.getValue().trim().length() > 0) {
+            container.addContainerFilter(
+                    new Or(new Like("title", "%" + keynwordField.getValue() + "%", false),
+                            new Like("description", "%" + keynwordField.getValue() + "%", false))
+            );
+        }
+        Category category = (Category)categoryField.getValue();
+        if (category != null) {
+            Collection<Category> children =  AppUI.getDataProvider().getChildren(category);
+            if (children.size() > 0) {
+                List<Container.Filter> filters = new ArrayList<Container.Filter>();
+                filters.add(new Compare.Equal("category", category));
+                for(Category child : children){
+                    filters.add(new Compare.Equal("category", child));
+                }
+                container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
+            }
+            else container.addContainerFilter(new Compare.Equal("category", category));
+        }
+        Division division = (Division)divisionField.getValue();
+        if (division != null) {
+            Collection<Division> children =  AppUI.getDataProvider().getChildren(division);
+            if (children.size() > 0) {
+                List<Container.Filter> filters = new ArrayList<Container.Filter>();
+                filters.add(new Compare.Equal("division", division));
+                for(Division child : children){
+                    filters.add(new Compare.Equal("division", child));
+                }
+                container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
+            }
+            else container.addContainerFilter(new Compare.Equal("division", division));
+        }
+        if (cityField.getValue() != null) {
+            container.addContainerFilter(new Compare.Equal("city", cityField.getValue()));
+        }
+
+        table.refreshRowCache();
+        table.setCurrentPage(1);
+        table.firePagedChangedEvent();
     }
 
     private Component buildTable() {
-        JPAContainer container = getContainer();
-
-        table = new AdTable(60);
-        table.setCaption(container.size() + " " + titleLabel);
-        table.addStyleName(ValoTheme.TABLE_BORDERLESS);
+        table = new AdTable(10, false);
+        //table.addStyleName(ValoTheme.TABLE_BORDERLESS);
         table.addStyleName(ValoTheme.TABLE_NO_HORIZONTAL_LINES);
         table.addStyleName(ValoTheme.TABLE_COMPACT);
         table.addStyleName(ValoTheme.TABLE_SMALL);
-        //table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
-        //table.setWidth("100%");
-        table.setSizeFull();
+        table.setWidth(100, Unit.PERCENTAGE);
+        table.setAlwaysRecalculateColumnWidths(false);
+        table.setNullSelectionAllowed(true);
         table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
         table.setColumnWidth("user", 65);
+
+        JPAContainer container = getContainer();
+        applyFilters();
         table.setContainerDataSource(container);
+
         table.setCellStyleGenerator(new Table.CellStyleGenerator() {
             public String getStyle(Table source, Object itemId, Object propertyId) {
                 return "view";
             }
         });
-
-        table.setVisibleColumns("user", "title", "rate", "created");
-        table.setColumnHeaders("User", "Title", "Rate", "Created");
-        table.setColumnExpandRatio("title", 2);
-
-        return createContentWrapper(table);
-    }
-
-    public Table getTable() {
-        return table;
-    }
-
-    private Component createContentWrapper(final Component content) {
-        CssLayout card = new CssLayout();
-        card.setWidth(800, Unit.PIXELS);
-        card.addStyleName(ValoTheme.LAYOUT_CARD);
-
-        HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.addStyleName("dashboard-panel-toolbar");
-        toolbar.setWidth("100%");
-
-        Label caption = new Label(content.getCaption());
-        caption.addStyleName(ValoTheme.LABEL_H4);
-        caption.addStyleName(ValoTheme.LABEL_COLORED);
-        caption.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        content.setCaption(null);
-
-        MenuBar tools = new MenuBar();
-        tools.addStyleName(ValoTheme.MENUBAR_BORDERLESS);
-        MenuBar.MenuItem root = tools.addItem("", FontAwesome.SORT, null);
-        root.addItem("Configure", new MenuBar.Command() {
-            @Override
-            public void menuSelected(final MenuBar.MenuItem selectedItem) {
-                Notification.show("Not implemented in this demo");
+        table.addValueChangeListener(new Property.ValueChangeListener() {
+            public void valueChange(Property.ValueChangeEvent e) {
+                Object value = e.getProperty().getValue();
+                if (value != null) UI.getCurrent().getNavigator().navigateTo(viewName + "/" + value);
             }
         });
-        root.addSeparator();
-        root.addItem("Close", new MenuBar.Command() {
+
+        table.setVisibleColumns("user", "division", "title", "created");
+        table.setColumnHeaders("User", "Division", "Title", "Created");
+        //table.setColumnExpandRatio("title", 2);
+
+        final WrapperLayout wrapperLayout = new WrapperLayout(null, table);
+        final HorizontalLayout controlLayout = table.createControls();
+        wrapperLayout.addComponent(controlLayout);
+        MenuBar.MenuItem root = wrapperLayout.addItem("", FontAwesome.SORT, null);
+        root.addItem("Tri", new MenuBar.Command() {
             @Override
             public void menuSelected(final MenuBar.MenuItem selectedItem) {
                 Notification.show("Not implemented in this demo");
             }
         });
 
-        toolbar.addComponents(caption, tools);
-        toolbar.setExpandRatio(caption, 1);
-        toolbar.setComponentAlignment(caption, Alignment.MIDDLE_LEFT);
-
-        card.addComponents(toolbar, content);
-        return card;
+        table.addListener(new PagedTable.PageChangeListener() {
+            public void pageChanged(PagedTable.PagedTableChangeEvent event) {
+                PagedTableContainer container = (PagedTableContainer)event.getTable().getContainerDataSource();
+                int realSize = container.getRealSize();
+                wrapperLayout.setCaption(realSize + " " + getTitleLabel());
+                if (realSize < 10)  {
+                    table.setPageLength(realSize);
+                    controlLayout.setVisible(false);
+                }
+                else {
+                    table.setPageLength(10);
+                    controlLayout.setVisible(true);
+                }
+            }
+        });
+        return wrapperLayout;
     }
 
 
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
         String parameters = event.getParameters();
-        EntityItem item = null;
+        EntityItem<Ad> item = null;
         Layout layout;
         if (!parameters.isEmpty()) {
             item = getItem(parameters);
+//            System.out.println("AdView.enter parameter: "+parameters + " item: "+item);
         }
-
         if (item != null) {
-            layout = buildDetailLayout(item);
-        } else {
-            layout = buildListLayout();
-            // Handle selection change.
-            getTable().addValueChangeListener(new Property.ValueChangeListener() {
-                public void valueChange(Property.ValueChangeEvent e) {
-                    UI.getCurrent().getNavigator().navigateTo(event.getViewName() + "/" + getTable().getValue());
-                }
-            });
+            layout = new AdLayout(item, getTitleLabel());
+            setContent(layout);
         }
-        setContent(layout);
+        else applyFilters();
     }
 }

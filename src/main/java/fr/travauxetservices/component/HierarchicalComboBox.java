@@ -1,8 +1,10 @@
 package fr.travauxetservices.component;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.ComboBox;
 
 import java.lang.reflect.Method;
@@ -14,6 +16,11 @@ import java.lang.reflect.Method;
 public class HierarchicalComboBox extends ComboBox {
     public HierarchicalComboBox(String caption) {
         super(caption);
+        addStyleName("hierarchical");
+    }
+
+    public HierarchicalComboBox(String caption, Container container) {
+        super(caption, container);
         addStyleName("hierarchical");
     }
 

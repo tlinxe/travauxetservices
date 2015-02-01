@@ -1,8 +1,8 @@
 package fr.travauxetservices.component;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.AbstractSelect;
-import fr.travauxetservices.MyVaadinUI;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.Category;
 
 import java.util.Collection;
@@ -13,23 +13,26 @@ import java.util.Collection;
 public class CategoryComboxBox extends HierarchicalComboBox {
     public CategoryComboxBox(String caption) {
         super(caption);
-        BeanItemContainer<Category> categoryBeanItemContainer = new BeanItemContainer<Category>(Category.class);
-        Collection<Category> categories = MyVaadinUI.getDataProvider().getCategories();
-        for (Category element : categories) {
+        setContainerDataSource(getContainer());
+        setItemCaptionMode(ItemCaptionMode.PROPERTY);
+        setItemCaptionPropertyId("name");
+    }
+
+    public Container getContainer() {
+        BeanItemContainer<Category> container = new BeanItemContainer<Category>(Category.class);
+        Collection<Category> collection = AppUI.getDataProvider().getCategories();
+        for (Category element : collection) {
             if (element.getParent() != null)
                 continue;
-            categoryBeanItemContainer.addItem(element);
-            for (Category child : categories) {
+            container.addItem(element);
+            for (Category child : collection) {
                 if (child.getParent() == null)
                     continue;
                 if (element.getId().equals(child.getParent().getId())) {
-                    categoryBeanItemContainer.addItem(child);
+                    container.addItem(child);
                 }
             }
         }
-        setContainerDataSource(categoryBeanItemContainer);
-        setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
-        //category.setContainerDataSource(MyVaadinUI.getDataProvider().getCategoryContainer());
-        setItemCaptionPropertyId("name");
+        return container;
     }
 }

@@ -1,45 +1,42 @@
 package fr.travauxetservices.views;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
-import com.vaadin.addon.jpacontainer.JPAContainerItem;
 import com.vaadin.data.Item;
+import com.vaadin.data.Validator;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.BeanValidator;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.MyVaadinUI;
-import fr.travauxetservices.event.CustomEvent;
-import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.Gender;
-import fr.travauxetservices.model.Role;
+import fr.travauxetservices.AppUI;
+import fr.travauxetservices.component.GenderComboBox;
+import fr.travauxetservices.component.RoleComboBox;
+import fr.travauxetservices.component.UserForm;
+import fr.travauxetservices.component.WrapperLayout;
 import fr.travauxetservices.model.User;
 
-import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * Created by Phobos on 12/12/14.
  */
 @SuppressWarnings("serial")
 public final class ProfileView extends Panel implements View, FormFieldFactory {
-    private final Form form = new Form();
+    private User user;
+    private UserForm form;
 
     public ProfileView() {
-        final User user = getCurrentUser();
-        if (user == null) {
-            UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
-            return;
-        }
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
 
         VerticalLayout root = new VerticalLayout();
         root.setMargin(true);
-        root.addStyleName("dashboard-view");
+        root.addStyleName("mytheme-view");
         root.addComponent(buildHeader());
         root.addComponent(buildContent());
         setContent(root);
@@ -51,7 +48,7 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label titleLabel = new Label(MyVaadinUI.I18N.getString("menu.profile"));
+        Label titleLabel = new Label(AppUI.I18N.getString("menu.profile"));
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -61,29 +58,34 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
     }
 
     private Component buildContent() {
-        HorizontalLayout root = new HorizontalLayout();
-        root.setWidth(100.0f, Unit.PERCENTAGE);
-        root.setSpacing(true);
-        root.setMargin(true);
-        root.addStyleName("profile-form");
-
-        form.setFormFieldFactory(this);
-        form.setItemDataSource(getEntityUser(), Arrays.asList("picture", "gender", "firstName", "lastName", "password"));
-        form.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
-        root.addComponent(form);
-        root.setExpandRatio(form, 1);
-
-        Button ok = new Button("Save");
-        ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        ok.addClickListener(new Button.ClickListener() {
+        User currentUser = getCurrentUser();
+        final User newUser = new User();
+        final BeanItem<User> newItem = new BeanItem<User>(newUser);
+        form = new UserForm(currentUser, newItem, false, false);
+        Button edit = new Button(AppUI.I18N.getString("button.change"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                commit();
+                try {
+                    form.commit();
+                    event.getButton().setCaption(AppUI.I18N.getString("button.change"));
+                    event.getButton().removeStyleName("primary");
+                } catch (Validator.InvalidValueException ive) {
+                    Notification.show(ive.getMessage());
+                    form.setValidationVisible(true);
+                }
             }
         });
+        edit.addStyleName("tiny");
+        edit.addStyleName("primary");
 
-        form.getFooter().addComponent(ok);
-        return root;
+        HorizontalLayout footer = new HorizontalLayout();
+        footer.setMargin(new MarginInfo(false, true, true, true));
+        footer.setSpacing(true);
+        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+        footer.addComponent(edit);
+        form.getFooter().addComponent(footer);
+
+        return new WrapperLayout("Votre profile", form);
     }
 
     @Override
@@ -91,6 +93,8 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
         if ("picture".equals(propertyId)) {
             field = new PictureField(field.getCaption());
+        } else if ("email".equals(propertyId)) {
+            field.addValidator(new EmailValidator(AppUI.I18N.getString("validator.email")));
         } else if ("gender".equals(propertyId)) {
             field = new GenderComboBox(field.getCaption());
         } else if ("role".equals(propertyId)) {
@@ -104,59 +108,40 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         return field;
     }
 
-    private void commit() {
-        try {
-            form.commit();
-            VaadinSession.getCurrent().setAttribute(User.class.getName(), ((JPAContainerItem) form.getItemDataSource()).getEntity());
-            // Updated user should also be persisted to database. But
-            // not in this demo.
-
-            Notification success = new Notification("Profile updated successfully");
-            success.setDelayMsec(2000);
-            success.setStyleName("bar success small");
-            success.setPosition(Position.BOTTOM_CENTER);
-            success.show(Page.getCurrent());
-
-            CustomEventBus.post(new CustomEvent.ProfileUpdatedEvent());
-        } catch (Exception e) {
-            Notification.show("Error while updating profile",
-                    Notification.Type.ERROR_MESSAGE);
-        }
+    private void setItemDataSource(User user) {
+        if (user != null && !user.isValidated()) user.setValidated(true);
+        form.setItem(getEntityUser(user), false);
     }
 
+    private Item getEntityUser(User user) {
+        if (user == null) {
+            return new BeanItem<User>(new User());
+        }
+        return AppUI.getDataProvider().getUser(user.getId());
+    }
 
     private User getCurrentUser() {
         return (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
     }
 
-    private EntityItem<User> getEntityUser() {
-        return MyVaadinUI.getDataProvider().getUser(getCurrentUser());
-    }
-
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
-        //notificationsButton.updateNotificationsCount(null);
-    }
-
-    static class GenderComboBox extends ComboBox {
-        public GenderComboBox(String caption) {
-            setCaption(caption);
-            addItem(Gender.MR);
-            setItemCaption(Gender.MR, "Mr.");
-            addItem(Gender.MRS);
-            setItemCaption(Gender.MRS, "Mrs.");
-            addItem(Gender.MS);
-            setItemCaption(Gender.MS, "Ms.");
+        user = (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
+        String parameters = event.getParameters();
+        if (!parameters.isEmpty()) {
+            try {
+                UUID id = UUID.fromString(parameters);
+                EntityItem<User> item = AppUI.getDataProvider().getUser(id);
+                if (item != null) {
+                    user = item.getEntity();
+                }
+            } catch (IllegalArgumentException e) {
+                //Ignored
+            }
         }
-    }
-
-    static class RoleComboBox extends ComboBox {
-        public RoleComboBox(String caption) {
-            setCaption(caption);
-            addItem(Role.ADMIN);
-            setItemCaption(Role.ADMIN, "Admin");
-            addItem(Role.CUSTOMER);
-            setItemCaption(Role.CUSTOMER, "Customer.");
+        if (user == null) {
+            UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
         }
+        setItemDataSource(user);
     }
 }

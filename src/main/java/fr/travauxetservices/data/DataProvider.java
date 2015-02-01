@@ -16,21 +16,31 @@ public interface DataProvider {
 
     public Collection<Request> getRequests();
 
+    public void addRequest(Ad a) throws UnsupportedOperationException;
+
     public JPAContainer<Offer> getOfferContainer();
 
     public EntityItem<Offer> getOffer(Object itemId);
 
     public Collection<Offer> getOffers();
 
+    public void addOffer(Ad a) throws UnsupportedOperationException;
+
     public JPAContainer<Category> getCategoryContainer();
 
     public Collection<Category> getCategories();
+
+    public Collection<Category> getChildren(Category c);
 
     public Collection<Notice> getNotices();
 
     public JPAContainer<Division> getDivisionContainer();
 
+    public EntityItem<Division> getDivition(Object itemId);
+
     public Collection<Division> getDivisions();
+
+    public Collection<Division> getChildren(Division c);
 
     public JPAContainer<User> getUserContainer();
 
@@ -38,7 +48,9 @@ public interface DataProvider {
 
     public void setUser(final User user);
 
-    public EntityItem<User> getUser(final User user);
+    public void addUser(User u) throws UnsupportedOperationException;
+
+    public EntityItem<User> getUser(Object itemId);
 
     public User authenticate(String email, String password);
 }

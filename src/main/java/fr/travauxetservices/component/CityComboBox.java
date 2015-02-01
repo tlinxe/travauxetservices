@@ -5,6 +5,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.ui.ComboBox;
 import fr.travauxetservices.model.City;
+import fr.travauxetservices.services.Geonames;
 import org.geonames.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,13 @@ public class CityComboBox extends ComboBox {
         setItemCaptionPropertyId("name");
     }
 
+    public void setValue(Object newValue) {
+        if (newValue != null && getValue() == null) {
+            addItem(newValue);
+        }
+        super.setValue(newValue);
+    }
+
 
     static public class CityContainer extends BeanItemContainer<City> {
         public CityContainer() throws IllegalArgumentException {
@@ -37,24 +45,7 @@ public class CityComboBox extends ComboBox {
             if ("".equals(filterPrefix) || filterPrefix == null) {
                 return Collections.emptyList();
             }
-            List<City> result = new ArrayList<City>();
-
-            try {
-                WebService.setUserName("tlinxe"); // add your username here
-                ToponymSearchCriteria searchCriteria = new ToponymSearchCriteria();
-                searchCriteria.setCountryCode("FR");
-                searchCriteria.setStyle(Style.FULL);
-                searchCriteria.setQ(filterPrefix);
-                ToponymSearchResult searchResult = WebService.search(searchCriteria);
-                for (Toponym toponym : searchResult.getToponyms()) {
-                    System.out.println("CityComboBox id: " + toponym.getGeoNameId() + " name: " + toponym.getName() + " code: " + toponym.getAdminCode1() + " code: " + toponym.getAdminCode2());
-                    result.add(new City(toponym.getGeoNameId(), toponym.getName()));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return result;
+            return Geonames.getCity(filterPrefix);
         }
 
         private void filterItems(String filterString) {
