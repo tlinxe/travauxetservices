@@ -1,6 +1,5 @@
 package fr.travauxetservices.client;
 
-import com.vaadin.client.VConsole;
 import com.vaadin.client.ui.VFilterSelect;
 
 public class HierarchicalComboBoxWidget extends VFilterSelect {

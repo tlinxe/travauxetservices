@@ -1,9 +1,8 @@
 package fr.travauxetservices.views;
 
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.*;
-import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
 import fr.travauxetservices.CustomNavigator;
 import fr.travauxetservices.component.MainMenu;
 

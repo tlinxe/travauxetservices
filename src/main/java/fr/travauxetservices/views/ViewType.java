@@ -3,7 +3,7 @@ package fr.travauxetservices.views;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import fr.travauxetservices.AppUI;
+import fr.travauxetservices.tools.I18N;
 
 /**
  * Created by Phobos on 12/12/14.
@@ -64,7 +64,7 @@ public enum ViewType {
     }
 
     public String getSubmenu() {
-        return submenu != null ? AppUI.I18N.getString(submenu) : null;
+        return submenu != null ? I18N.getString(submenu) : null;
     }
 
     public Class<? extends View> getViewClass() {

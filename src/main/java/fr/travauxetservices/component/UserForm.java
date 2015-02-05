@@ -1,5 +1,6 @@
 package fr.travauxetservices.component;
 
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
@@ -8,8 +9,8 @@ import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.User;
+import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.views.PictureField;
 
 import java.io.Serializable;
@@ -58,7 +59,7 @@ public class UserForm extends Form {
         //setValidationVisibleOnCommit(false);
 
         form = new FormLayout();
-        //form.setMargin(true);
+        form.setMargin(false);
         form.setSpacing(true);
         form.setReadOnly(this.readOnly);
         wrapUser.addComponent(form);
@@ -126,7 +127,9 @@ public class UserForm extends Form {
             if (propertyId.equals("gender")) return;
             if (propertyId.equals("firstName")) return;
             if (!textual) {
-                if (propertyId.equals("email")) {
+                if (propertyId.equals("lastName")) {
+                    field.setCaption(null);
+                } else if (propertyId.equals("email")) {
                     emailButton.setData(field.getValue());
                     form.addComponent(emailButton);
                     return;
@@ -163,18 +166,18 @@ public class UserForm extends Form {
 
     private class CustomFieldFactory extends DefaultFieldFactory {
         final PictureField pictureField = new PictureField(null);
-        final TextField emailField = new TextField(AppUI.I18N.getString("user.email"));
-        final GenderComboBox genderField = new GenderComboBox(AppUI.I18N.getString("user.gender"));
-        final TextField firstNameField = new TextField(AppUI.I18N.getString("user.firstName"));
-        final TextField lastNameField = new TextField(AppUI.I18N.getString("user.lastName"));
-        final RoleComboBox roleField = new RoleComboBox(AppUI.I18N.getString("user.role"));
-        final PasswordField passwordField = new PasswordField(AppUI.I18N.getString("user.password"));
-        final TextField phoneField = new TextField(AppUI.I18N.getString("user.phone"));
-        final CheckBox professionalField = new CheckBox(AppUI.I18N.getString("user.professional"));
+        final TextField emailField = new TextField(I18N.getString("user.email"));
+        final GenderComboBox genderField = new GenderComboBox(I18N.getString("user.gender"));
+        final TextField firstNameField = new TextField(I18N.getString("user.firstName"));
+        final TextField lastNameField = new TextField(I18N.getString("user.lastName"));
+        final RoleComboBox roleField = new RoleComboBox(I18N.getString("user.role"));
+        final PasswordField passwordField = new PasswordField(I18N.getString("user.password"));
+        final TextField phoneField = new TextField(I18N.getString("user.phone"));
+        final CheckBox professionalField = new CheckBox(I18N.getString("user.professional"));
 
         public CustomFieldFactory() {
-            emailField.addValidator(new EmailValidator(AppUI.I18N.getString("validator.email")));
-            lastNameField.setDescription(AppUI.I18N.getString("user.lastName.description"));
+            emailField.addValidator(new EmailValidator(I18N.getString("validator.email")));
+            lastNameField.setDescription(I18N.getString("user.lastName.description"));
 
             phoneField.setIcon(FontAwesome.PHONE);
             emailField.setIcon(FontAwesome.ENVELOPE);
@@ -189,7 +192,7 @@ public class UserForm extends Form {
             if ("picture".equals(propertyId)) {
                 final Object professional = item.getItemProperty("professional").getValue();
                 if (professional instanceof Boolean) {
-                    pictureField.setCaption((Boolean)professional ? AppUI.I18N.getString("user.professional") : AppUI.I18N.getString("user.individual"));
+                    pictureField.setCaption((Boolean) professional ? I18N.getString("user.professional") : I18N.getString("user.individual"));
                 }
                 field = pictureField;
             } else if ("email".equals(propertyId)) {
@@ -200,22 +203,10 @@ public class UserForm extends Form {
                 field = firstNameField;
             } else if ("lastName".equals(propertyId)) {
                 if (isReadOnly()) {
-                    final Object gender = item.getItemProperty("gender").getValue();
-                    final Object firstName = item.getItemProperty("firstName").getValue();
-                    final Object lastName = item.getItemProperty("lastName").getValue();
+                    final User user = (User) getEntity(item);
                     field = new TextField(lastNameField.getCaption()) {
                         public String getValue() {
-                            StringBuffer text = new StringBuffer();
-                            if (gender != null) {
-                                text.append(AppUI.I18N.getString("gender." + gender.toString()));
-                            }
-                            if (firstName != null) {
-                                text.append(" " + firstName.toString());
-                            }
-                            if (lastName != null) {
-                                text.append(" " + lastName.toString());
-                            }
-                            return text.toString();
+                            return user != null ? user.getCommonName() : null;
                         }
                     };
                 } else field = lastNameField;
@@ -232,6 +223,16 @@ public class UserForm extends Form {
             field.addValidator(new BeanValidator(User.class, propertyId.toString()));
             return field;
         }
+    }
+
+    private Object getEntity(Item item) {
+        if (item instanceof BeanItem) {
+            return ((BeanItem) item).getBean();
+        }
+        if (item instanceof EntityItem) {
+            return ((EntityItem) item).getEntity();
+        }
+        return null;
     }
 
     @Override

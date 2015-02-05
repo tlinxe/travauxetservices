@@ -1,11 +1,15 @@
 package fr.travauxetservices.model;
 
+import fr.travauxetservices.tools.I18N;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -31,36 +35,40 @@ public class User implements Serializable {
     private String firstName;
 
     @NotNull
-    @Size(min=1, max=255)
+    @Size(min = 1, max = 255)
     @Column(length = 255)
     private String lastName;
 
     @NotNull
-    @Size(min=1, max=255)
+    @Size(min = 1, max = 255)
     @Column(length = 255)
     private String email;
 
     @NotNull
-    @Size(min=6,max=16)
+    @Size(min = 6, max = 16)
     @Column(length = 16)
     private String password;
 
     @Lob
     private byte[] picture;
 
-    @Pattern(regexp="^((\\+|00)33\\s?|0)[1-9](\\s?\\d{2}){4}$")
+    @Pattern(regexp = "^((\\+|00)33\\s?|0)[1-9](\\s?\\d{2}){4}$")
     String phone;
 
     protected boolean professional;
     boolean validated;
 
+    @OneToMany
+    private Set<Rating> ratings;
+
     public User() {
         id = UUID.randomUUID();
         created = new Date(System.currentTimeMillis());
         role = Role.CUSTOMER;
+        ratings = new HashSet<Rating>();
     }
 
-    public User(UUID id, Date created, Role role, Gender gender, String firstName, String lastName, String email, String password, String phone, byte[] picture, boolean professional, boolean validated) {
+    public User(UUID id, Date created, Role role, Gender gender, String firstName, String lastName, String email, String password, String phone, byte[] picture, boolean professional, boolean validated, Set<Rating> ratings) {
         this.id = id;
         this.created = created;
         this.role = role;
@@ -73,6 +81,7 @@ public class User implements Serializable {
         this.picture = picture;
         this.professional = professional;
         this.validated = validated;
+        this.ratings = ratings;
     }
 
     public UUID getId() {
@@ -173,6 +182,43 @@ public class User implements Serializable {
 
     public void setValidated(boolean b) {
         this.validated = b;
+    }
+
+    public Set<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(Set<Rating> ratings) {
+        this.ratings = ratings;
+    }
+
+    public double getOverallRating() {
+        int ovreal = 0;
+        if (ratings.size() > 0) {
+            for (Rating rating : ratings) {
+                ovreal += rating.getOverall();
+            }
+            ovreal = ovreal / ratings.size();
+        }
+        return ovreal;
+    }
+
+    public int getNumberRating() {
+        return ratings.size();
+    }
+
+    public String getCommonName() {
+        StringBuilder text = new StringBuilder();
+        if (gender != null) {
+            text.append(I18N.getString("gender." + gender.toString()));
+        }
+        if (firstName != null) {
+            text.append(" ").append(firstName);
+        }
+        if (lastName != null) {
+            text.append(" ").append(lastName);
+        }
+        return text.toString();
     }
 
     @Override

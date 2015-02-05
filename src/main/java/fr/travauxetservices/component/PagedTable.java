@@ -54,7 +54,7 @@ public class PagedTable extends Table {
     }
 
     public HorizontalLayout createControls() {
-        Label itemsPerPageLabel = new Label("Annonces par page:");
+        Label itemsPerPageLabel = new Label("Résultat par page:");
         final ComboBox itemsPerPageSelect = new ComboBox();
 
         itemsPerPageSelect.addItem("5");
@@ -164,7 +164,7 @@ public class PagedTable extends Table {
         pageSize.addComponent(itemsPerPageLabel);
         pageSize.addComponent(itemsPerPageSelect);
         pageSize.setComponentAlignment(itemsPerPageLabel, Alignment.MIDDLE_LEFT);
-        pageSize.setComponentAlignment(itemsPerPageSelect,Alignment.MIDDLE_LEFT);
+        pageSize.setComponentAlignment(itemsPerPageSelect, Alignment.MIDDLE_LEFT);
         pageSize.setSpacing(true);
         pageManagement.addComponent(first);
         pageManagement.addComponent(previous);
@@ -178,8 +178,8 @@ public class PagedTable extends Table {
         pageManagement.setComponentAlignment(previous, Alignment.MIDDLE_LEFT);
         pageManagement.setComponentAlignment(pageLabel, Alignment.MIDDLE_LEFT);
         pageManagement.setComponentAlignment(currentPageTextField, Alignment.MIDDLE_LEFT);
-        pageManagement.setComponentAlignment(separatorLabel,Alignment.MIDDLE_LEFT);
-        pageManagement.setComponentAlignment(totalPagesLabel,Alignment.MIDDLE_LEFT);
+        pageManagement.setComponentAlignment(separatorLabel, Alignment.MIDDLE_LEFT);
+        pageManagement.setComponentAlignment(totalPagesLabel, Alignment.MIDDLE_LEFT);
         pageManagement.setComponentAlignment(next, Alignment.MIDDLE_LEFT);
         pageManagement.setComponentAlignment(last, Alignment.MIDDLE_LEFT);
         pageManagement.setWidth(null);

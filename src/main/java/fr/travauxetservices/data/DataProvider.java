@@ -53,4 +53,8 @@ public interface DataProvider {
     public EntityItem<User> getUser(Object itemId);
 
     public User authenticate(String email, String password);
+
+    public JPAContainer<Message> getMessageContainer();
+
+    public EntityItem<Message> getMessage(final Object itemId);
 }

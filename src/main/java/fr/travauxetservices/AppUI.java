@@ -7,18 +7,18 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.*;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
+import fr.travauxetservices.data.AppDataProvider;
 import fr.travauxetservices.data.DataProvider;
 import fr.travauxetservices.data.DummyDataGenerator;
-import fr.travauxetservices.data.DummyDataProvider;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
+import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.views.MainView;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 @Theme("mytheme")
 @PreserveOnRefresh
@@ -57,7 +57,6 @@ public class AppUI extends UI {
     }
 
     public static final String PERSISTENCE_UNIT = "h2";
-    public static ResourceBundle I18N = ResourceBundle.getBundle("i18n.messages");
 
     private DataProvider dataProvider;
     private CustomEventBus eventBus = new CustomEventBus();
@@ -68,12 +67,10 @@ public class AppUI extends UI {
         getPage().setTitle(I18N.getString("title"));
         setLocale(Locale.FRANCE);
 
-        System.out.println("I18N " + I18N.getClass().getName());
-
         CustomEventBus.register(this);
         Responsive.makeResponsive(this);
 
-        dataProvider = new DummyDataProvider();
+        dataProvider = new AppDataProvider();
 
         updateContent();
 

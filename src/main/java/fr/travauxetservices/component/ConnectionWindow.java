@@ -7,9 +7,9 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
+import fr.travauxetservices.tools.I18N;
 
 @SuppressWarnings("serial")
 public class ConnectionWindow extends Window {
@@ -65,12 +65,12 @@ public class ConnectionWindow extends Window {
         fields.setSpacing(true);
         fields.addStyleName("fields");
 
-        final TextField username = new TextField(AppUI.I18N.getString("user.email"));
+        final TextField username = new TextField(I18N.getString("user.email"));
         username.setIcon(FontAwesome.USER);
         username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
         username.setValue("tlinxe@email.fr");
 
-        final PasswordField password = new PasswordField(AppUI.I18N.getString("user.password"));
+        final PasswordField password = new PasswordField(I18N.getString("user.password"));
         password.setIcon(FontAwesome.LOCK);
         password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
         password.setValue("motdepasse");

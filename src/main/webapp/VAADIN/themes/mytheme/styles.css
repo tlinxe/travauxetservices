@@ -11857,3 +11857,13 @@ div.v-layout.v-horizontal.v-widget {
 	background-image: linear, to bottom, #1b87e3 2%, #166ed5 98%;
 	color: #eceded;
 }
+
+.mytheme .v-ratingstars-wrapper-large .v-ratingstars-bar {
+	background-image: url(img/star_bg_34x33.gif);
+}
+
+.mytheme .v-ratingstars-wrapper-large .v-ratingstars-star {
+	background-image: url(img/star_34x33.gif);
+	width: 34px;
+	height: 33px;
+}

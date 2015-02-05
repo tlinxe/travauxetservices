@@ -3,24 +3,24 @@ package fr.travauxetservices.views;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container;
-import com.vaadin.data.Property;
-import com.vaadin.data.Validator;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Or;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.*;
-import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Responsive;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.*;
 import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.*;
-import fr.travauxetservices.tools.IOToolkit;
+import fr.travauxetservices.model.Ad;
+import fr.travauxetservices.model.Category;
+import fr.travauxetservices.model.Division;
+import fr.travauxetservices.tools.I18N;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,14 +44,17 @@ public abstract class AdView extends Panel implements CustomView {
         CustomEventBus.register(this);
 
         VerticalLayout root = new VerticalLayout();
-        root.addStyleName("mytheme-view");
-        //root.setSizeFull();
+        root.setSizeFull();
         root.setMargin(true);
-        root.addComponent(buildHeader());
-        root.addComponent(buildSearchLayout());
-        root.addComponent(buildTable());
         setContent(root);
         Responsive.makeResponsive(root);
+        root.addStyleName("mytheme-view");
+
+        root.addComponent(buildHeader());
+        root.addComponent(buildSearchLayout());
+        Component content = buildContent();
+        root.addComponent(content);
+        root.setExpandRatio(content, 1);
     }
 
     protected abstract String getTitleLabel();
@@ -80,17 +83,17 @@ public abstract class AdView extends Panel implements CustomView {
     private Component buildSearchLayout() {
         GridLayout layout = new GridLayout(4, 2);
         layout.addStyleName("dark");
-        layout.setWidth(800, Unit.PIXELS);
+        layout.setWidth(100, Unit.PERCENTAGE);
         layout.setSpacing(true);
 
         keynwordField = new TextField();
         keynwordField.addStyleName(ValoTheme.TEXTFIELD_TINY);
         keynwordField.setWidth("250px");
-        keynwordField.setInputPrompt(AppUI.I18N.getString("input.keyword.optional"));
+        keynwordField.setInputPrompt(I18N.getString("input.keyword.optional"));
         layout.addComponent(keynwordField, 0, 0);
 
         categoryField = new CategoryComboxBox(null);
-        categoryField.setInputPrompt(AppUI.I18N.getString("input.categories"));
+        categoryField.setInputPrompt(I18N.getString("input.categories"));
         categoryField.setPageLength(20);
         categoryField.setScrollToSelectedItem(true);
         categoryField.addStyleName(ValoTheme.COMBOBOX_TINY);
@@ -98,7 +101,7 @@ public abstract class AdView extends Panel implements CustomView {
         layout.addComponent(categoryField, 1, 0);
 
         divisionField = new DivisionComboxBox(null);
-        divisionField.setInputPrompt(AppUI.I18N.getString("input.division"));
+        divisionField.setInputPrompt(I18N.getString("input.division"));
         divisionField.setPageLength(20);
         divisionField.setScrollToSelectedItem(true);
         divisionField.addStyleName(ValoTheme.COMBOBOX_TINY);
@@ -106,12 +109,12 @@ public abstract class AdView extends Panel implements CustomView {
         layout.addComponent(divisionField, 2, 0);
 
         cityField = new CityComboBox(null);
-        cityField.setInputPrompt(AppUI.I18N.getString("input.city"));
+        cityField.setInputPrompt(I18N.getString("input.city"));
         //cityField.setPageLength(0);
         cityField.addStyleName(ValoTheme.TEXTFIELD_TINY);
         layout.addComponent(cityField, 2, 1);
 
-        Button search = new Button(AppUI.I18N.getString("button.search"), FontAwesome.SEARCH);
+        Button search = new Button(I18N.getString("button.search"), FontAwesome.SEARCH);
         search.addStyleName(ValoTheme.BUTTON_TINY);
         search.addStyleName(ValoTheme.BUTTON_DANGER);
         search.addClickListener(new Button.ClickListener() {
@@ -124,83 +127,27 @@ public abstract class AdView extends Panel implements CustomView {
         return layout;
     }
 
-    private void applyFilters() {
-        JPAContainer container = getContainer();
-        container.removeAllContainerFilters();
-        container.addContainerFilter(new Compare.Equal("validated", true));
-
-        if (keynwordField.getValue() != null && keynwordField.getValue().trim().length() > 0) {
-            container.addContainerFilter(
-                    new Or(new Like("title", "%" + keynwordField.getValue() + "%", false),
-                            new Like("description", "%" + keynwordField.getValue() + "%", false))
-            );
-        }
-        Category category = (Category)categoryField.getValue();
-        if (category != null) {
-            Collection<Category> children =  AppUI.getDataProvider().getChildren(category);
-            if (children.size() > 0) {
-                List<Container.Filter> filters = new ArrayList<Container.Filter>();
-                filters.add(new Compare.Equal("category", category));
-                for(Category child : children){
-                    filters.add(new Compare.Equal("category", child));
-                }
-                container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
-            }
-            else container.addContainerFilter(new Compare.Equal("category", category));
-        }
-        Division division = (Division)divisionField.getValue();
-        if (division != null) {
-            Collection<Division> children =  AppUI.getDataProvider().getChildren(division);
-            if (children.size() > 0) {
-                List<Container.Filter> filters = new ArrayList<Container.Filter>();
-                filters.add(new Compare.Equal("division", division));
-                for(Division child : children){
-                    filters.add(new Compare.Equal("division", child));
-                }
-                container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
-            }
-            else container.addContainerFilter(new Compare.Equal("division", division));
-        }
-        if (cityField.getValue() != null) {
-            container.addContainerFilter(new Compare.Equal("city", cityField.getValue()));
-        }
-
-        table.refreshRowCache();
-        table.setCurrentPage(1);
-        table.firePagedChangedEvent();
-    }
-
-    private Component buildTable() {
+    private Component buildContent() {
         table = new AdTable(10, false);
         //table.addStyleName(ValoTheme.TABLE_BORDERLESS);
         table.addStyleName(ValoTheme.TABLE_NO_HORIZONTAL_LINES);
         table.addStyleName(ValoTheme.TABLE_COMPACT);
         table.addStyleName(ValoTheme.TABLE_SMALL);
-        table.setWidth(100, Unit.PERCENTAGE);
-        table.setAlwaysRecalculateColumnWidths(false);
-        table.setNullSelectionAllowed(true);
         table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
-        table.setColumnWidth("user", 65);
+        table.setWidth(100, Unit.PERCENTAGE);
 
-        JPAContainer container = getContainer();
         applyFilters();
-        table.setContainerDataSource(container);
-
-        table.setCellStyleGenerator(new Table.CellStyleGenerator() {
-            public String getStyle(Table source, Object itemId, Object propertyId) {
-                return "view";
-            }
-        });
-        table.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(Property.ValueChangeEvent e) {
-                Object value = e.getProperty().getValue();
-                if (value != null) UI.getCurrent().getNavigator().navigateTo(viewName + "/" + value);
-            }
-        });
+        table.setContainerDataSource(getContainer());
 
         table.setVisibleColumns("user", "division", "title", "created");
         table.setColumnHeaders("User", "Division", "Title", "Created");
-        //table.setColumnExpandRatio("title", 2);
+        table.setColumnExpandRatio("title", 1);
+
+        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+            public void itemClick(ItemClickEvent e) {
+                UI.getCurrent().getNavigator().navigateTo(viewName + "/" + e.getItem());
+            }
+        });
 
         final WrapperLayout wrapperLayout = new WrapperLayout(null, table);
         final HorizontalLayout controlLayout = table.createControls();
@@ -215,20 +162,64 @@ public abstract class AdView extends Panel implements CustomView {
 
         table.addListener(new PagedTable.PageChangeListener() {
             public void pageChanged(PagedTable.PagedTableChangeEvent event) {
-                PagedTableContainer container = (PagedTableContainer)event.getTable().getContainerDataSource();
+                PagedTableContainer container = (PagedTableContainer) event.getTable().getContainerDataSource();
                 int realSize = container.getRealSize();
                 wrapperLayout.setCaption(realSize + " " + getTitleLabel());
-                if (realSize < 10)  {
+                if (realSize < 10) {
                     table.setPageLength(realSize);
                     controlLayout.setVisible(false);
-                }
-                else {
+                } else {
                     table.setPageLength(10);
                     controlLayout.setVisible(true);
                 }
             }
         });
         return wrapperLayout;
+    }
+
+
+    private void applyFilters() {
+        JPAContainer container = getContainer();
+        container.removeAllContainerFilters();
+        container.addContainerFilter(new Compare.Equal("validated", true));
+
+        if (keynwordField.getValue() != null && keynwordField.getValue().trim().length() > 0) {
+            container.addContainerFilter(
+                    new Or(new Like("title", "%" + keynwordField.getValue() + "%", false),
+                            new Like("description", "%" + keynwordField.getValue() + "%", false))
+            );
+        }
+        Category category = (Category) categoryField.getValue();
+        if (category != null) {
+            Collection<Category> children = AppUI.getDataProvider().getChildren(category);
+            if (children.size() > 0) {
+                List<Container.Filter> filters = new ArrayList<Container.Filter>();
+                filters.add(new Compare.Equal("category", category));
+                for (Category child : children) {
+                    filters.add(new Compare.Equal("category", child));
+                }
+                container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
+            } else container.addContainerFilter(new Compare.Equal("category", category));
+        }
+        Division division = (Division) divisionField.getValue();
+        if (division != null) {
+            Collection<Division> children = AppUI.getDataProvider().getChildren(division);
+            if (children.size() > 0) {
+                List<Container.Filter> filters = new ArrayList<Container.Filter>();
+                filters.add(new Compare.Equal("division", division));
+                for (Division child : children) {
+                    filters.add(new Compare.Equal("division", child));
+                }
+                container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
+            } else container.addContainerFilter(new Compare.Equal("division", division));
+        }
+        if (cityField.getValue() != null) {
+            container.addContainerFilter(new Compare.Equal("city", cityField.getValue()));
+        }
+
+        table.refreshRowCache();
+        table.setCurrentPage(1);
+        table.firePagedChangedEvent();
     }
 
 
@@ -244,7 +235,6 @@ public abstract class AdView extends Panel implements CustomView {
         if (item != null) {
             layout = new AdLayout(item, getTitleLabel());
             setContent(layout);
-        }
-        else applyFilters();
+        } else applyFilters();
     }
 }

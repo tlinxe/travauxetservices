@@ -19,6 +19,7 @@ import fr.travauxetservices.component.RoleComboBox;
 import fr.travauxetservices.component.UserForm;
 import fr.travauxetservices.component.WrapperLayout;
 import fr.travauxetservices.model.User;
+import fr.travauxetservices.tools.I18N;
 
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label titleLabel = new Label(AppUI.I18N.getString("menu.profile"));
+        Label titleLabel = new Label(I18N.getString("menu.profile"));
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -62,12 +63,12 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         final User newUser = new User();
         final BeanItem<User> newItem = new BeanItem<User>(newUser);
         form = new UserForm(currentUser, newItem, false, false);
-        Button edit = new Button(AppUI.I18N.getString("button.change"), new Button.ClickListener() {
+        Button edit = new Button(I18N.getString("button.change"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
                     form.commit();
-                    event.getButton().setCaption(AppUI.I18N.getString("button.change"));
+                    event.getButton().setCaption(I18N.getString("button.change"));
                     event.getButton().removeStyleName("primary");
                 } catch (Validator.InvalidValueException ive) {
                     Notification.show(ive.getMessage());
@@ -94,7 +95,7 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         if ("picture".equals(propertyId)) {
             field = new PictureField(field.getCaption());
         } else if ("email".equals(propertyId)) {
-            field.addValidator(new EmailValidator(AppUI.I18N.getString("validator.email")));
+            field.addValidator(new EmailValidator(I18N.getString("validator.email")));
         } else if ("gender".equals(propertyId)) {
             field = new GenderComboBox(field.getCaption());
         } else if ("role".equals(propertyId)) {

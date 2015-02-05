@@ -16,7 +16,7 @@ public class City implements Serializable {
     int id;
 
     @NotNull
-    @Size(min=1, max=255)
+    @Size(min = 1, max = 255)
     @Column(length = 255)
     String name;
 

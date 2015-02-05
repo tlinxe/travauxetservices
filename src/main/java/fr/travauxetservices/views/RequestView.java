@@ -1,13 +1,9 @@
 package fr.travauxetservices.views;
 
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.util.filter.Compare;
 import fr.travauxetservices.AppUI;
-import fr.travauxetservices.event.CustomEvent;
-import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.Request;
+import fr.travauxetservices.tools.I18N;
 
 import java.util.UUID;
 
@@ -22,7 +18,7 @@ public final class RequestView extends AdView {
 
     @Override
     public String getTitleLabel() {
-        return AppUI.I18N.getString("menu.requests");
+        return I18N.getString("menu.requests");
     }
 
     @Override

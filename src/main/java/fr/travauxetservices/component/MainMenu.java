@@ -5,10 +5,10 @@ import com.vaadin.server.*;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
+import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.tools.IOToolkit;
 import fr.travauxetservices.views.ViewType;
 
@@ -188,7 +188,7 @@ public final class MainMenu extends CustomComponent {
             this.view = view;
             setPrimaryStyleName("valo-menu-item");
             setIcon(view.getIcon());
-            String caption = AppUI.I18N.getString("menu." + view.getViewName());
+            String caption = I18N.getString("menu." + view.getViewName());
             setCaption(caption.substring(0, 1).toUpperCase() + caption.substring(1));
             CustomEventBus.register(this);
             addClickListener(new ClickListener() {

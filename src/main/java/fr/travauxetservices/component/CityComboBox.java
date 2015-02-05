@@ -6,9 +6,7 @@ import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.ui.ComboBox;
 import fr.travauxetservices.model.City;
 import fr.travauxetservices.services.Geonames;
-import org.geonames.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

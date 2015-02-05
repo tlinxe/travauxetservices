@@ -5,9 +5,9 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.filter.JoinFilter;
 import com.vaadin.data.Container;
-import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Or;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
@@ -31,6 +31,7 @@ import fr.travauxetservices.model.Notice;
 import fr.travauxetservices.model.Offer;
 import fr.travauxetservices.services.Geonames;
 import fr.travauxetservices.services.Location;
+import fr.travauxetservices.tools.I18N;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -113,7 +114,7 @@ public final class HomeView extends Panel implements View {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label titleLabel = new Label(AppUI.I18N.getString("menu.home"));
+        Label titleLabel = new Label(I18N.getString("menu.home"));
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -191,8 +192,7 @@ public final class HomeView extends Panel implements View {
             filters.add(new Compare.Equal("division", division));
             filters.add(new JoinFilter("city", new Compare.Equal("region", division.getId())));
             container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
-        }
-        else container.addContainerFilter(new Compare.Equal("division", null));
+        } else container.addContainerFilter(new Compare.Equal("division", null));
         table.refreshRowCache();
         table.firePagedChangedEvent();
 
@@ -218,24 +218,20 @@ public final class HomeView extends Panel implements View {
         table.addStyleName(ValoTheme.TABLE_NO_HORIZONTAL_LINES);
         table.addStyleName(ValoTheme.TABLE_COMPACT);
         table.addStyleName(ValoTheme.TABLE_SMALL);
-
-        table.setNullSelectionAllowed(true);
         table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
         table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
         table.setSizeFull();
-        JPAContainer container = getContainer();
+
         applyFilters(null);
-        table.setContainerDataSource(container);
+        table.setContainerDataSource(getContainer());
 
         table.setVisibleColumns("user", "title", "division");
         table.setColumnHeaders("User", "Title", "Division");
         table.setColumnExpandRatio("title", 1);
 
-        table.addValueChangeListener(new Property.ValueChangeListener() {
-            public void valueChange(Property.ValueChangeEvent e) {
-                Object value = e.getProperty().getValue();
-                if (value != null)
-                    UI.getCurrent().getNavigator().navigateTo(ViewType.OFFER.getViewName() + "/" + value);
+        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+            public void itemClick(ItemClickEvent e) {
+                UI.getCurrent().getNavigator().navigateTo(ViewType.OFFER.getViewName() + "/" + e.getItem());
             }
         });
 

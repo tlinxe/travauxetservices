@@ -1,12 +1,12 @@
 package fr.travauxetservices.component;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class PagedTableContainer implements Container, Container.Indexed,
         Container.Sortable {

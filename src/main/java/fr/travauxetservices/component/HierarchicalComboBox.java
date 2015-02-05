@@ -4,7 +4,6 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.ComboBox;
 
 import java.lang.reflect.Method;

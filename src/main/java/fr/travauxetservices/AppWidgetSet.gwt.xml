@@ -34,6 +34,5 @@
     <inherits name="com.vaadin.tapio.googlemaps.Widgetset"/>
 
 
-
-    
+    <inherits name="org.vaadin.teemu.ratingstars.gwt.RatingStarsWidgetset"/>
 </module>

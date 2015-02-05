@@ -2,14 +2,20 @@ package fr.travauxetservices.component;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Validator;
-import com.vaadin.server.*;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.Ad;
+import fr.travauxetservices.model.Rating;
 import fr.travauxetservices.model.User;
+import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.tools.IOToolkit;
+import org.vaadin.teemu.ratingstars.RatingStars;
 
 /**
  * Created by Phobos on 31/01/15.
@@ -20,9 +26,9 @@ public class AdLayout extends VerticalLayout {
         setSpacing(true);
         addStyleName("mytheme-view");
         addComponent(buildHeader(title));
-        addComponent(buildAdLayout(item));
-        addComponent(buildUserLayout(item));
-        addComponent(buildReviewsLayout(item));
+        addComponent(buildAdContent(item));
+        addComponent(buildUserContent(item));
+        addComponent(buildReviewsContent(item));
     }
 
     private Component buildHeader(String title) {
@@ -39,25 +45,25 @@ public class AdLayout extends VerticalLayout {
         return header;
     }
 
-    private Component buildAdLayout(final EntityItem<Ad> item) {
+    private Component buildAdContent(final EntityItem<Ad> item) {
         User currentUser = getCurrentUser();
         User itemUser = (User) item.getItemProperty("user").getValue();
 
         final AdForm form = new AdForm(currentUser, item, true);
         if (currentUser != null && (currentUser.isAdmin() || currentUser.equals(itemUser))) {
-            Button edit = new Button(AppUI.I18N.getString("button.change"), new Button.ClickListener() {
+            Button edit = new Button(I18N.getString("button.change"), new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (form.isReadOnly()) {
                         form.setItem(item, false);
-                        event.getButton().setCaption(AppUI.I18N.getString("button.save"));
+                        event.getButton().setCaption(I18N.getString("button.save"));
                         event.getButton().addStyleName("primary");
                     } else {
                         try {
                             form.commit();
                             item.commit();
                             form.setItem(item, true);
-                            event.getButton().setCaption(AppUI.I18N.getString("button.change"));
+                            event.getButton().setCaption(I18N.getString("button.change"));
                             event.getButton().removeStyleName("primary");
                         } catch (Validator.InvalidValueException ive) {
                             Notification.show(ive.getMessage());
@@ -78,11 +84,11 @@ public class AdLayout extends VerticalLayout {
         return new WrapperLayout((item.getEntity()).getTitle(), form);
     }
 
-    private Component buildUserLayout(EntityItem<Ad> item) {
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setSizeUndefined();
-        //horizontalLayout.setMargin(true);
-        horizontalLayout.setSpacing(true);
+    private Component buildUserContent(EntityItem<Ad> item) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setMargin(false);
+        layout.setSpacing(true);
+
         Resource resource = new ClassResource("/images/profile-pic-300px.jpg");
         User user = item.getEntity().getUser();
         if (user != null) {
@@ -92,16 +98,72 @@ public class AdLayout extends VerticalLayout {
         }
         Image image = new Image(null, resource);
         image.setWidth(100.0f, Unit.PIXELS);
-        horizontalLayout.addComponent(new UserForm(item.getEntity().getUser()));
+        layout.addComponent(new UserForm(item.getEntity().getUser()));
 
-        return new WrapperLayout("Contacter l'annonceur", horizontalLayout);
+        return new WrapperLayout("Contacter l'annonceur", layout);
     }
 
-    private Component buildReviewsLayout(EntityItem<Ad> item) {
+    private Component buildReviewsContent(EntityItem<Ad> item) {
+        User user = item.getEntity().getUser();
+
         VerticalLayout layout = new VerticalLayout();
-        layout.setSizeUndefined();
+        //layout.setSizeFull();
         layout.setMargin(true);
         layout.setSpacing(true);
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setMargin(true);
+        horizontalLayout.setSpacing(true);
+
+        RatingStars ratingStars = new CustomRatingStars();
+        ratingStars.setMaxValue(5);
+        System.out.println("AdLayout.buildReviewsContent getOverallRating: " + user.getOverallRating());
+        ratingStars.setValue(user.getOverallRating());
+        ratingStars.setReadOnly(true);
+        ratingStars.addStyleName("large");
+        ratingStars.setImmediate(true);
+        horizontalLayout.addComponent(ratingStars);
+
+        Label ratingLabel = new Label("(" + user.getNumberRating() + " avis)");
+        horizontalLayout.addComponent(ratingLabel);
+        horizontalLayout.setComponentAlignment(ratingLabel, Alignment.MIDDLE_CENTER);
+
+        Button writeButton = new Button("Ecrire un avis", new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+
+            }
+        });
+        writeButton.addStyleName(ValoTheme.BUTTON_SMALL);
+        writeButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        horizontalLayout.addComponent(writeButton);
+        horizontalLayout.setExpandRatio(writeButton, 1);
+        horizontalLayout.setComponentAlignment(writeButton, Alignment.MIDDLE_RIGHT);
+        layout.addComponent(horizontalLayout);
+
+        if (user.getRatings().size() > 0) {
+            RatingTable table = new RatingTable();
+            table.addStyleName(ValoTheme.TABLE_NO_STRIPES);
+            //table.addStyleName(ValoTheme.TABLE_NO_HORIZONTAL_LINES);
+            table.addStyleName(ValoTheme.TABLE_COMPACT);
+            table.addStyleName(ValoTheme.TABLE_SMALL);
+            //table.setSizeUndefined();
+            table.setNullSelectionAllowed(true);
+            table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
+
+            BeanItemContainer<Rating> container = new BeanItemContainer<Rating>(Rating.class);
+            table.setContainerDataSource(container);
+            container.addAll(user.getRatings());
+            //table.setPageLength(user.getRatings().size());
+
+            table.setVisibleColumns("title", "overall");
+            table.setColumnHeaders("Title", "Overall");
+            //table.setColumnWidth("user", 100);
+            table.setColumnWidth("title", 400);
+            table.setColumnWidth("overall", 270);
+            layout.addComponent(table);
+        }
+
         return new WrapperLayout("Avis d'utilisateurs", layout);
     }
 

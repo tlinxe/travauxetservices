@@ -1,13 +1,9 @@
 package fr.travauxetservices.views;
 
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.util.filter.Compare;
 import fr.travauxetservices.AppUI;
-import fr.travauxetservices.event.CustomEvent;
-import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.Offer;
+import fr.travauxetservices.tools.I18N;
 
 import java.util.UUID;
 
@@ -22,7 +18,7 @@ public final class OfferView extends AdView {
 
     @Override
     public String getTitleLabel() {
-        return AppUI.I18N.getString("menu.offers");
+        return I18N.getString("menu.offers");
     }
 
     @Override

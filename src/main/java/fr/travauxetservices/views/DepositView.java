@@ -1,10 +1,6 @@
 package fr.travauxetservices.views;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.validator.BeanValidator;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Responsive;
@@ -18,10 +14,9 @@ import fr.travauxetservices.component.UserForm;
 import fr.travauxetservices.component.WrapperLayout;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.Ad;
-import fr.travauxetservices.model.Role;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.services.Mail;
-import fr.travauxetservices.tools.TextBundle;
+import fr.travauxetservices.tools.I18N;
 
 import java.util.Date;
 import java.util.UUID;
@@ -56,7 +51,7 @@ public final class DepositView extends Panel implements View {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label label = new Label(AppUI.I18N.getString("menu.deposit"));
+        Label label = new Label(I18N.getString("menu.deposit"));
         label.setSizeUndefined();
         label.addStyleName(ValoTheme.LABEL_H1);
         label.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -91,14 +86,14 @@ public final class DepositView extends Panel implements View {
                     formAd.commit();
                     if (user == null) {
                         formUser.commit();
-                        BeanItem item = (BeanItem)formUser.getItemDataSource();
-                        user = (User)item.getBean();
+                        BeanItem item = (BeanItem) formUser.getItemDataSource();
+                        user = (User) item.getBean();
                         Object email = user.getEmail();
                         AppUI.getDataProvider().addUser(user);
 
                         String url = AppUI.getEncodedUrl() + "/#!" + ViewType.PROFILE.getViewName() + "/" + user.getId();
-                        String subject = AppUI.I18N.getString("confirmation.user.account.subject");
-                        String text = TextBundle.getString("confirmation.user.account.text", new String[]{email.toString(), url});
+                        String subject = I18N.getString("message.user.account.subject");
+                        String text = I18N.getString("message.user.account.text", new String[]{email.toString(), url});
                         Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", email.toString(), subject, text, false);
                     }
 
@@ -140,6 +135,6 @@ public final class DepositView extends Panel implements View {
     }
 
     private User getCurrentUser() {
-        return  (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
+        return (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
     }
 }

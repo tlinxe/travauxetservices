@@ -6,20 +6,21 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.BeanValidator;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.model.Remuneration;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.HtmlEscape;
+import fr.travauxetservices.tools.I18N;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -71,6 +72,7 @@ public class AdForm extends Form {
         List<String> values = new ArrayList<String>();
         //if (!readOnly && (user != null && user.isAdmin())) values.add("validated");
         if (!readOnly && !(item instanceof EntityItem)) values.add("type");
+        if (readOnly) values.add("created");
         values.add("category");
         values.add("division");
         values.add("city");
@@ -100,15 +102,15 @@ public class AdForm extends Form {
             wrapRegion.addComponent(getField(field, null));
         } else if (propertyId.equals("city")) {
             wrapRegion.addComponent(getField(field, null));
-            wrapRegion.setCaption(AppUI.I18N.getString("ad.location"));
-            wrapRegion.setIcon(FontAwesome.LOCATION_ARROW);
+            wrapRegion.setCaption(I18N.getString("ad.location"));
+            //wrapRegion.setIcon(FontAwesome.LOCATION_ARROW);
             form.addComponent(wrapRegion);
         } else if (!isReadOnly() && propertyId.equals("price")) {
             wrapPrice.addComponent(getField(field, null));
         } else if (propertyId.equals("remuneration")) {
             if (!isReadOnly()) {
                 wrapPrice.addComponent(getField(field, null));
-                wrapPrice.setCaption(AppUI.I18N.getString("ad.price"));
+                wrapPrice.setCaption(I18N.getString("ad.price"));
                 form.addComponent(wrapPrice);
             }
         } else {
@@ -149,14 +151,14 @@ public class AdForm extends Form {
     }
 
     private class CustomFieldFactory extends DefaultFieldFactory {
-        final ComboBox typeField = new TypeComboBox(AppUI.I18N.getString("ad.type"));
-        final ComboBox categoryField = new CategoryComboxBox(AppUI.I18N.getString("ad.category"));
-        final ComboBox divisionField = new DivisionComboxBox(AppUI.I18N.getString("ad.region"));
-        final ComboBox cityField = new CityComboBox(AppUI.I18N.getString("ad.city"));
-        final TextField titleField = new TextField(AppUI.I18N.getString("ad.title"));
-        final TextArea descriptionField = new TextArea(AppUI.I18N.getString("ad.description"));
-        final TextField priceField = new TextField(AppUI.I18N.getString("ad.price"));
-        final ComboBox remunerationField = new RemunerationComboBox(AppUI.I18N.getString("ad.remuneration"));
+        final ComboBox typeField = new TypeComboBox(I18N.getString("ad.type"));
+        final ComboBox categoryField = new CategoryComboxBox(I18N.getString("ad.category"));
+        final ComboBox divisionField = new DivisionComboxBox(I18N.getString("ad.region"));
+        final ComboBox cityField = new CityComboBox(I18N.getString("ad.city"));
+        final TextField titleField = new TextField(I18N.getString("ad.title"));
+        final TextArea descriptionField = new TextArea(I18N.getString("ad.description"));
+        final TextField priceField = new TextField(I18N.getString("ad.price"));
+        final ComboBox remunerationField = new RemunerationComboBox(I18N.getString("ad.remuneration"));
 
         public CustomFieldFactory() {
             typeField.setNullSelectionAllowed(false);
@@ -164,19 +166,19 @@ public class AdForm extends Form {
 
             categoryField.setPageLength(20);
 
-            divisionField.setInputPrompt(AppUI.I18N.getString("input.division"));
+            divisionField.setInputPrompt(I18N.getString("input.division"));
             divisionField.setPageLength(20);
 
-            cityField.setInputPrompt(AppUI.I18N.getString("input.city"));
+            cityField.setInputPrompt(I18N.getString("input.city"));
             cityField.setPageLength(20);
 
-            titleField.setCaption(AppUI.I18N.getString("ad.title"));
+            titleField.setCaption(I18N.getString("ad.title"));
             titleField.setWidth(100, Unit.PERCENTAGE);
 
             descriptionField.setSizeFull();
             descriptionField.addStyleName("notes");
 
-            remunerationField.setInputPrompt(AppUI.I18N.getString("input.remuneration"));
+            remunerationField.setInputPrompt(I18N.getString("input.remuneration"));
             remunerationField.setPageLength(20);
         }
 
@@ -187,6 +189,14 @@ public class AdForm extends Form {
             Field field = super.createField(item, propertyId, uiContext);
             if ("type".equals(propertyId)) {
                 field = typeField;
+            } else if ("created".equals(propertyId)) {
+                final Date date = (Date) item.getItemProperty(propertyId).getValue();
+                field = new TextField(I18N.getString("published")) {
+                    public String getValue() {
+                        DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, getLocale() != null ? getLocale() : Locale.getDefault());
+                        return df.format(date);
+                    }
+                };
             } else if ("category".equals(propertyId)) {
                 field = categoryField;
             } else if ("division".equals(propertyId)) {
@@ -203,8 +213,7 @@ public class AdForm extends Form {
                 if (isReadOnly()) {
                     final double price = (Double) item.getItemProperty("price").getValue();
                     final Remuneration remuneration = (Remuneration) item.getItemProperty("remuneration").getValue();
-                    System.out.println("AdForm.createField field: price price: " + price + " remuneration: " + remuneration);
-                    field = new TextField(AppUI.I18N.getString("ad.price")) {
+                    field = new TextField(I18N.getString("ad.price")) {
                         public String getValue() {
                             StringBuffer text = new StringBuffer();
                             if (price > 0) {
@@ -214,7 +223,7 @@ public class AdForm extends Form {
                                 text.append(cf.format(price));
                             }
                             if (remuneration != null) {
-                                text.append((price > 0) ? "/" : "").append(AppUI.I18N.getString("remuneration." + remuneration.toString() + ".short"));
+                                text.append((price > 0) ? "/" : "").append(I18N.getString("remuneration." + remuneration.toString() + ".short"));
                             }
                             return text.toString();
                         }

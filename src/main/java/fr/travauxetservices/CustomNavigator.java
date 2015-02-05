@@ -90,7 +90,7 @@ public class CustomNavigator extends Navigator {
                         result = super.getView(viewType.getViewName());
                         boolean stateFul = viewType.isStateful();
                         if (result instanceof CustomView) {
-                            stateFul = ((CustomView)result).isStateful(viewAndParameters);
+                            stateFul = ((CustomView) result).isStateful(viewAndParameters);
                         }
                         if (stateFul) {
                             // Stateful views get lazily instantiated

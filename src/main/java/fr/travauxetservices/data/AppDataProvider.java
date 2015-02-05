@@ -7,22 +7,22 @@ import com.vaadin.data.util.filter.Compare;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.*;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * Created by Phobos on 13/12/14.
  */
-public class DummyDataProvider implements DataProvider {
+public class AppDataProvider implements DataProvider {
 
     private JPAContainer<Category> categories;
     private JPAContainer<Division> divisions;
     private JPAContainer<Request> requests;
     private JPAContainer<Offer> offers;
     private JPAContainer<User> users;
+    private JPAContainer<Message> messages;
 
-    public DummyDataProvider() {
+    public AppDataProvider() {
         categories = JPAContainerFactory.make(Category.class, AppUI.PERSISTENCE_UNIT);
         categories.sort(new String[]{"name"}, new boolean[]{true});
         categories.setParentProperty("parent");
@@ -32,12 +32,13 @@ public class DummyDataProvider implements DataProvider {
         divisions.setParentProperty("parent");
 
         requests = JPAContainerFactory.make(Request.class, AppUI.PERSISTENCE_UNIT);
-        requests.sort(new String[]{"created"}, new boolean[]{true});
+        requests.sort(new String[]{"created"}, new boolean[]{false});
 
         offers = JPAContainerFactory.make(Offer.class, AppUI.PERSISTENCE_UNIT);
-        offers.sort(new String[]{"created"}, new boolean[]{true});
+        offers.sort(new String[]{"created"}, new boolean[]{false});
 
         users = JPAContainerFactory.make(User.class, AppUI.PERSISTENCE_UNIT);
+        messages = JPAContainerFactory.make(Message.class, AppUI.PERSISTENCE_UNIT);
     }
 
     @Override
@@ -130,7 +131,7 @@ public class DummyDataProvider implements DataProvider {
     }
 
     @Override
-    public EntityItem<Division> getDivition(Object itemId){
+    public EntityItem<Division> getDivition(Object itemId) {
         return getDivisionContainer().getItem(itemId);
     }
 
@@ -203,5 +204,14 @@ public class DummyDataProvider implements DataProvider {
         Object user = container.firstItemId();
         container.removeAllContainerFilters();
         return user != null ? container.getItem(user).getEntity() : null;
+    }
+
+    public JPAContainer<Message> getMessageContainer() {
+        users.removeAllContainerFilters();
+        return messages;
+    }
+
+    public EntityItem<Message> getMessage(final Object itemId) {
+        return getMessageContainer().getItem(itemId);
     }
 }
