@@ -49,7 +49,7 @@ public class AdLayout extends VerticalLayout {
         User currentUser = getCurrentUser();
         User itemUser = (User) item.getItemProperty("user").getValue();
 
-        final AdForm form = new AdForm(item, true);
+        final CustomForm form = new CustomForm(item, true);
         if (currentUser != null && (currentUser.isAdmin() || currentUser.equals(itemUser))) {
             Button edit = new Button(I18N.getString("button.change"), new Button.ClickListener() {
                 @Override

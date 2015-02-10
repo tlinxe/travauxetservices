@@ -9,7 +9,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
-import fr.travauxetservices.component.AdForm;
+import fr.travauxetservices.component.CustomForm;
 import fr.travauxetservices.component.UserForm;
 import fr.travauxetservices.component.WrapperLayout;
 import fr.travauxetservices.event.CustomEventBus;
@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 @SuppressWarnings("serial")
 public final class DepositView extends Panel implements View {
-    private AdForm formAd;
+    private CustomForm formAd;
     private UserForm formUser;
 
     public DepositView() {
@@ -63,7 +63,7 @@ public final class DepositView extends Panel implements View {
     private Component buildAdForm() {
         final Ad newAd = new Ad();
         final BeanItem<Ad> newItem = new BeanItem<Ad>(newAd);
-        formAd = new AdForm(newItem, false);
+        formAd = new CustomForm(newItem, false);
 
         return new WrapperLayout("Votre annonce", formAd);
     }
