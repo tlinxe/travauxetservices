@@ -28,21 +28,21 @@ import java.util.Locale;
  * Created by Phobos on 02/01/15.
  */
 public class AdForm extends Form {
-    private final User user;
     private final Item item;
     private boolean readOnly;
     private FormLayout form;
     final HorizontalLayout wrapRegion = new HorizontalLayout();
     final HorizontalLayout wrapPrice = new HorizontalLayout();
 
-    public AdForm(User user, Item item, boolean readOnly) {
-        this.user = user;
+    public AdForm(Item item, boolean readOnly) {
         this.item = item;
         this.readOnly = readOnly;
 
+        // FieldFactory for customizing the fields and adding validators
+        setFormFieldFactory(new CustomFieldFactory());
+
         setBuffered(true);
-        //setValidationVisible(false);
-        //setValidationVisibleOnCommit(false);
+        setImmediate(true);
 
         form = new FormLayout();
         form.setMargin(true);
@@ -59,8 +59,6 @@ public class AdForm extends Form {
         wrapPrice.setMargin(false);
         wrapPrice.setSpacing(true);
 
-        // FieldFactory for customizing the fields and adding validators
-        setFormFieldFactory(new CustomFieldFactory());
         setItem(item, this.readOnly);
     }
 
@@ -186,7 +184,7 @@ public class AdForm extends Form {
         public Field createField(Item item, Object propertyId, Component uiContext) {
             // Use the super class to create a suitable field base on the
             // property type.
-            Field field = super.createField(item, propertyId, uiContext);
+            Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
             if ("type".equals(propertyId)) {
                 field = typeField;
             } else if ("created".equals(propertyId)) {
@@ -231,6 +229,9 @@ public class AdForm extends Form {
                 } else field = priceField;
             } else if ("remuneration".equals(propertyId)) {
                 field = remunerationField;
+            }
+            if (field instanceof AbstractTextField) {
+                ((AbstractTextField) field).setNullRepresentation("");
             }
             if (!isReadOnly()) field.addStyleName("tiny");
             field.addValidator(new BeanValidator(Ad.class, propertyId.toString()));

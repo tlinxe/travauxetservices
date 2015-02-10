@@ -49,6 +49,7 @@ public final class HomeView extends Panel implements View {
     private Window notificationsWindow;
     private GoogleMap map;
     private AdTable table;
+    private JPAContainer container;
 
     public HomeView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -183,34 +184,6 @@ public final class HomeView extends Panel implements View {
         }
     }
 
-    public void applyFilters(Division division) {
-        JPAContainer container = getContainer();
-        container.removeAllContainerFilters();
-        container.addContainerFilter(new Compare.Equal("validated", true));
-        if (division != null) {
-            List<Container.Filter> filters = new ArrayList<Container.Filter>();
-            filters.add(new Compare.Equal("division", division));
-            filters.add(new JoinFilter("city", new Compare.Equal("region", division.getId())));
-            container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
-        } else container.addContainerFilter(new Compare.Equal("division", null));
-        table.refreshRowCache();
-        table.firePagedChangedEvent();
-
-        int index = 1;
-        for (Object itemId : container.getItemIds()) {
-            EntityItem<Offer> item = container.getItem(itemId);
-            City city = item.getEntity().getCity();
-            if (city != null) {
-                double latitude = city.getLatitude();
-                double longitude = city.getLongitude();
-                if (latitude != 0 && longitude != 0) {
-                    GoogleMapMarker marker = new GoogleMapMarker(index + ". " + item.getEntity().getTitle(), new LatLon(latitude, longitude), false, null);
-                    if (!map.hasMarker(marker)) map.addMarker(marker);
-                }
-            }
-        }
-    }
-
     private Component buildTable() {
         table = new AdTable(10, true);
         table.setCaption("Top 10 des offres près de chez vous");
@@ -241,7 +214,44 @@ public final class HomeView extends Panel implements View {
     }
 
     private JPAContainer getContainer() {
-        return AppUI.getDataProvider().getOfferContainer();
+        if (container == null) {
+            container =  AppUI.getDataProvider().getOfferContainer();
+        }
+        return container;
+    }
+
+    public void applyFilters(Division division) {
+        JPAContainer container = getContainer();
+        container.removeAllContainerFilters();
+        container.addContainerFilter(new Compare.Equal("validated", true));
+
+        if (division == null) {
+            container.addContainerFilter(new Compare.Equal("division", null));
+        }
+        else {
+            List<Container.Filter> filters = new ArrayList<Container.Filter>();
+            filters.add(new Compare.Equal("division", division));
+            filters.add(new JoinFilter("city", new Compare.Equal("region", division.getId())));
+            container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
+        }
+
+        table.refreshRowCache();
+        table.setCurrentPage(1);
+        table.firePagedChangedEvent();
+
+        int index = 1;
+        for (Object itemId : container.getItemIds()) {
+            EntityItem<Offer> item = container.getItem(itemId);
+            City city = item.getEntity().getCity();
+            if (city != null) {
+                double latitude = city.getLatitude();
+                double longitude = city.getLongitude();
+                if (latitude != 0 && longitude != 0) {
+                    GoogleMapMarker marker = new GoogleMapMarker(index + ". " + item.getEntity().getTitle(), new LatLon(latitude, longitude), false, null);
+                    if (!map.hasMarker(marker)) map.addMarker(marker);
+                }
+            }
+        }
     }
 
 

@@ -31,6 +31,9 @@ public final class ValidationView extends Panel implements View {
     private AdTable requestTable;
     private ComboBox validatedField;
 
+    private JPAContainer offerContainer;
+    private JPAContainer requestContainer;
+
     public ValidationView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
@@ -98,14 +101,15 @@ public final class ValidationView extends Panel implements View {
     }
 
     private Component buildContent() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSpacing(true);
-        layout.addComponent(buildOfferContent());
-        layout.addComponent(buildRequestContent());
-        return layout;
+        TabSheet tabsheet = new TabSheet();
+        tabsheet.addStyleName("framed");
+        tabsheet.addTab(buildOfferContent(), I18N.getString("menu.offers"), FontAwesome.SHARE_SQUARE);
+        tabsheet.addTab(buildRequestContent(), I18N.getString("menu.requests"), FontAwesome.SHARE_SQUARE_O);
+        return tabsheet;
     }
 
     private Component buildOfferContent() {
+        VerticalLayout layout = new VerticalLayout();
         offerTable = new AdTable(10);
         offerTable.setEditable(true);
         offerTable.addStyleName(ValoTheme.TABLE_SMALL);
@@ -162,15 +166,17 @@ public final class ValidationView extends Panel implements View {
 
         offerTable.setVisibleColumns("created", "user", "title", "validated");
         offerTable.setColumnHeaders(I18N.getString("ad.created"), I18N.getString("ad.user"), I18N.getString("ad.title"), I18N.getString("ad.validated"));
-        offerTable.setColumnWidth("validated", 60);
+        offerTable.setColumnWidth("validated", 50);
         offerTable.setColumnExpandRatio("title", 1);
 
-        final WrapperLayout wrapperLayout = new WrapperLayout(I18N.getString("menu.offers"), offerTable);
-        wrapperLayout.addComponent(offerTable.createControls());
-        return wrapperLayout;
+        layout.addComponent(offerTable);
+        layout.addComponent(offerTable.createControls());
+        return layout;
     }
 
     private Component buildRequestContent() {
+        VerticalLayout layout = new VerticalLayout();
+
         requestTable = new AdTable(10);
         requestTable.setEditable(true);
         requestTable.addStyleName(ValoTheme.TABLE_SMALL);
@@ -227,23 +233,29 @@ public final class ValidationView extends Panel implements View {
 
         requestTable.setVisibleColumns("created", "user", "title", "validated");
         requestTable.setColumnHeaders(I18N.getString("ad.created"), I18N.getString("ad.user"), I18N.getString("ad.title"), I18N.getString("ad.validated"));
-        requestTable.setColumnWidth("validated", 60);
+        requestTable.setColumnWidth("validated", 50);
         requestTable.setColumnExpandRatio("title", 1);
 
-        final WrapperLayout wrapperLayout = new WrapperLayout(I18N.getString("menu.requests"), requestTable);
-        wrapperLayout.addComponent(requestTable.createControls());
-        return wrapperLayout;
+        layout.addComponent(requestTable);
+        layout.addComponent(requestTable.createControls());
+        return layout;
     }
 
     private JPAContainer getOfferContainer() {
-        return AppUI.getDataProvider().getOfferContainer();
+        if (offerContainer == null) {
+            offerContainer = AppUI.getDataProvider().getOfferContainer();
+        }
+        return offerContainer;
     }
 
     private JPAContainer getRequestContainer() {
-        return AppUI.getDataProvider().getRequestContainer();
+        if (requestContainer == null) {
+            requestContainer = AppUI.getDataProvider().getRequestContainer();
+        }
+        return requestContainer;
     }
 
-    private void applyFilters() {
+    private JPAContainer applyFilters() {
         JPAContainer offerContainer = getOfferContainer();
         offerContainer.removeAllContainerFilters();
         if (validatedField.getValue() != null) {
@@ -263,6 +275,7 @@ public final class ValidationView extends Panel implements View {
             requestTable.refreshRowCache();
             requestTable.setCurrentPage(1);
         }
+        return offerContainer;
     }
 
     private User getCurrentUser() {

@@ -12,6 +12,8 @@ import java.util.UUID;
  */
 @SuppressWarnings("serial")
 public final class OfferView extends AdView {
+    private JPAContainer container;
+
     public OfferView() {
         super(ViewType.OFFER.getViewName());
     }
@@ -23,7 +25,10 @@ public final class OfferView extends AdView {
 
     @Override
     public JPAContainer getContainer() {
-        return AppUI.getDataProvider().getOfferContainer();
+        if (container == null) {
+            container =  AppUI.getDataProvider().getOfferContainer();
+        }
+        return container;
     }
 
 

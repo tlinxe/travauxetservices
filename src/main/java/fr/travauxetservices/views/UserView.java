@@ -27,6 +27,7 @@ import fr.travauxetservices.tools.I18N;
 public final class UserView extends Panel implements View {
     private AdTable table;
     private ComboBox validatedField;
+    private JPAContainer container;
 
     public UserView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -147,7 +148,7 @@ public final class UserView extends Panel implements View {
         });
         table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             public void itemClick(ItemClickEvent e) {
-                UI.getCurrent().getNavigator().navigateTo(ViewType.PROFILE.getViewName() + "/" + e.getItem());
+                UI.getCurrent().getNavigator().navigateTo(ViewType.PROFILE.getViewName() + "/" + e.getItem().getItemProperty("id"));
             }
         });
 
@@ -158,7 +159,10 @@ public final class UserView extends Panel implements View {
     }
 
     private JPAContainer getContainer() {
-        return AppUI.getDataProvider().getUserContainer();
+        if (container == null) {
+            container =  AppUI.getDataProvider().getUserContainer();
+        }
+        return container;
     }
 
     private void applyFilters() {

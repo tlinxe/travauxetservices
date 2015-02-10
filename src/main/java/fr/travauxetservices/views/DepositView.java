@@ -63,7 +63,7 @@ public final class DepositView extends Panel implements View {
     private Component buildAdForm() {
         final Ad newAd = new Ad();
         final BeanItem<Ad> newItem = new BeanItem<Ad>(newAd);
-        formAd = new AdForm(getCurrentUser(), newItem, false);
+        formAd = new AdForm(newItem, false);
 
         return new WrapperLayout("Votre annonce", formAd);
     }

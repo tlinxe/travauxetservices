@@ -7,6 +7,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.tools.I18N;
@@ -14,6 +15,8 @@ import fr.travauxetservices.tools.I18N;
 @SuppressWarnings("serial")
 public class ConnectionWindow extends Window {
     public static final String ID = "connectionwindow";
+
+    private CheckBox rememberField;
 
     private ConnectionWindow() {
         addStyleName("profile-window");
@@ -51,11 +54,14 @@ public class ConnectionWindow extends Window {
         Responsive.makeResponsive(loginPanel);
         //loginPanel.addStyleName("login-panel");
 
+        rememberField = new CheckBox(I18N.getString("Connection.remember"));
+        rememberField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+
         Component component = buildButtonFB();
         loginPanel.addComponent(component);
         loginPanel.addComponent(new Label("<hr/>", ContentMode.HTML));
         loginPanel.addComponent(buildFields());
-        loginPanel.addComponent(new CheckBox("Remember me", true));
+        loginPanel.addComponent(rememberField);
         loginPanel.setComponentAlignment(component, Alignment.MIDDLE_CENTER);
         return loginPanel;
     }
@@ -65,28 +71,30 @@ public class ConnectionWindow extends Window {
         fields.setSpacing(true);
         fields.addStyleName("fields");
 
-        final TextField username = new TextField(I18N.getString("user.email"));
-        username.setIcon(FontAwesome.USER);
-        username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        username.setValue("tlinxe@email.fr");
+        String username = AppUI.getValueCookie(AppUI.USERNAME_COOKIE);
+        final TextField usernameField = new TextField(I18N.getString("user.email"));
+        usernameField.setIcon(FontAwesome.USER);
+        usernameField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        usernameField.setValue(username != null ? username : "tlinxe@email.fr");
 
-        final PasswordField password = new PasswordField(I18N.getString("user.password"));
-        password.setIcon(FontAwesome.LOCK);
-        password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        password.setValue("motdepasse");
+        String password = AppUI.getValueCookie(AppUI.PASSWORD_COOKIE);
+        final PasswordField passwordField = new PasswordField(I18N.getString("user.password"));
+        passwordField.setIcon(FontAwesome.LOCK);
+        passwordField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        passwordField.setValue(password != null ? password : "motdepasse");
 
-        final Button signin = new Button("Se connecter");
+        final Button signin = new Button(I18N.getString("Connection.signin"));
         signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
         signin.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         signin.focus();
 
-        fields.addComponents(username, password, signin);
+        fields.addComponents(usernameField, passwordField, signin);
         fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
 
         signin.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(final Button.ClickEvent event) {
-                CustomEventBus.post(new CustomEvent.UserLoginRequestedEvent(username.getValue(), password.getValue()));
+                CustomEventBus.post(new CustomEvent.UserLoginRequestedEvent(usernameField.getValue(), passwordField.getValue(), rememberField.getValue()));
             }
         });
         return fields;

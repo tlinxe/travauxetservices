@@ -12,6 +12,8 @@ import java.util.UUID;
  */
 @SuppressWarnings("serial")
 public final class RequestView extends AdView {
+    private JPAContainer container;
+
     public RequestView() {
         super(ViewType.REQUEST.getViewName());
     }
@@ -23,7 +25,10 @@ public final class RequestView extends AdView {
 
     @Override
     public JPAContainer getContainer() {
-        return AppUI.getDataProvider().getRequestContainer();
+        if (container == null) {
+            container = AppUI.getDataProvider().getRequestContainer();
+        }
+        return container;
     }
 
     @Override

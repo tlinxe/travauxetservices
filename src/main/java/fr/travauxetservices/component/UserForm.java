@@ -188,7 +188,7 @@ public class UserForm extends Form {
         public Field createField(Item item, Object propertyId, Component uiContext) {
             // Use the super class to create a suitable field base on the
             // property type.
-            Field field = super.createField(item, propertyId, uiContext);
+            Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
             if ("picture".equals(propertyId)) {
                 final Object professional = item.getItemProperty("professional").getValue();
                 if (professional instanceof Boolean) {
@@ -218,6 +218,9 @@ public class UserForm extends Form {
                 field = passwordField;
             } else if ("phone".equals(propertyId)) {
                 field = phoneField;
+            }
+            if (field instanceof AbstractTextField) {
+                ((AbstractTextField) field).setNullRepresentation("");
             }
             if (!isReadOnly()) field.addStyleName("tiny");
             field.addValidator(new BeanValidator(User.class, propertyId.toString()));

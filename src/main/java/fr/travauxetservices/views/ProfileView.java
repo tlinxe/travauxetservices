@@ -91,6 +91,8 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
 
     @Override
     public Field createField(Item item, Object propertyId, Component uiContext) {
+        // Use the super class to create a suitable field base on the
+        // property type.
         Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
         if ("picture".equals(propertyId)) {
             field = new PictureField(field.getCaption());
@@ -103,8 +105,10 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         } else if ("password".equals(propertyId)) {
             field = new PasswordField(field.getCaption());
         }
+        if (field instanceof AbstractTextField) {
+            ((AbstractTextField) field).setNullRepresentation("");
+        }
         field.addStyleName("tiny");
-
         field.addValidator(new BeanValidator(User.class, propertyId.toString()));
         return field;
     }

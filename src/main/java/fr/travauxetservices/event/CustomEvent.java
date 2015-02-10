@@ -11,10 +11,12 @@ public abstract class CustomEvent {
 
     public static final class UserLoginRequestedEvent {
         private final String userName, password;
+        private final boolean remember;
 
-        public UserLoginRequestedEvent(final String userName, final String password) {
+        public UserLoginRequestedEvent(final String userName, final String password, final boolean remember) {
             this.userName = userName;
             this.password = password;
+            this.remember = remember;
         }
 
         public String getUserName() {
@@ -23,6 +25,10 @@ public abstract class CustomEvent {
 
         public String getPassword() {
             return password;
+        }
+
+        public boolean isRemember() {
+            return remember;
         }
     }
 

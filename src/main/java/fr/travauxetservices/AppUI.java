@@ -18,6 +18,7 @@ import fr.travauxetservices.views.MainView;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import java.util.Locale;
 
 @Theme("mytheme")
@@ -56,6 +57,9 @@ public class AppUI extends UI {
         DummyDataGenerator.create();
     }
 
+    public static final String USERNAME_COOKIE = "username";
+    public static final String PASSWORD_COOKIE = "password";
+    public static final String REMEMBER_COOKIE = "remember";
     public static final String PERSISTENCE_UNIT = "h2";
 
     private DataProvider dataProvider;
@@ -71,6 +75,11 @@ public class AppUI extends UI {
         Responsive.makeResponsive(this);
 
         dataProvider = new AppDataProvider();
+
+        String remember = getValueCookie(REMEMBER_COOKIE);
+        if ("TRUE".equalsIgnoreCase(remember)) {
+            signin(getValueCookie(USERNAME_COOKIE), getValueCookie(PASSWORD_COOKIE));
+        }
 
         updateContent();
 
@@ -92,10 +101,19 @@ public class AppUI extends UI {
 
     @Subscribe
     public void userLoginRequested(final CustomEvent.UserLoginRequestedEvent event) {
-        User user = getDataProvider().authenticate(event.getUserName(), event.getPassword());
-        VaadinSession.getCurrent().setAttribute(User.class.getName(), user);
-        if (user != null) {
-            updateContent();
+        signin(event.getUserName(), event.getPassword());
+        setCookie(USERNAME_COOKIE, event.getUserName());
+        setCookie(PASSWORD_COOKIE, event.getPassword());
+        setCookie(REMEMBER_COOKIE, Boolean.toString(event.isRemember()));
+    }
+
+    public void signin(String username, String password) {
+        if (username != null && password != null) {
+            User user = getDataProvider().authenticate(username, password);
+            VaadinSession.getCurrent().setAttribute(User.class.getName(), user);
+            if (user != null) {
+                updateContent();
+            }
         }
     }
 
@@ -113,6 +131,35 @@ public class AppUI extends UI {
         for (Window window : getWindows()) {
             window.close();
         }
+    }
+
+    private void setCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(60 * 60 * 24 * 30);
+        // Set the cookie path.
+        cookie.setPath(VaadinService.getCurrentRequest().getContextPath());
+
+        // Save cookie
+        VaadinService.getCurrentResponse().addCookie(cookie);
+    }
+
+    static private Cookie getCookie(String name) {
+        // Fetch all cookies from the request
+        Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
+
+        // Iterate to find cookie by its name
+        for (Cookie cookie : cookies) {
+            if (name.equals(cookie.getName())) {
+                return cookie;
+            }
+        }
+
+        return null;
+    }
+
+    static public String getValueCookie(String name) {
+        Cookie cookie = getCookie(name);
+        return cookie != null ? cookie.getValue() : null;
     }
 
     /**
