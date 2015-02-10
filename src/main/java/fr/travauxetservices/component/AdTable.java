@@ -48,9 +48,8 @@ public class AdTable extends PagedTable {
             addGeneratedColumn("division", new DivisionColumnGenerator());
             addGeneratedColumn("remuneration", new RemunerationColumnGenerator(getLocale() != null ? getLocale() : Locale.getDefault()));
             addGeneratedColumn("title", new TitleColumnGenerator());
+            addGeneratedColumn("user", new UserColumnGenerator());
         }
-        addGeneratedColumn("user", new UserColumnGenerator());
-//        addGeneratedColumn("validated", new ValidatedColumnGenerator());
     }
 
     @Override
@@ -70,23 +69,17 @@ public class AdTable extends PagedTable {
     public class UserColumnGenerator implements Table.ColumnGenerator {
         public Component generateCell(Table source, Object itemId, Object columnId) {
             User user = (User) source.getContainerProperty(itemId, "user").getValue();
-            if (formatted) {
-                Resource resource = new ClassResource("/images/profile-pic-300px.jpg");
-                if (user != null) {
-                    if (user.getPicture() != null) {
-                        resource = new StreamResource(new IOToolkit.ByteArraySource(user.getPicture()), "picture.png");
-                    }
+            Resource resource = new ClassResource("/images/profile-pic-300px.jpg");
+            if (user != null) {
+                if (user.getPicture() != null) {
+                    resource = new StreamResource(new IOToolkit.ByteArraySource(user.getPicture()), "picture.png");
                 }
-                Image image = new Image(null, resource);
-                image.addStyleName("border");
-                image.setWidth(simplified ? 40 : 60, Unit.PIXELS);
-                image.setHeight(simplified ? 40 : 60, Unit.PIXELS);
-                return image;
-            } else {
-                final Label field = new Label();
-                field.setValue(user.getCommonName());
-                return field;
             }
+            Image image = new Image(null, resource);
+            image.addStyleName("border");
+            image.setWidth(simplified ? 40 : 60, Unit.PIXELS);
+            image.setHeight(simplified ? 40 : 60, Unit.PIXELS);
+            return image;
         }
     }
 
@@ -165,16 +158,24 @@ public class AdTable extends PagedTable {
         }
     }
 
-//    public class ValidatedColumnGenerator implements Table.ColumnGenerator {
-//        public Component generateCell(final Table source, Object itemId, Object columnId) {
-//            final CheckBox field = new CheckBox("Editable");
-//            field.addValueChangeListener(new ValueChangeListener() {
-//                @Override
-//                public void valueChange(final com.vaadin.data.Property.ValueChangeEvent event) {
-//                    System.out.println("AdTable.ValidatedColumnGenerator value: "+((Boolean) event.getProperty().getValue()).booleanValue());
-//                }
-//            });
-//            return field;
-//        }
-//    }
+    static public class ValueColumnGenerator implements Table.ColumnGenerator {
+        /**
+         * Generates the cell containing the value.
+         * The column is irrelevant in this use case.
+         */
+        public Component generateCell(Table source, Object itemId, Object columnId) {
+            // Get the object stored in the cell as a property
+            Property prop = source.getItem(itemId).getItemProperty(columnId);
+            String value = ((AdTable) source).formatPropertyValue(itemId, columnId, prop);
+            Label label = new Label(value);
+
+            // Set styles for the column: one indicating that it's
+            // a value and a more specific one with the column
+            // name in it. This assumes that the column name
+            // is proper for CSS.
+            label.addStyleName("column-type-value");
+            label.addStyleName("column-" + columnId);
+            return label;
+        }
+    }
 }

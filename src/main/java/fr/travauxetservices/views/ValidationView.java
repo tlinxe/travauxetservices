@@ -118,6 +118,9 @@ public final class ValidationView extends Panel implements View {
         applyFilters();
         offerTable.setContainerDataSource(getOfferContainer());
 
+        offerTable.addGeneratedColumn("created", new AdTable.ValueColumnGenerator());
+        offerTable.addGeneratedColumn("user", new AdTable.ValueColumnGenerator());
+        offerTable.addGeneratedColumn("title", new AdTable.ValueColumnGenerator());
         offerTable.addGeneratedColumn("validated", new Table.ColumnGenerator() {
             public Object generateCell(Table source, Object itemId, Object columnId) {
                 final CheckBox field = new CheckBox();
@@ -166,6 +169,7 @@ public final class ValidationView extends Panel implements View {
 
         offerTable.setVisibleColumns("created", "user", "title", "validated");
         offerTable.setColumnHeaders(I18N.getString("ad.created"), I18N.getString("ad.user"), I18N.getString("ad.title"), I18N.getString("ad.validated"));
+        offerTable.setColumnWidth("created", 120);
         offerTable.setColumnWidth("validated", 50);
         offerTable.setColumnExpandRatio("title", 1);
 
@@ -185,6 +189,9 @@ public final class ValidationView extends Panel implements View {
         applyFilters();
         requestTable.setContainerDataSource(getRequestContainer());
 
+        requestTable.addGeneratedColumn("created", new AdTable.ValueColumnGenerator());
+        requestTable.addGeneratedColumn("user", new AdTable.ValueColumnGenerator());
+        requestTable.addGeneratedColumn("title", new AdTable.ValueColumnGenerator());
         requestTable.addGeneratedColumn("validated", new Table.ColumnGenerator() {
             public Object generateCell(Table source, Object itemId, Object columnId) {
                 final CheckBox field = new CheckBox();
@@ -233,6 +240,7 @@ public final class ValidationView extends Panel implements View {
 
         requestTable.setVisibleColumns("created", "user", "title", "validated");
         requestTable.setColumnHeaders(I18N.getString("ad.created"), I18N.getString("ad.user"), I18N.getString("ad.title"), I18N.getString("ad.validated"));
+        requestTable.setColumnWidth("created", 120);
         requestTable.setColumnWidth("validated", 50);
         requestTable.setColumnExpandRatio("title", 1);
 

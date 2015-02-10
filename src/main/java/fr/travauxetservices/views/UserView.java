@@ -114,6 +114,9 @@ public final class UserView extends Panel implements View {
         applyFilters();
         table.setContainerDataSource(getContainer());
 
+        table.addGeneratedColumn("created", new AdTable.ValueColumnGenerator());
+        table.addGeneratedColumn("email", new AdTable.ValueColumnGenerator());
+        table.addGeneratedColumn("lastName", new AdTable.ValueColumnGenerator());
         table.addGeneratedColumn("validated", new Table.ColumnGenerator() {
             public Object generateCell(Table source, Object itemId, Object columnId) {
                 final CheckBox field = new CheckBox();
