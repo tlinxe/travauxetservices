@@ -23,6 +23,8 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
+import fr.travauxetservices.component.ConnectionWindow;
+import fr.travauxetservices.component.RegistrationWindow;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.City;
@@ -97,12 +99,23 @@ public final class HomeView extends Panel implements View {
         layout.addComponent(i2);
 
         VerticalLayout verticalLayout = new VerticalLayout();
-        Label h2 = new Label("A propos de Travaux et Services");
-        h2.addStyleName("h3");
+        verticalLayout.setSpacing(true);
+        Label h2 = new Label(I18N.getString("message.about"));
+        h2.addStyleName(ValoTheme.LABEL_H2);
         verticalLayout.addComponent(h2);
-        Label t2 = new Label("Travaux et Services est un site de petites annonces gratuites de particuliers et professionnels. Vous pouvez passer une annonce gratuite ou consulter nos petites annonces dans différentes catégories... bla bla bla.", ContentMode.HTML);
+        Label t2 = new Label(I18N.getString("message.about.text"), ContentMode.HTML);
         t2.addStyleName("small");
         verticalLayout.addComponent(t2);
+
+        final Button registration = new Button(I18N.getString("registration") + "...", new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                RegistrationWindow.open();
+            }
+        });
+        registration.addStyleName(ValoTheme.BUTTON_SMALL);
+        registration.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        verticalLayout.addComponent(registration);
 
         layout.addComponent(verticalLayout);
         layout.setExpandRatio(verticalLayout, 1f);

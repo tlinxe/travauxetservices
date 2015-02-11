@@ -27,14 +27,14 @@ import java.util.Locale;
 /**
  * Created by Phobos on 02/01/15.
  */
-public class CustomForm extends Form {
+public class AdForm extends Form {
     private final Item item;
     private boolean readOnly;
     private FormLayout form;
     final HorizontalLayout wrapRegion = new HorizontalLayout();
     final HorizontalLayout wrapPrice = new HorizontalLayout();
 
-    public CustomForm(Item item, boolean readOnly) {
+    public AdForm(Item item, boolean readOnly) {
         this.item = item;
         this.readOnly = readOnly;
 

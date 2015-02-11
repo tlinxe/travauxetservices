@@ -26,7 +26,6 @@ public class ConnectionWindow extends Window {
         setModal(true);
         setCloseShortcut(ShortcutAction.KeyCode.ESCAPE, null);
         setResizable(false);
-        setClosable(false);
         setHeight(250, Unit.PIXELS);
         setWidth(550, Unit.PIXELS);
 
@@ -35,7 +34,7 @@ public class ConnectionWindow extends Window {
         content.setMargin(new MarginInfo(true, false, false, false));
         setContent(content);
 
-        Component loginForm = buildLoginForm();
+        Component loginForm = buildForm();
         content.addComponent(loginForm);
         content.setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
 
@@ -47,7 +46,7 @@ public class ConnectionWindow extends Window {
 //        notification.show(Page.getCurrent());
     }
 
-    private Component buildLoginForm() {
+    private Component buildForm() {
         final VerticalLayout loginPanel = new VerticalLayout();
         loginPanel.setSizeUndefined();
         loginPanel.setSpacing(true);
