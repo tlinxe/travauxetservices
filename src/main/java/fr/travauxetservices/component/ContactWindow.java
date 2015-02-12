@@ -44,15 +44,15 @@ public class ContactWindow extends Window {
 
     private Component buildForm() {
         final VerticalLayout layout = new VerticalLayout();
-        layout.setWidth("100%");
-        layout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+        //layout.setSizeFull();
+        layout.setMargin(true);
+        layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
         //layout.setSizeUndefined();
         layout.setSpacing(true);
         Responsive.makeResponsive(layout);
 
         form = new FormLayout();
-        form.setSizeFull();
-        form.setMargin(true);
+        //form.setSizeFull();
 
         final TextField nameField = new TextField("Votre nom");
         nameField.setIcon(FontAwesome.USER);
@@ -73,11 +73,11 @@ public class ContactWindow extends Window {
         textField.addStyleName(ValoTheme.TEXTFIELD_TINY);
         textField.addStyleName("notes");
         textField.setSizeFull();
-        form.addComponent(textField);
 
         layout.addComponent(form);
+        layout.addComponent(textField);
         //layout.addComponent(buildFooter());
-        layout.setExpandRatio(form, 1);
+        layout.setExpandRatio(textField, 1);
 
         return layout;
     }
