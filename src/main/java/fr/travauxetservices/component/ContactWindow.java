@@ -33,7 +33,7 @@ public class ContactWindow extends Window {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
-        content.setMargin(new MarginInfo(true, false, false, false));
+        content.setMargin(true);
         setContent(content);
 
         Component form = buildForm();
@@ -44,8 +44,7 @@ public class ContactWindow extends Window {
 
     private Component buildForm() {
         final VerticalLayout layout = new VerticalLayout();
-        //layout.setSizeFull();
-        layout.setMargin(true);
+        layout.setWidth("100%");
         layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
         //layout.setSizeUndefined();
         layout.setSpacing(true);
@@ -85,7 +84,6 @@ public class ContactWindow extends Window {
     private Component buildFooter() {
         HorizontalLayout footer = new HorizontalLayout();
         footer.setWidth("100%");
-        footer.setMargin(true);
         footer.setSpacing(true);
         footer.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
         //footer.addStyleName("v-window-bottom-toolbar");

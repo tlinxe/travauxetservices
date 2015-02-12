@@ -40,17 +40,19 @@ public class RegistrationWindow extends Window {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
-        content.setMargin(new MarginInfo(true, false, false, false));
+        content.setMargin(true);
         setContent(content);
 
         Component form = buildForm();
         content.addComponent(form);
+        content.addComponent(buildFooter());
+        content.setExpandRatio(form, 1);
     }
 
     private Component buildForm() {
         final HorizontalLayout layout = new HorizontalLayout();
         layout.setWidth("100%");
-        layout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+        layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
         //layout.setSizeUndefined();
         layout.setSpacing(true);
         Responsive.makeResponsive(layout);
@@ -59,8 +61,6 @@ public class RegistrationWindow extends Window {
         form = new UserForm(null, newItem, false, true);
         layout.addComponent(form);
         //layout.setExpandRatio(form, 1);
-
-        form.getFooter().addComponent(buildFooter());
 
         return layout;
     }
