@@ -138,7 +138,6 @@ public final class ValidationView extends Panel implements View {
                             String url = AppUI.getEncodedUrl() + "/#!" + ViewType.OFFER.getViewName() + "/" + item;
                             String subject = I18N.getString("message.ad.online.subject", new String[]{title});
                             String text = I18N.getString("message.ad.online.text", new String[]{title, url});
-                            System.out.println("title: " + title + " url: " + url);
                             applyFilters();
                             Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", user.getEmail(), subject, text, false);
                         }

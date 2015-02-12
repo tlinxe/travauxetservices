@@ -1,6 +1,7 @@
 package fr.travauxetservices.views;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.JPAContainerItem;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -128,10 +129,25 @@ public final class UserView extends Panel implements View {
                     public void valueChange(Property.ValueChangeEvent event) {
                         if ((Boolean) event.getProperty().getValue()) {
                             property.setValue(event.getProperty().getValue());
-
+                            applyFilters();
                         }
                     }
                 });
+                return field;
+            }
+        });
+        table.addGeneratedColumn("id", new Table.ColumnGenerator() {
+            public Object generateCell(final Table source, final Object itemId, final Object columnId) {
+                final Button field = new Button("Remove", new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        final Item item = source.getItem(itemId);
+                        final Property property = item.getItemProperty(columnId);
+                        AppUI.getDataProvider().removeUser(property.getValue());
+                        applyFilters();
+                    }
+                });
+                field.addStyleName(ValoTheme.BUTTON_TINY);
                 return field;
             }
         });
@@ -155,8 +171,8 @@ public final class UserView extends Panel implements View {
             }
         });
 
-        table.setVisibleColumns("created", "email", "lastName", "validated");
-        table.setColumnHeaders(I18N.getString("user.created"), I18N.getString("user.email"), I18N.getString("user.lastName"), I18N.getString("user.validated"));
+        table.setVisibleColumns("created", "email", "lastName", "validated", "id");
+        table.setColumnHeaders(I18N.getString("user.created"), I18N.getString("user.email"), I18N.getString("user.lastName"), I18N.getString("user.validated"), "");
         table.setColumnWidth("validated", 60);
         return table;
     }

@@ -26,6 +26,8 @@ public interface DataProvider {
 
     public void addOffer(Ad a) throws UnsupportedOperationException;
 
+    public void addAd(Ad a) throws UnsupportedOperationException;
+
     public JPAContainer<Category> getCategoryContainer();
 
     public Collection<Category> getCategories();
@@ -52,7 +54,13 @@ public interface DataProvider {
 
     public EntityItem<User> getUser(Object itemId);
 
+    public void removeUser(final Object itemId) throws UnsupportedOperationException;
+
     public User authenticate(String email, String password);
+
+    public User findUser(String email);
+
+    public boolean hasUser(String email);
 
     public JPAContainer<Message> getMessageContainer();
 

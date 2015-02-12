@@ -117,7 +117,6 @@ public class AdLayout extends VerticalLayout {
 
         RatingStars ratingStars = new CustomRatingStars();
         ratingStars.setMaxValue(5);
-        System.out.println("AdLayout.buildReviewsContent getOverallRating: " + user.getOverallRating());
         ratingStars.setValue(user.getOverallRating());
         ratingStars.setReadOnly(true);
         ratingStars.addStyleName("large");

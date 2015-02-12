@@ -6,6 +6,9 @@ import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.data.util.filter.Compare;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.*;
+import fr.travauxetservices.services.Mail;
+import fr.travauxetservices.tools.I18N;
+import fr.travauxetservices.views.ViewType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +64,7 @@ public class AppDataProvider implements DataProvider {
         return values;
     }
 
-    public void addRequest(Ad a) throws UnsupportedOperationException {
+    public void addRequest(Ad a) throws UnsupportedOperationException, IllegalStateException {
         getRequestContainer().addEntity(new Request(a));
     }
 
@@ -85,8 +88,17 @@ public class AppDataProvider implements DataProvider {
         return values;
     }
 
-    public void addOffer(Ad a) throws UnsupportedOperationException {
+    public void addOffer(Ad a) throws UnsupportedOperationException, IllegalStateException {
         getOfferContainer().addEntity(new Offer(a));
+    }
+
+    public void addAd(Ad a) throws UnsupportedOperationException, IllegalStateException {
+        if (a instanceof Offer) {
+            AppUI.getDataProvider().addOffer(a);
+        }
+        if (a instanceof Request) {
+            AppUI.getDataProvider().addRequest(a);
+        }
     }
 
     @Override
@@ -192,8 +204,17 @@ public class AppDataProvider implements DataProvider {
 
     }
 
-    public void addUser(User u) throws UnsupportedOperationException {
+    public void addUser(User u) throws UnsupportedOperationException, IllegalStateException {
         getUserContainer().addEntity(u);
+
+        String url = AppUI.getEncodedUrl() + "/#!" + ViewType.PROFILE.getViewName() + "/" + u.getId();
+        String subject = I18N.getString("message.user.account.subject");
+        String text = I18N.getString("message.user.account.text", new String[]{u.toString(), url});
+        Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", u.toString(), subject, text, false);
+    }
+
+    public void removeUser(final Object itemId) throws UnsupportedOperationException {
+        getUserContainer().removeItem(itemId);
     }
 
     @Override
@@ -202,8 +223,18 @@ public class AppDataProvider implements DataProvider {
         container.addContainerFilter(new Compare.Equal("email", email));
         container.addContainerFilter(new Compare.Equal("password", password));
         Object user = container.firstItemId();
-        container.removeAllContainerFilters();
         return user != null ? container.getItem(user).getEntity() : null;
+    }
+
+    public User findUser(String email) {
+        JPAContainer<User> container = getUserContainer();
+        container.addContainerFilter(new Compare.Equal("email", email));
+        Object user = container.firstItemId();
+        return user != null ? container.getItem(user).getEntity() : null;
+    }
+
+    public boolean hasUser(String email) {
+        return findUser(email) != null;
     }
 
     public JPAContainer<Message> getMessageContainer() {

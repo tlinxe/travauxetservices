@@ -5,16 +5,14 @@ import com.vaadin.server.ClassResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
+import com.vaadin.ui.*;
 import fr.travauxetservices.model.Remuneration;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.DateToolkit;
 import fr.travauxetservices.tools.HtmlEscape;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.tools.IOToolkit;
+import org.vaadin.teemu.ratingstars.RatingStars;
 
 import java.text.NumberFormat;
 import java.util.Date;
@@ -134,15 +132,11 @@ public class AdTable extends PagedTable {
 
     public class DivisionColumnGenerator implements Table.ColumnGenerator {
         public Component generateCell(Table source, Object itemId, Object columnId) {
+            VerticalLayout layout = new VerticalLayout();
             StringBuffer text = new StringBuffer();
-            Property pUser = source.getContainerProperty(itemId, "user");
-            if (pUser.getValue() != null) {
-                User user = (User) pUser.getValue();
-                if (user != null) {
-                    if (user.isProfessional()) {
-                        text.append("<b>").append(I18N.getString("user.professional")).append("</b>");
-                    }
-                }
+            User user = (User) source.getContainerProperty(itemId, "user").getValue();
+            if (user.isProfessional()) {
+                text.append("<b>").append(I18N.getString("user.professional")).append("</b>");
             }
             Property value = source.getContainerProperty(itemId, columnId);
             if (value.getValue() != null) {
@@ -154,7 +148,18 @@ public class AdTable extends PagedTable {
                 if (text.length() > 0) text.append("<br/>");
                 text.append(city.getValue());
             }
-            return new Label(text.toString(), ContentMode.HTML);
+            layout.addComponent(new Label(text.toString(), ContentMode.HTML));
+            double rating = user.getOverallRating();
+            if (rating > 0) {
+                RatingStars ratingStars = new CustomRatingStars();
+                ratingStars.setMaxValue(5);
+                ratingStars.setValue(rating);
+                ratingStars.setReadOnly(true);
+                ratingStars.addStyleName("tiny");
+                ratingStars.setImmediate(true);
+                layout.addComponent(ratingStars);
+            }
+            return layout;
         }
     }
 

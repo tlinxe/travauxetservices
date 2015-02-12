@@ -15,11 +15,7 @@ import fr.travauxetservices.component.WrapperLayout;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.model.User;
-import fr.travauxetservices.services.Mail;
 import fr.travauxetservices.tools.I18N;
-
-import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by Phobos on 12/12/14.
@@ -86,35 +82,20 @@ public final class DepositView extends Panel implements View {
                     formAd.commit();
                     if (user == null) {
                         formUser.commit();
-                        BeanItem item = (BeanItem) formUser.getItemDataSource();
-                        user = (User) item.getBean();
-                        Object email = user.getEmail();
+                        user = ((BeanItem<User>) formUser.getItemDataSource()).getBean();
                         AppUI.getDataProvider().addUser(user);
-
-                        String url = AppUI.getEncodedUrl() + "/#!" + ViewType.PROFILE.getViewName() + "/" + user.getId();
-                        String subject = I18N.getString("message.user.account.subject");
-                        String text = I18N.getString("message.user.account.text", new String[]{email.toString(), url});
-                        Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", email.toString(), subject, text, false);
                     }
 
-                    formAd.commit();
                     Ad newAd = ((BeanItem<Ad>) formAd.getItemDataSource()).getBean();
                     newAd.setUser(user);
-                    newAd.setId(UUID.randomUUID());
-                    newAd.setCreated(new Date(System.currentTimeMillis()));
-                    newAd.setValidated(false);
-                    if (newAd.getType() == Ad.Type.OFFER) {
-                        AppUI.getDataProvider().addOffer(newAd);
-                    } else {
-                        AppUI.getDataProvider().addRequest(newAd);
-                    }
+                    AppUI.getDataProvider().addAd(newAd);
                     if (newAd.getType() == Ad.Type.OFFER) {
                         UI.getCurrent().getNavigator().navigateTo(ViewType.OFFER.getViewName() + "/" + newAd.getId().toString());
                     } else {
                         UI.getCurrent().getNavigator().navigateTo(ViewType.REQUEST.getViewName() + "/" + newAd.getId().toString());
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //Ignored
                 }
             }
         });

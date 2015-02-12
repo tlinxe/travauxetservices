@@ -23,7 +23,7 @@ public class Ad implements Serializable {
     protected Date created;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.REMOVE)
     protected User user;
 
     @NotNull

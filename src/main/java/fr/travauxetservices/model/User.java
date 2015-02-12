@@ -58,7 +58,7 @@ public class User implements Serializable {
     protected boolean professional;
     boolean validated;
 
-    @OneToMany
+    @OneToMany(cascade=CascadeType.REMOVE)
     private Set<Rating> ratings;
 
     public User() {

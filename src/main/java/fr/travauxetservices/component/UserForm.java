@@ -7,8 +7,10 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.views.PictureField;
@@ -240,6 +242,13 @@ public class UserForm extends Form {
 
     @Override
     public void commit() throws SourceException, Validator.InvalidValueException {
+        TextField field = (TextField)getField("email");
+        if (field != null && field.isModified() && field.getValue() != null) {
+            if (AppUI.getDataProvider().hasUser(field.getValue())) {
+                field.setComponentError(new UserError(I18N.getString("message.email.address.already.exists")));
+                throw new Validator.InvalidValueException(I18N.getString("message.email.address.already.exists"));
+            }
+        }
         super.commit();
         fireEvent(new EditorSavedEvent(this, item));
     }
