@@ -141,12 +141,12 @@ public class AdTable extends PagedTable {
             Property value = source.getContainerProperty(itemId, columnId);
             if (value.getValue() != null) {
                 if (text.length() > 0) text.append("<br/>");
-                text.append(value);
+                text.append("<nobr>").append(value).append("</nobr>");
             }
             Property city = source.getContainerProperty(itemId, "city");
             if (city.getValue() != null) {
                 if (text.length() > 0) text.append("<br/>");
-                text.append(city.getValue());
+                text.append("<nobr>").append(city.getValue()).append("</nobr>");
             }
             layout.addComponent(new Label(text.toString(), ContentMode.HTML));
             double rating = user.getOverallRating();

@@ -34,8 +34,7 @@ public class UserForm extends Form {
     final Button emailButton = new Button("Contacter par email", new Button.ClickListener() {
         @Override
         public void buttonClick(Button.ClickEvent event) {
-            Object data = event.getButton().getData();
-            event.getButton().setCaption(data != null ? data.toString() : "?");
+            ContactWindow.open();
         }
     });
     final Button phoneButton = new Button("Afficher le téléphone", new Button.ClickListener() {
