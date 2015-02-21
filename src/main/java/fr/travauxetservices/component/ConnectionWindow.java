@@ -53,7 +53,7 @@ public class ConnectionWindow extends Window {
         Responsive.makeResponsive(loginPanel);
         //loginPanel.addStyleName("login-panel");
 
-        rememberField = new CheckBox(I18N.getString("Connection.remember"));
+        rememberField = new CheckBox(I18N.getString("connection.remember"));
         rememberField.addStyleName(ValoTheme.CHECKBOX_SMALL);
 
         Component component = buildButtonFB();
@@ -82,7 +82,7 @@ public class ConnectionWindow extends Window {
         passwordField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
         passwordField.setValue(password != null ? password : "motdepasse");
 
-        final Button signin = new Button(I18N.getString("Connection.signin"));
+        final Button signin = new Button(I18N.getString("connection.signin"));
         signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
         signin.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         signin.focus();

@@ -6,6 +6,8 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.AbstractErrorMessage;
+import com.vaadin.server.ErrorMessage;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.*;
@@ -14,6 +16,9 @@ import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.views.PictureField;
+import pl.lt.vaadin.ui.FormRowLayout;
+import pl.lt.vaadin.ui.RowLayout;
+import pl.lt.vaadin.ui.client.rowlayout.RowLayoutState;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -28,22 +33,7 @@ public class UserForm extends Form {
     private final Item item;
     private boolean readOnly;
     private boolean textual;
-    private FormLayout form;
-    final HorizontalLayout wrapUser = new HorizontalLayout();
-
-    final Button emailButton = new Button("Contacter par email", new Button.ClickListener() {
-        @Override
-        public void buttonClick(Button.ClickEvent event) {
-            ContactWindow.open();
-        }
-    });
-    final Button phoneButton = new Button("Afficher le téléphone", new Button.ClickListener() {
-        @Override
-        public void buttonClick(Button.ClickEvent event) {
-            Object data = event.getButton().getData();
-            event.getButton().setCaption(data != null ? data.toString() : "?");
-        }
-    });
+    private FormRowLayout form;
 
     public UserForm(User user) {
         this(user, new BeanItem<User>(user), true, false);
@@ -56,28 +46,18 @@ public class UserForm extends Form {
         this.textual = textual;
 
         setBuffered(true);
+        setImmediate(true);
         setValidationVisible(false);
-        //setValidationVisibleOnCommit(false);
+        setValidationVisibleOnCommit(false);
 
-        form = new FormLayout();
-        form.setMargin(false);
+        form = new FormRowLayout(1, "100px");
+        form.setDefaultCaptionWidth("100px");
+        form.setDefaultComponentAlignment(Alignment.TOP_LEFT);
+        form.setMargin(true);
         form.setSpacing(true);
         form.setReadOnly(this.readOnly);
-        wrapUser.addComponent(form);
 
-        setLayout(wrapUser);
-
-        wrapUser.addStyleName("profile-form");
-        wrapUser.setMargin(true);
-        wrapUser.setSpacing(true);
-
-        phoneButton.setIcon(FontAwesome.PHONE);
-        phoneButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        phoneButton.addStyleName(ValoTheme.BUTTON_SMALL);
-
-        emailButton.setIcon(FontAwesome.ENVELOPE);
-        emailButton.addStyleName(ValoTheme.BUTTON_DANGER);
-        emailButton.addStyleName(ValoTheme.BUTTON_SMALL);
+        setLayout(form);
 
         // FieldFactory for customizing the fields and adding validators
         setFormFieldFactory(new CustomFieldFactory());
@@ -90,7 +70,7 @@ public class UserForm extends Form {
 
     private List<String> getFields() {
         List<String> values = new ArrayList<String>();
-        values.add("picture");
+        if (!isReadOnly() && !textual) values.add("picture");
         if (!isReadOnly() && (user != null && user.isAdmin())) values.add("role");
         if (!isReadOnly()) values.add("email");
         values.add("gender");
@@ -98,16 +78,17 @@ public class UserForm extends Form {
         values.add("lastName");
         if (!isReadOnly()) values.add("professional");
         if (!isReadOnly()) values.add("password");
+        if (!isReadOnly()) values.add("confirm");
         if (isReadOnly()) values.add("email");
         values.add("phone");
+        if (!isReadOnly()) values.add("newsletter");
+        if (!isReadOnly()) values.add("terms");
         return values;
     }
 
     public void setItem(Item item, boolean readOnly) {
         this.readOnly = readOnly;
         form.removeAllComponents();
-        wrapUser.removeAllComponents();
-        wrapUser.addComponent(form);
         setItemDataSource(item, getFields()); // bind to POJO via BeanItem
     }
 
@@ -115,34 +96,21 @@ public class UserForm extends Form {
     @Override
     protected void attachField(Object propertyId, Field field) {
         Object value = field.getValue();
-        if (propertyId.equals("picture")) {
-            if (textual && value == null) {
-                return;
-            }
-            field.setReadOnly(textual || isReadOnly());
-            wrapUser.addComponent(field, 0);
-            wrapUser.setComponentAlignment(field, Alignment.TOP_CENTER);
-        } else if (isReadOnly()) {
+        if (isReadOnly()) {
             if (value == null) return;
             if (propertyId.equals("gender")) return;
-            if (propertyId.equals("gender")) return;
             if (propertyId.equals("firstName")) return;
-            if (!textual) {
-                if (propertyId.equals("lastName")) {
-                    field.setCaption(null);
-                } else if (propertyId.equals("email")) {
-                    emailButton.setData(field.getValue());
-                    form.addComponent(emailButton);
-                    return;
-                } else if (propertyId.equals("phone")) {
-                    phoneButton.setData(field.getValue());
-                    form.addComponent(phoneButton);
-                    return;
-                }
-            }
             form.addComponent(getField(field));
         } else {
-            form.addComponent(getField(field));
+            if (propertyId.equals("professional")) {
+                RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
+                rowLayout.addComponent(getField(field), "0px", RowLayoutState.CaptionPos.LEFT);
+            } else if (propertyId.equals("confirm")) {
+                RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
+                rowLayout.addComponent(getField(field), "100px", RowLayoutState.CaptionPos.LEFT);
+            } else {
+                form.addComponent(getField(field));
+            }
         }
     }
 
@@ -153,47 +121,68 @@ public class UserForm extends Form {
     private Component getField(Field field, String caption) {
         field.setCaption(caption);
         if (!isReadOnly()) return field;
-        if (!textual && field instanceof Button) return field;
+//        if (!textual && field instanceof Button) return field;
         Object value = field.getValue();
-        Label label = new Label(value != null ? value.toString() : null);
+        LabelField label = new LabelField(field.getCaption());
         label.setIcon(field.getIcon());
         if (field instanceof TextArea) {
             label.setWidth(100, Unit.PERCENTAGE);
         }
-        if (caption != null) label.setCaption(caption + " :");
+        if (field.getValue() != null) label.setValue(field.getValue().toString());
         label.addStyleName(ValoTheme.LABEL_SMALL);
         return label;
     }
 
     private class CustomFieldFactory extends DefaultFieldFactory {
-        final PictureField pictureField = new PictureField(null);
+        final PictureField pictureField = new PictureField(I18N.getString("user.picture"));
         final TextField emailField = new TextField(I18N.getString("user.email"));
         final GenderComboBox genderField = new GenderComboBox(I18N.getString("user.gender"));
-        final TextField firstNameField = new TextField(I18N.getString("user.firstName"));
-        final TextField lastNameField = new TextField(I18N.getString("user.lastName"));
         final RoleComboBox roleField = new RoleComboBox(I18N.getString("user.role"));
         final PasswordField passwordField = new PasswordField(I18N.getString("user.password"));
-        final TextField phoneField = new TextField(I18N.getString("user.phone"));
-        final CheckBox professionalField = new CheckBox(I18N.getString("user.professional"));
+        final PasswordField confirmField = new PasswordField(I18N.getString("user.confirmation"));
+        final CheckBox professionalField = new CheckBox(I18N.getString("user.professional.question"));
+        final CheckBox newsletterField = new CheckBox(I18N.getString("check.newsletter"));
+        final CheckBox termsField = new CheckBox(I18N.getString("check.terms"));
 
         public CustomFieldFactory() {
-            emailField.addValidator(new EmailValidator(I18N.getString("validator.email")));
-            lastNameField.setDescription(I18N.getString("user.lastName.description"));
-
-            phoneField.setIcon(FontAwesome.PHONE);
             emailField.setIcon(FontAwesome.ENVELOPE);
+            emailField.addValidator(new EmailValidator(I18N.getString("validator.email")));
+            emailField.addValidator(new ExistsEmailValidator(emailField));
             passwordField.setIcon(FontAwesome.LOCK);
+            confirmField.setIcon(FontAwesome.LOCK);
+            professionalField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+            newsletterField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+            termsField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+            termsField.setRequired(true);
+            termsField.setRequiredError("Vous devez accepter les conditions générales");
+
+            confirmField.addValidator(new Validator() {
+                @Override
+                public void validate(Object value) throws InvalidValueException {
+                    if (passwordField.isModified()) {
+                        String passwordValue = passwordField.getValue();
+                        if (passwordValue != null) {
+                            String confirmValue = confirmField.getValue();
+                            if (!passwordValue.equals(confirmValue)) {
+                                throw new InvalidValueException("La confirmation doit être identique au mot de passe");
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         @Override
         public Field createField(Item item, Object propertyId, Component uiContext) {
             // Use the super class to create a suitable field base on the
             // property type.
-            Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
+            Field field = super.createField(item, propertyId, uiContext);
             if ("picture".equals(propertyId)) {
-                final Object professional = item.getItemProperty("professional").getValue();
-                if (professional instanceof Boolean) {
-                    pictureField.setCaption((Boolean) professional ? I18N.getString("user.professional") : I18N.getString("user.individual"));
+                if (isReadOnly() || textual) {
+                    final Object professional = item.getItemProperty("professional").getValue();
+                    if (professional instanceof Boolean) {
+                        //pictureField.setCaption((Boolean) professional ? I18N.getString("user.professional") : I18N.getString("user.individual"));
+                    }
                 }
                 field = pictureField;
             } else if ("email".equals(propertyId)) {
@@ -201,29 +190,47 @@ public class UserForm extends Form {
             } else if ("gender".equals(propertyId)) {
                 field = genderField;
             } else if ("firstName".equals(propertyId)) {
-                field = firstNameField;
+                field.setCaption(I18N.getString("user.firstName"));
             } else if ("lastName".equals(propertyId)) {
                 if (isReadOnly()) {
                     final User user = (User) getEntity(item);
-                    field = new TextField(lastNameField.getCaption()) {
+                    field = new TextField() {
                         public String getValue() {
                             return user != null ? user.getCommonName() : null;
                         }
                     };
-                } else field = lastNameField;
+                }
+                field.setCaption(I18N.getString("user.lastname"));
+                ((AbstractTextField) field).setDescription(I18N.getString("user.lastname.description"));
             } else if ("professional".equals(propertyId)) {
                 field = professionalField;
             } else if ("role".equals(propertyId)) {
                 field = roleField;
             } else if ("password".equals(propertyId)) {
                 field = passwordField;
+            } else if ("confirm".equals(propertyId)) {
+                field = confirmField;
             } else if ("phone".equals(propertyId)) {
-                field = phoneField;
+                field.setCaption(I18N.getString("user.phone"));
+                field.setIcon(FontAwesome.PHONE);
+            } else if ("newsletter".equals(propertyId)) {
+                field = newsletterField;
+            } else if ("terms".equals(propertyId)) {
+                field = termsField;
             }
             if (field instanceof AbstractTextField) {
                 ((AbstractTextField) field).setNullRepresentation("");
             }
-            if (!isReadOnly()) field.addStyleName("tiny");
+            if (field instanceof AbstractField) {
+                ((AbstractField) field).setValidationVisible(isValidationVisible());
+            }
+            if (!isReadOnly()) {
+                if (field instanceof CheckBox) {
+                    field.addStyleName(ValoTheme.CHECKBOX_SMALL);
+                } else {
+                    field.addStyleName("tiny");
+                }
+            }
             field.addValidator(new BeanValidator(User.class, propertyId.toString()));
             return field;
         }
@@ -241,15 +248,30 @@ public class UserForm extends Form {
 
     @Override
     public void commit() throws SourceException, Validator.InvalidValueException {
-        TextField field = (TextField)getField("email");
-        if (field != null && field.isModified() && field.getValue() != null) {
-            if (AppUI.getDataProvider().hasUser(field.getValue())) {
-                field.setComponentError(new UserError(I18N.getString("message.email.address.already.exists")));
-                throw new Validator.InvalidValueException(I18N.getString("message.email.address.already.exists"));
+        try {
+            setComponentError(null);
+            super.commit();
+            fireEvent(new EditorSavedEvent(this, item));
+        } catch (Validator.InvalidValueException e) {
+            for (Object property : getItemPropertyIds()) {
+                Field field = getField(property);
+                if (field instanceof AbstractField) {
+                    ((AbstractField) field).setValidationVisible(true);
+                    ErrorMessage message = ((AbstractField<?>) field).getErrorMessage();
+                    if (message != null) {
+                        String name = field instanceof CheckBox ? "" : field.getCaption() + ":&#32;";
+                        String text = message.getFormattedHtmlMessage();
+                        text = text.replaceAll("<div>", "");
+                        text = text.replaceAll("</div>", "");
+                        System.out.println("Error: " + text);
+                        setComponentError(new UserError(name + text, AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
+                        field.focus();
+                        throw e;
+                    }
+                }
             }
         }
-        super.commit();
-        fireEvent(new EditorSavedEvent(this, item));
+
     }
 
     public void addListener(EditorSavedListener listener) {
@@ -264,6 +286,23 @@ public class UserForm extends Form {
 
     public void removeListener(EditorSavedListener listener) {
         removeListener(EditorSavedEvent.class, listener);
+    }
+
+    public static class ExistsEmailValidator implements Validator {
+        private Field field;
+
+        public ExistsEmailValidator(Field field) {
+            this.field = field;
+        }
+
+        @Override
+        public void validate(Object value) throws InvalidValueException {
+            if (field.isModified() && value != null) {
+                if (AppUI.getDataProvider().hasUser(value.toString())) {
+                    throw new Validator.InvalidValueException(I18N.getString("message.email.address.already.exists"));
+                }
+            }
+        }
     }
 
     public static class EditorSavedEvent extends Event {

@@ -24,6 +24,7 @@ public class AppDataProvider implements DataProvider {
     private JPAContainer<Offer> offers;
     private JPAContainer<User> users;
     private JPAContainer<Message> messages;
+    private JPAContainer<Rating> ratings;
 
     public AppDataProvider() {
         categories = JPAContainerFactory.make(Category.class, AppUI.PERSISTENCE_UNIT);
@@ -42,6 +43,7 @@ public class AppDataProvider implements DataProvider {
 
         users = JPAContainerFactory.make(User.class, AppUI.PERSISTENCE_UNIT);
         messages = JPAContainerFactory.make(Message.class, AppUI.PERSISTENCE_UNIT);
+        ratings = JPAContainerFactory.make(Rating.class, AppUI.PERSISTENCE_UNIT);
     }
 
     @Override
@@ -238,11 +240,20 @@ public class AppDataProvider implements DataProvider {
     }
 
     public JPAContainer<Message> getMessageContainer() {
-        users.removeAllContainerFilters();
+        messages.removeAllContainerFilters();
         return messages;
     }
 
     public EntityItem<Message> getMessage(final Object itemId) {
         return getMessageContainer().getItem(itemId);
+    }
+
+    public void addMessage(Message m) throws UnsupportedOperationException {
+        getMessageContainer().addEntity(m);
+    }
+
+    public JPAContainer<Rating> getRatingContainer() {
+        ratings.removeAllContainerFilters();
+        return ratings;
     }
 }

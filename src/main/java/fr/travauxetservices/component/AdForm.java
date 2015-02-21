@@ -6,14 +6,19 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.BeanValidator;
+import com.vaadin.server.AbstractErrorMessage;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.model.Remuneration;
-import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.HtmlEscape;
 import fr.travauxetservices.tools.I18N;
+import pl.lt.vaadin.ui.FormRowLayout;
+import pl.lt.vaadin.ui.RowLayout;
+import pl.lt.vaadin.ui.client.rowlayout.RowLayoutState;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -30,9 +35,7 @@ import java.util.Locale;
 public class AdForm extends Form {
     private final Item item;
     private boolean readOnly;
-    private FormLayout form;
-    final HorizontalLayout wrapRegion = new HorizontalLayout();
-    final HorizontalLayout wrapPrice = new HorizontalLayout();
+    private FormRowLayout form;
 
     public AdForm(Item item, boolean readOnly) {
         this.item = item;
@@ -43,21 +46,17 @@ public class AdForm extends Form {
 
         setBuffered(true);
         setImmediate(true);
+        setValidationVisible(false);
+        setValidationVisibleOnCommit(false);
 
-        form = new FormLayout();
+        form = new FormRowLayout(1, "100px");
+        form.setDefaultCaptionWidth("100px");
+        form.setDefaultComponentAlignment(Alignment.TOP_LEFT);
         form.setMargin(true);
         form.setSpacing(true);
         form.setReadOnly(this.readOnly);
 
         setLayout(form);
-
-        wrapRegion.addStyleName("profile-form");
-        wrapRegion.setMargin(false);
-        wrapRegion.setSpacing(true);
-
-        wrapPrice.addStyleName("profile-form");
-        wrapPrice.setMargin(false);
-        wrapPrice.setSpacing(true);
 
         setItem(item, this.readOnly);
     }
@@ -68,7 +67,6 @@ public class AdForm extends Form {
 
     private List<String> getFields() {
         List<String> values = new ArrayList<String>();
-        //if (!readOnly && (user != null && user.isAdmin())) values.add("validated");
         if (!readOnly && !(item instanceof EntityItem)) values.add("type");
         if (readOnly) values.add("created");
         values.add("category");
@@ -84,8 +82,6 @@ public class AdForm extends Form {
     public void setItem(Item item, boolean readOnly) {
         this.readOnly = readOnly;
         form.removeAllComponents();
-        wrapRegion.removeAllComponents();
-        wrapPrice.removeAllComponents();
         setItemDataSource(item, getFields()); // bind to POJO via BeanItem
     }
 
@@ -96,20 +92,13 @@ public class AdForm extends Form {
             if (!isReadOnly()) {
                 form.addComponent(getField(field));
             }
-        } else if (propertyId.equals("division")) {
-            wrapRegion.addComponent(getField(field, null));
         } else if (propertyId.equals("city")) {
-            wrapRegion.addComponent(getField(field, null));
-            wrapRegion.setCaption(I18N.getString("ad.location"));
-            //wrapRegion.setIcon(FontAwesome.LOCATION_ARROW);
-            form.addComponent(wrapRegion);
-        } else if (!isReadOnly() && propertyId.equals("price")) {
-            wrapPrice.addComponent(getField(field, null));
+            RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
+            rowLayout.addComponent(getField(field), "100px", RowLayoutState.CaptionPos.LEFT);
         } else if (propertyId.equals("remuneration")) {
             if (!isReadOnly()) {
-                wrapPrice.addComponent(getField(field, null));
-                wrapPrice.setCaption(I18N.getString("ad.price"));
-                form.addComponent(wrapPrice);
+                RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
+                rowLayout.addComponent(getField(field), "100px", RowLayoutState.CaptionPos.LEFT);
             }
         } else {
             form.addComponent(getField(field));
@@ -124,14 +113,14 @@ public class AdForm extends Form {
         field.setCaption(caption);
         if (!isReadOnly()) return field;
         Object value = field.getValue();
-        Label label = new Label(value != null ? value.toString() : null);
+        LabelField label = new LabelField(field.getCaption());
         label.setIcon(field.getIcon());
         if (field instanceof TextArea) {
             label.setWidth(100, Unit.PERCENTAGE);
             label.setContentMode(ContentMode.HTML);
             if (value != null) label.setValue(HtmlEscape.escapeBr(value.toString()));
         }
-        if (caption != null) label.setCaption(caption + " :");
+        if (field.getValue() != null) label.setValue(field.getValue().toString());
         label.addStyleName(ValoTheme.LABEL_SMALL);
         return label;
     }
@@ -153,9 +142,7 @@ public class AdForm extends Form {
         final ComboBox categoryField = new CategoryComboxBox(I18N.getString("ad.category"));
         final ComboBox divisionField = new DivisionComboxBox(I18N.getString("ad.region"));
         final ComboBox cityField = new CityComboBox(I18N.getString("ad.city"));
-        final TextField titleField = new TextField(I18N.getString("ad.title"));
         final TextArea descriptionField = new TextArea(I18N.getString("ad.description"));
-        final TextField priceField = new TextField(I18N.getString("ad.price"));
         final ComboBox remunerationField = new RemunerationComboBox(I18N.getString("ad.remuneration"));
 
         public CustomFieldFactory() {
@@ -170,10 +157,8 @@ public class AdForm extends Form {
             cityField.setInputPrompt(I18N.getString("input.city"));
             cityField.setPageLength(20);
 
-            titleField.setCaption(I18N.getString("ad.title"));
-            titleField.setWidth(100, Unit.PERCENTAGE);
-
-            descriptionField.setSizeFull();
+            descriptionField.setWidth(100, Unit.PERCENTAGE);
+            descriptionField.setRows(15);
             descriptionField.addStyleName("notes");
 
             remunerationField.setInputPrompt(I18N.getString("input.remuneration"));
@@ -184,7 +169,7 @@ public class AdForm extends Form {
         public Field createField(Item item, Object propertyId, Component uiContext) {
             // Use the super class to create a suitable field base on the
             // property type.
-            Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
+            Field field = super.createField(item, propertyId, uiContext);
             if ("type".equals(propertyId)) {
                 field = typeField;
             } else if ("created".equals(propertyId)) {
@@ -204,14 +189,15 @@ public class AdForm extends Form {
                 Property p = item.getItemProperty("city");
                 if (p != null) field.setValue(p.getValue());
             } else if ("title".equals(propertyId)) {
-                field = titleField;
+                field.setCaption(I18N.getString("ad.title"));
+                field.setWidth(100, Unit.PERCENTAGE);
             } else if ("description".equals(propertyId)) {
                 field = descriptionField;
             } else if ("price".equals(propertyId)) {
                 if (isReadOnly()) {
                     final double price = (Double) item.getItemProperty("price").getValue();
                     final Remuneration remuneration = (Remuneration) item.getItemProperty("remuneration").getValue();
-                    field = new TextField(I18N.getString("ad.price")) {
+                    field = new TextField() {
                         public String getValue() {
                             StringBuffer text = new StringBuffer();
                             if (price > 0) {
@@ -226,14 +212,24 @@ public class AdForm extends Form {
                             return text.toString();
                         }
                     };
-                } else field = priceField;
+                }
+                field.setCaption(I18N.getString("ad.price"));
             } else if ("remuneration".equals(propertyId)) {
                 field = remunerationField;
             }
             if (field instanceof AbstractTextField) {
                 ((AbstractTextField) field).setNullRepresentation("");
             }
-            if (!isReadOnly()) field.addStyleName("tiny");
+            if (field instanceof AbstractField) {
+                ((AbstractField) field).setValidationVisible(isValidationVisible());
+            }
+            if (!isReadOnly()) {
+                if (field instanceof CheckBox) {
+                    field.addStyleName(ValoTheme.CHECKBOX_SMALL);
+                } else {
+                    field.addStyleName("tiny");
+                }
+            }
             field.addValidator(new BeanValidator(Ad.class, propertyId.toString()));
             return field;
         }
@@ -241,8 +237,28 @@ public class AdForm extends Form {
 
     @Override
     public void commit() throws Buffered.SourceException, Validator.InvalidValueException {
-        super.commit();
-        fireEvent(new EditorSavedEvent(this, item));
+        try {
+            setComponentError(null);
+            super.commit();
+            fireEvent(new EditorSavedEvent(this, item));
+        } catch (Validator.InvalidValueException e) {
+            for (Object property : getItemPropertyIds()) {
+                Field field = getField(property);
+                if (field instanceof AbstractField) {
+                    ((AbstractField) field).setValidationVisible(true);
+                    ErrorMessage message = ((AbstractField<?>) field).getErrorMessage();
+                    if (message != null) {
+                        String text = message.getFormattedHtmlMessage();
+                        text = text.replaceAll("<div>", "");
+                        text = text.replaceAll("</div>", "");
+                        System.out.println("Error: " + text);
+                        setComponentError(new UserError(field.getCaption() + ":&#32;" + text, AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
+                        field.focus();
+                        throw e;
+                    }
+                }
+            }
+        }
     }
 
     public void addListener(EditorSavedListener listener) {

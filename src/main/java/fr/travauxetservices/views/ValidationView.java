@@ -50,7 +50,7 @@ public final class ValidationView extends Panel implements View {
         root.addComponent(buildSearchLayout());
         Component content = buildContent();
         root.addComponent(content);
-        root.setExpandRatio(content, 1);
+        root.setExpandRatio(content, 1.0f);
     }
 
     private Component buildHeader() {

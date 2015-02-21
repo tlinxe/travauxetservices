@@ -188,8 +188,8 @@ public class PagedTable extends Table {
         controlBar.setComponentAlignment(pageSize, Alignment.MIDDLE_LEFT);
         controlBar.addComponent(pageManagement);
         controlBar.setComponentAlignment(pageManagement, Alignment.MIDDLE_CENTER);
-        controlBar.setWidth("100%");
-        controlBar.setExpandRatio(pageSize, 1);
+        controlBar.setWidth(100, Unit.PERCENTAGE);
+        controlBar.setExpandRatio(pageSize, 1.0f);
         addListener(new PageChangeListener() {
             public void pageChanged(PagedTableChangeEvent event) {
                 first.setEnabled(container.getStartIndex() > 0);

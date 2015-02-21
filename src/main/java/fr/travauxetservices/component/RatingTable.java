@@ -21,7 +21,7 @@ import java.util.Locale;
  */
 public class RatingTable extends Table {
     public RatingTable() {
-        setImmediate(true);
+        //setImmediate(true);
         setNullSelectionAllowed(false);
         setSortEnabled(false);
         setSelectable(false);
@@ -29,27 +29,6 @@ public class RatingTable extends Table {
         addGeneratedColumn("title", new TitleColumnGenerator());
         addGeneratedColumn("overall", new OverallColumnGenerator());
     }
-
-//    public class UserColumnGenerator implements Table.ColumnGenerator {
-//        public Component generateCell(Table source, Object itemId, Object columnId) {
-//            VerticalLayout layout = new VerticalLayout();
-//            layout.setDefaultComponentAlignment(Alignment.TOP_CENTER);
-//
-//            Resource resource = new ClassResource("/images/profile-pic-300px.jpg");
-//            User user = (User) source.getContainerProperty(itemId, "user").getValue();
-//            if (user.getPicture() != null) {
-//                resource = new StreamResource(new IOToolkit.ByteArraySource(user.getPicture()), "picture.png");
-//            }
-//            Image image = new Image(null, resource);
-//            image.setWidth(60, Unit.PIXELS);
-//            image.setHeight(60, Unit.PIXELS);
-//            layout.addComponent(image);
-//
-//            Label label = new Label(user.getCommonName(TextBundle));
-//            layout.addComponent(label);
-//            return layout;
-//        }
-//    }
 
     public class TitleColumnGenerator implements Table.ColumnGenerator {
         public Component generateCell(Table source, Object itemId, Object columnId) {
@@ -84,30 +63,40 @@ public class RatingTable extends Table {
 
     public class OverallColumnGenerator implements Table.ColumnGenerator {
         public Component generateCell(Table source, Object itemId, Object columnId) {
-            FormLayout layout = new FormLayout();
+            GridLayout layout = new GridLayout(2, 5);
+            layout.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
             layout.setMargin(false);
             layout.setSpacing(false);
-            layout.setReadOnly(true);
-            layout.setSizeUndefined();
-            layout.addComponent(getRatingStar(source, itemId, "reception"));
-            layout.addComponent(getRatingStar(source, itemId, "advice"));
-            layout.addComponent(getRatingStar(source, itemId, "availability"));
-            layout.addComponent(getRatingStar(source, itemId, "quality"));
-            layout.addComponent(getRatingStar(source, itemId, "price"));
+
+            addRatingStars(layout, source, itemId, "reception", 0);
+            addRatingStars(layout, source, itemId, "advice", 1);
+            addRatingStars(layout, source, itemId, "availability", 2);
+            addRatingStars(layout, source, itemId, "quality", 3);
+            addRatingStars(layout, source, itemId, "price", 4);
             return layout;
         }
     }
 
+    private void addRatingStars(GridLayout layout, Table source, Object itemId, Object columnId, int index) {
+        layout.addComponent(getLabel(columnId), 0, index);
+        layout.addComponent(getRatingStar(source, itemId, columnId), 1, index);
+    }
+
+    private Component getLabel(Object columnId) {
+        Label label = new Label(I18N.getString("rating." + columnId));
+        label.addStyleName(ValoTheme.LABEL_SMALL);
+        return label;
+    }
+
     private Component getRatingStar(Table source, Object itemId, Object columnId) {
         HorizontalLayout layout = new HorizontalLayout();
-        Label label = new Label(I18N.getString("rating." + columnId));
-        label.addStyleName(ValoTheme.LABEL_TINY);
-        layout.addComponent(label);
+        layout.addComponent(getLabel(columnId));
 
-        RatingStars ratingStars = new RatingStars();
-        ratingStars.setCaption(I18N.getString("rating." + columnId));
-        ratingStars.setImmediate(true);
+        RatingStars ratingStars = new CustomRatingStars();
+        //ratingStars.setCaption(I18N.getString("rating." + columnId));
+        //ratingStars.setImmediate(true);
         ratingStars.addStyleName("tiny");
+//        ratingStars.setHeight(20, Unit.PIXELS);
         int value = (Integer) source.getContainerProperty(itemId, columnId).getValue();
         ratingStars.setValue((double) value);
         ratingStars.setReadOnly(true);

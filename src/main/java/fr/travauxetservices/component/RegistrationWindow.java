@@ -36,7 +36,7 @@ public class RegistrationWindow extends Window {
         setCloseShortcut(ShortcutAction.KeyCode.ESCAPE, null);
         setResizable(false);
         setHeight(500, Unit.PIXELS);
-        setWidth(400, Unit.PIXELS);
+        setWidth(700, Unit.PIXELS);
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -46,12 +46,12 @@ public class RegistrationWindow extends Window {
         Component form = buildForm();
         content.addComponent(form);
         content.addComponent(buildFooter());
-        content.setExpandRatio(form, 1);
+        content.setExpandRatio(form, 1.0f);
     }
 
     private Component buildForm() {
         final HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidth("100%");
+        layout.setWidth(100, Unit.PERCENTAGE);
         layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
         //layout.setSizeUndefined();
         layout.setSpacing(true);
@@ -67,7 +67,7 @@ public class RegistrationWindow extends Window {
 
     private Component buildFooter() {
         HorizontalLayout footer = new HorizontalLayout();
-        footer.setWidth("100%");
+        footer.setWidth(100, Unit.PERCENTAGE);
         footer.setSpacing(true);
         footer.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
         //footer.addStyleName("v-window-bottom-toolbar");
@@ -97,7 +97,7 @@ public class RegistrationWindow extends Window {
             }
         });
         footer.addComponents(footerText, ok, cancel);
-        footer.setExpandRatio(footerText, 1);
+        footer.setExpandRatio(footerText, 1.0f);
         return footer;
     }
 

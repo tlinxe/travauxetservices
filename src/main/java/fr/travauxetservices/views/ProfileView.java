@@ -14,10 +14,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
-import fr.travauxetservices.component.GenderComboBox;
-import fr.travauxetservices.component.RoleComboBox;
-import fr.travauxetservices.component.UserForm;
-import fr.travauxetservices.component.WrapperLayout;
+import fr.travauxetservices.component.*;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
 
@@ -33,9 +30,11 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
 
     public ProfileView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
+        addStyleName("content-view");
         setSizeFull();
 
         VerticalLayout root = new VerticalLayout();
+        root.setWidth(100, Unit.PERCENTAGE);
         root.setMargin(true);
         root.addStyleName("mytheme-view");
         root.addComponent(buildHeader());

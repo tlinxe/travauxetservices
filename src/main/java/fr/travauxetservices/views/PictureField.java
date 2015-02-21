@@ -30,7 +30,9 @@ public class PictureField extends CustomField<byte[]> {
     @Override
     protected Component initContent() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setDefaultComponentAlignment(Alignment.TOP_CENTER);
         layout.setSizeUndefined();
+        layout.setMargin(false);
         layout.setSpacing(true);
         layout.addComponent(image);
         upload = new Button("Change…", new Button.ClickListener() {

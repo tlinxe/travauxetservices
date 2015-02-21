@@ -46,7 +46,7 @@ public final class UserView extends Panel implements View {
         root.addComponent(buildSearchLayout());
         Component content = buildContent();
         root.addComponent(content);
-        root.setExpandRatio(content, 1);
+        root.setExpandRatio(content, 1.0f);
     }
 
     private Component buildHeader() {
@@ -172,7 +172,7 @@ public final class UserView extends Panel implements View {
         });
 
         table.setVisibleColumns("created", "email", "lastName", "validated", "id");
-        table.setColumnHeaders(I18N.getString("user.created"), I18N.getString("user.email"), I18N.getString("user.lastName"), I18N.getString("user.validated"), "");
+        table.setColumnHeaders(I18N.getString("user.created"), I18N.getString("user.email"), I18N.getString("user.lastname"), I18N.getString("user.validated"), "");
         table.setColumnWidth("validated", 60);
         return table;
     }

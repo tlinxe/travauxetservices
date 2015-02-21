@@ -16,8 +16,8 @@ public class WrapperLayout extends CssLayout {
         addStyleName(ValoTheme.LAYOUT_CARD);
 
         panelCaption = new HorizontalLayout();
-        panelCaption.addStyleName("wrapperLayout");
-        panelCaption.setWidth("100%");
+        panelCaption.addStyleName("v-panel-caption");
+        panelCaption.setWidth(100, Unit.PERCENTAGE);
         panelCaption.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         label = new Label(caption);
         label.addStyleName(ValoTheme.LABEL_H4);
@@ -25,7 +25,7 @@ public class WrapperLayout extends CssLayout {
         label.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         panelCaption.addComponent(label);
         panelCaption.setExpandRatio(label, 1);
-        //panelCaption.setComponentAlignment(label, Alignment.MIDDLE_LEFT);
+        panelCaption.setComponentAlignment(label, Alignment.MIDDLE_LEFT);
 
 
         addComponent(panelCaption);

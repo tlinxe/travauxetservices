@@ -65,4 +65,8 @@ public interface DataProvider {
     public JPAContainer<Message> getMessageContainer();
 
     public EntityItem<Message> getMessage(final Object itemId);
+
+    public void addMessage(Message m) throws UnsupportedOperationException;
+
+    public JPAContainer<Rating> getRatingContainer();
 }

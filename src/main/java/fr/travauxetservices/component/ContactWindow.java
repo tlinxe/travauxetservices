@@ -39,12 +39,12 @@ public class ContactWindow extends Window {
         Component form = buildForm();
         content.addComponent(form);
         content.addComponent(buildFooter());
-        content.setExpandRatio(form, 1);
+        content.setExpandRatio(form, 1.0f);
     }
 
     private Component buildForm() {
         final VerticalLayout layout = new VerticalLayout();
-        layout.setWidth("100%");
+        layout.setWidth(100, Unit.PERCENTAGE);
         layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
         //layout.setSizeUndefined();
         layout.setSpacing(true);
@@ -76,14 +76,14 @@ public class ContactWindow extends Window {
         layout.addComponent(form);
         layout.addComponent(textField);
         //layout.addComponent(buildFooter());
-        layout.setExpandRatio(textField, 1);
+        layout.setExpandRatio(textField, 1.0f);
 
         return layout;
     }
 
     private Component buildFooter() {
         HorizontalLayout footer = new HorizontalLayout();
-        footer.setWidth("100%");
+        footer.setWidth(100, Unit.PERCENTAGE);
         footer.setSpacing(true);
         footer.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
         //footer.addStyleName("v-window-bottom-toolbar");
@@ -113,7 +113,7 @@ public class ContactWindow extends Window {
             }
         });
         footer.addComponents(footerText, ok, cancel);
-        footer.setExpandRatio(footerText, 1);
+        footer.setExpandRatio(footerText, 1.0f);
         return footer;
     }
 

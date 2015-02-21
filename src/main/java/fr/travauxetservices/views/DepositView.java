@@ -27,10 +27,11 @@ public final class DepositView extends Panel implements View {
 
     public DepositView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
-        setSizeFull();
+        addStyleName("content-view");
         CustomEventBus.register(this);
 
         VerticalLayout root = new VerticalLayout();
+        root.setWidth(100, Unit.PERCENTAGE);
         root.addStyleName("mytheme-view");
         root.setMargin(true);
         root.setSpacing(true);

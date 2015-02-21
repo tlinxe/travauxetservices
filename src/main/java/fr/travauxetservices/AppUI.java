@@ -7,6 +7,7 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.*;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.data.AppDataProvider;
 import fr.travauxetservices.data.DataProvider;
 import fr.travauxetservices.data.DummyDataGenerator;
@@ -14,6 +15,7 @@ import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
+import fr.travauxetservices.views.HomeView;
 import fr.travauxetservices.views.MainView;
 
 import javax.servlet.ServletException;
@@ -73,6 +75,7 @@ public class AppUI extends UI {
 
         CustomEventBus.register(this);
         Responsive.makeResponsive(this);
+        addStyleName(ValoTheme.UI_WITH_MENU);
 
         dataProvider = new AppDataProvider();
 
@@ -82,6 +85,7 @@ public class AppUI extends UI {
         }
 
         updateContent();
+        getNavigator().setErrorView(HomeView.class);
 
         // Some views need to be aware of browser resize events so a
         // BrowserResizeEvent gets fired to the event but on every occasion.

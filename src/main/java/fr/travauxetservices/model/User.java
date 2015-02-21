@@ -55,8 +55,15 @@ public class User implements Serializable {
     @Pattern(regexp = "^((\\+|00)33\\s?|0)[1-9](\\s?\\d{2}){4}$")
     String phone;
 
-    protected boolean professional;
-    boolean validated;
+    private boolean professional;
+    private boolean validated;
+    private boolean newsletter;
+
+    @Transient
+    private boolean terms;
+
+    @Transient
+    private String confirm;
 
     @OneToMany(cascade=CascadeType.REMOVE)
     private Set<Rating> ratings;
@@ -68,7 +75,7 @@ public class User implements Serializable {
         ratings = new HashSet<Rating>();
     }
 
-    public User(UUID id, Date created, Role role, Gender gender, String firstName, String lastName, String email, String password, String phone, byte[] picture, boolean professional, boolean validated, Set<Rating> ratings) {
+    public User(UUID id, Date created, Role role, Gender gender, String firstName, String lastName, String email, String password, String phone, byte[] picture, boolean professional, boolean validated, boolean newsletter, Set<Rating> ratings) {
         this.id = id;
         this.created = created;
         this.role = role;
@@ -81,6 +88,7 @@ public class User implements Serializable {
         this.picture = picture;
         this.professional = professional;
         this.validated = validated;
+        this.newsletter = newsletter;
         this.ratings = ratings;
     }
 
@@ -184,6 +192,14 @@ public class User implements Serializable {
         this.validated = b;
     }
 
+    public boolean isNewsletter() {
+        return newsletter;
+    }
+
+    public void setNewsletter(boolean b) {
+        this.newsletter = b;
+    }
+
     public Set<Rating> getRatings() {
         return ratings;
     }
@@ -219,6 +235,22 @@ public class User implements Serializable {
             text.append(" ").append(lastName);
         }
         return text.toString();
+    }
+
+    public boolean isTerms() {
+        return terms;
+    }
+
+    public void setTerms(boolean b) {
+        this.terms = b;
+    }
+
+    public String getConfirm() {
+        return confirm;
+    }
+
+    public void setConfirm(String confirm) {
+        this.confirm = confirm;
     }
 
     @Override

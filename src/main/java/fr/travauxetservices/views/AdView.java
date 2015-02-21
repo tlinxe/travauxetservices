@@ -40,15 +40,14 @@ public abstract class AdView extends Panel implements CustomView {
     public AdView(String viewName) {
         this.viewName = viewName;
         addStyleName(ValoTheme.PANEL_BORDERLESS);
-        setSizeFull();
+        addStyleName("content-view");
         CustomEventBus.register(this);
 
         VerticalLayout root = new VerticalLayout();
-        root.setSizeFull();
-        root.setMargin(true);
-        setContent(root);
+        root.setWidth(100, Unit.PERCENTAGE);
         Responsive.makeResponsive(root);
         root.addStyleName("mytheme-view");
+        setContent(root);
 
         root.addComponent(buildHeader());
         root.addComponent(buildSearchLayout());
@@ -88,7 +87,7 @@ public abstract class AdView extends Panel implements CustomView {
 
         keynwordField = new TextField();
         keynwordField.addStyleName(ValoTheme.TEXTFIELD_TINY);
-        keynwordField.setWidth("250px");
+        keynwordField.setWidth("220px");
         keynwordField.setInputPrompt(I18N.getString("input.keyword.optional"));
         layout.addComponent(keynwordField, 0, 0);
 
@@ -130,7 +129,8 @@ public abstract class AdView extends Panel implements CustomView {
     private Component buildContent() {
         table = new AdTable(10, false);
         //table.addStyleName(ValoTheme.TABLE_BORDERLESS);
-        table.addStyleName(ValoTheme.TABLE_NO_HORIZONTAL_LINES);
+        table.addStyleName(ValoTheme.TABLE_NO_VERTICAL_LINES);
+        table.addStyleName(ValoTheme.TABLE_NO_STRIPES);
         table.addStyleName(ValoTheme.TABLE_COMPACT);
         table.addStyleName(ValoTheme.TABLE_SMALL);
         table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);

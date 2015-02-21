@@ -5,6 +5,9 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.filter.JoinFilter;
 import com.vaadin.data.Container;
+import com.vaadin.data.Item;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Or;
 import com.vaadin.event.ItemClickEvent;
@@ -12,9 +15,7 @@ import com.vaadin.event.LayoutEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.ClassResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Responsive;
+import com.vaadin.server.*;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
@@ -25,20 +26,17 @@ import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
 import fr.travauxetservices.component.ConnectionWindow;
 import fr.travauxetservices.component.RegistrationWindow;
+import fr.travauxetservices.component.RichText;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.City;
-import fr.travauxetservices.model.Division;
-import fr.travauxetservices.model.Notice;
-import fr.travauxetservices.model.Offer;
+import fr.travauxetservices.model.*;
 import fr.travauxetservices.services.Geonames;
 import fr.travauxetservices.services.Location;
 import fr.travauxetservices.tools.I18N;
+import fr.travauxetservices.tools.IOToolkit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.util.*;
 
 /**
  * Created by Phobos on 12/12/14.
@@ -46,6 +44,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public final class HomeView extends Panel implements View {
     private NotificationsButton notificationsButton;
+    private RichText text;
     private CssLayout mythemePanels;
     private final VerticalLayout root;
     private Window notificationsWindow;
@@ -69,7 +68,7 @@ public final class HomeView extends Panel implements View {
         root.addComponent(buildSparklines());
         Component content = buildContent();
         root.addComponent(content);
-        root.setExpandRatio(content, 1);
+        root.setExpandRatio(content, 1.0f);
 
         // All the open sub-windows should be closed whenever the root layout
         // gets clicked.
@@ -87,25 +86,54 @@ public final class HomeView extends Panel implements View {
     }
 
     private Component buildSparklines() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidth(100, Unit.PERCENTAGE);
-        layout.setSpacing(true);
-        layout.addStyleName("sparks");
-        Responsive.makeResponsive(layout);
+        HorizontalLayout root = new HorizontalLayout();
+        root.setWidth(100, Unit.PERCENTAGE);
+        root.setSpacing(true);
+        root.addStyleName("sparks");
+        Responsive.makeResponsive(root);
 
         Image i2 = new Image(null, new ClassResource("/images/demande.jpg"));
         i2.setWidth(180, Unit.PIXELS);
         i2.setHeight(180, Unit.PIXELS);
-        layout.addComponent(i2);
+        root.addComponent(i2);
 
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSpacing(true);
-        Label h2 = new Label(I18N.getString("message.about"));
-        h2.addStyleName(ValoTheme.LABEL_H2);
-        verticalLayout.addComponent(h2);
-        Label t2 = new Label(I18N.getString("message.about.text"), ContentMode.HTML);
-        t2.addStyleName("small");
-        verticalLayout.addComponent(t2);
+        VerticalLayout layout = new VerticalLayout();
+        layout.setMargin(false);
+        layout.setSpacing(true);
+
+        text = new RichText();
+        text.setSizeFull();
+        layout.addComponent(text);
+
+        editForm(false);
+
+        Item item = AppUI.getDataProvider().getMessage("view.home");
+        if (item == null) {
+            String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+            FileResource resource = new FileResource(new File(basepath + "/WEB-INF/home.html"));
+            item = new BeanItem<Message>(new Message("view.home", IOToolkit.getResourceAsText(resource)));
+        }
+
+        final FieldGroup binder = new FieldGroup(item);
+        binder.setBuffered(true);
+        binder.bind(text, "text");
+        binder.setReadOnly(true);
+
+        text.addEditorSavedListener(new RichText.EditorSavedListener() {
+            @Override
+            public void editorSaved(RichText.EditorSavedEvent event) {
+                try {
+                    binder.commit();
+                    Item item = binder.getItemDataSource();
+                    if (item instanceof BeanItem) {
+                        AppUI.getDataProvider().addMessage((Message) ((BeanItem) item).getBean());
+                    }
+                    editForm(false);
+                } catch (FieldGroup.CommitException ive) {
+                    //Ignored
+                }
+            }
+        });
 
         final Button registration = new Button(I18N.getString("registration") + "...", new Button.ClickListener() {
             @Override
@@ -115,12 +143,16 @@ public final class HomeView extends Panel implements View {
         });
         registration.addStyleName(ValoTheme.BUTTON_SMALL);
         registration.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        verticalLayout.addComponent(registration);
+        layout.addComponent(registration);
 
-        layout.addComponent(verticalLayout);
-        layout.setExpandRatio(verticalLayout, 1f);
+        root.addComponent(layout);
+        root.setExpandRatio(layout, 1.0f);
 
-        return layout;
+        return root;
+    }
+
+    private void editForm(boolean edit) {
+        text.setEdit(edit);
     }
 
     private Component buildHeader() {
@@ -134,8 +166,7 @@ public final class HomeView extends Panel implements View {
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         header.addComponent(titleLabel);
 
-        notificationsButton = buildNotificationsButton();
-        HorizontalLayout tools = new HorizontalLayout(notificationsButton);
+        HorizontalLayout tools = new HorizontalLayout(buildButtons());
         tools.setSpacing(true);
         tools.addStyleName("toolbar");
         header.addComponent(tools);
@@ -143,15 +174,31 @@ public final class HomeView extends Panel implements View {
         return header;
     }
 
-    private NotificationsButton buildNotificationsButton() {
-        NotificationsButton result = new NotificationsButton();
-        result.addClickListener(new Button.ClickListener() {
+    private Button[] buildButtons() {
+        List<Button> buttons = new ArrayList<Button>();
+        notificationsButton = new NotificationsButton();
+        notificationsButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(final Button.ClickEvent event) {
                 openNotificationsPopup(event);
             }
         });
-        return result;
+        buttons.add(notificationsButton);
+        User user = getCurrentUser();
+        if (user != null && user.isAdmin()) {
+            Button editButton = new Button();
+            editButton.setIcon(FontAwesome.EDIT);
+            editButton.addStyleName("notifications");
+            editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+            editButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(final Button.ClickEvent event) {
+                    editForm(text.isReadOnly());
+                }
+            });
+            buttons.add(editButton);
+        }
+        return buttons.toArray(new Button[buttons.size()]);
     }
 
     private Component buildContent() {
@@ -270,16 +317,16 @@ public final class HomeView extends Panel implements View {
 
     private Component createContentWrapper(final Component content) {
         final CssLayout slot = new CssLayout();
-        slot.setWidth("100%");
+        slot.setWidth(100, Unit.PERCENTAGE);
         slot.addStyleName("mytheme-panel-slot");
 
         CssLayout card = new CssLayout();
-        card.setWidth("100%");
+        card.setWidth(100, Unit.PERCENTAGE);
         card.addStyleName(ValoTheme.LAYOUT_CARD);
 
         HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.addStyleName("mytheme-panel-toolbar");
-        toolbar.setWidth("100%");
+        toolbar.setWidth(100, Unit.PERCENTAGE);
 
         Label caption = new Label(content.getCaption());
         caption.addStyleName(ValoTheme.LABEL_H4);
@@ -320,7 +367,7 @@ public final class HomeView extends Panel implements View {
         });
 
         toolbar.addComponents(caption, tools);
-        toolbar.setExpandRatio(caption, 1);
+        toolbar.setExpandRatio(caption, 1.0f);
         toolbar.setComponentAlignment(caption, Alignment.MIDDLE_LEFT);
 
         card.addComponents(toolbar, content);
@@ -363,7 +410,7 @@ public final class HomeView extends Panel implements View {
 
         HorizontalLayout footer = new HorizontalLayout();
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
-        footer.setWidth("100%");
+        footer.setWidth(100, Unit.PERCENTAGE);
         Button showAll = new Button("View All Notifications",
                 new Button.ClickListener() {
                     @Override
@@ -415,6 +462,10 @@ public final class HomeView extends Panel implements View {
         } else {
             panel.removeStyleName("max");
         }
+    }
+
+    private User getCurrentUser() {
+        return (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
     }
 
     @Override

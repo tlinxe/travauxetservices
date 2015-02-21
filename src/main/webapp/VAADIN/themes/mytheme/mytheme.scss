@@ -35,7 +35,7 @@ $valo-menu-background-color: #414B56;
   @include mytheme-transactions-view;
   @include mytheme-reports-view;
 
-  $color1: hsl(220, 5%, 38%);
+  $color1: #414B56;
   $color2: #5d73c0;
   $color3: #3dbc1a;
   $color4: #d2f4f3;
@@ -47,8 +47,16 @@ $valo-menu-background-color: #414B56;
     background: transparent;
   }
 
+  .content-view {
+    max-width: 800px;
+  }
+
   .v-filterselect-suggestpopup-hierarchical .gwt-MenuItem {
     white-space: pre;
+  }
+
+  .v-form-errormessage {
+    color: red;
   }
 
   .v-menubar-color1 {
@@ -66,6 +74,10 @@ $valo-menu-background-color: #414B56;
   .v-panel-caption-color3 {
     @include valo-panel-caption-style($background-color: $color5);
   }
+
+//  .v-panel-caption.v-horizontallayout {
+//    @include valo-panel-caption-style($background-color: $color1);
+//  }
 
   .v-button-color1 {
     @include valo-panel-caption-style($background-color: $color1);
@@ -142,12 +154,26 @@ $valo-menu-background-color: #414B56;
     color: #eceded;
   }
 
+  .v-ratingstars-wrapper {
+    border: none !important;
+    background:transparent !important;
+  }
+
+  .v-ratingstars-wrapper-tiny {
+    width: 70px;
+  }
+
   .v-ratingstars-wrapper-large .v-ratingstars-bar {
     background-image: url(img/star_bg_34x33.gif);
   }
+
   .v-ratingstars-wrapper-large .v-ratingstars-star {
     background-image: url(img/star_34x33.gif);
     width: 34px;
     height: 33px;
+  }
+
+  .v-formlayout.light > table > tbody > tr > td {
+    border-bottom: none;
   }
 }
