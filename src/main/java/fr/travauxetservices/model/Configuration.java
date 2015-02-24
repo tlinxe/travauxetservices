@@ -154,7 +154,7 @@ public class Configuration {
 
         jdbcPlatform = props.getProperty("eclipselink.jdbc.platform", "org.eclipse.persistence.platform.database.H2Platform");
         jdbcDriver = props.getProperty("eclipselink.jdbc.driver", "org.h2.Driver");
-        jdbcUrl = props.getProperty("eclipselink.jdbc.url", "jdbc:h2:D:/Sgbd/H2/tesdb;AUTO_SERVER=TRUE");
+        jdbcUrl = props.getProperty("eclipselink.jdbc.url", "jdbc:h2:C:/Sgbd/H2/travauxetservices;AUTO_SERVER=TRUE");
         jdbcUser = props.getProperty("eclipselink.jdbc.user", "sa");
         jdbcPassword = props.getProperty("eclipselink.jdbc.password", "sa");
         loggingLevel = props.getProperty("eclipselink.logging.level", "FINE");
