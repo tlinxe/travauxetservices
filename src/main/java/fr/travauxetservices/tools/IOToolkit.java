@@ -13,7 +13,7 @@ public class IOToolkit {
         final StringBuilder result = new StringBuilder();
         try {
             InputStream is = IOToolkit.class.getClassLoader().getResourceAsStream(s);
-            final Reader input = new InputStreamReader(is);
+            final Reader input = new InputStreamReader(is, "UTF-8");
             try {
                 char[] buffer = new char[8192];
                 int read;
@@ -33,7 +33,7 @@ public class IOToolkit {
         final StringBuilder result = new StringBuilder();
         try {
             InputStream is = f.getStream().getStream();
-            final Reader input = new InputStreamReader(is);
+            final Reader input = new InputStreamReader(is, "UTF-8");
             try {
                 char[] buffer = new char[8192];
                 int read;
