@@ -90,7 +90,6 @@ public class AppUI extends UI {
         }
 
         updateContent();
-        getNavigator().setErrorView(HomeView.class);
 
         // Some views need to be aware of browser resize events so a
         // BrowserResizeEvent gets fired to the event but on every occasion.
@@ -104,14 +103,13 @@ public class AppUI extends UI {
     }
 
     private void updateContent() {
-        System.out.println("AppUI.updateContent saved: "+getConfiguration().isSaved());
-        System.out.println("AppUI.updateContent ready: "+getDataProvider().isReady());
         if (!getConfiguration().isSaved() || !getDataProvider().isReady()) {
             setContent(new ConfigurationView());
         }
         else {
             setContent(new MainView());
             getNavigator().navigateTo(getNavigator().getState());
+            getNavigator().setErrorView(HomeView.class);
         }
     }
 
