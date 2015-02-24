@@ -51,10 +51,6 @@ public class UserForm extends Form {
         setValidationVisibleOnCommit(false);
 
         form = new FormRowLayout(1, "100px");
-        form.setDefaultCaptionWidth("100px");
-        form.setDefaultComponentAlignment(Alignment.TOP_LEFT);
-        form.setMargin(true);
-        form.setSpacing(true);
         form.setReadOnly(this.readOnly);
 
         setLayout(form);
@@ -115,21 +111,18 @@ public class UserForm extends Form {
     }
 
     private Component getField(Field field) {
-        return getField(field, field.getCaption());
+        return getField(field, false);
     }
 
-    private Component getField(Field field, String caption) {
-        field.setCaption(caption);
-        if (!isReadOnly()) return field;
-//        if (!textual && field instanceof Button) return field;
-        Object value = field.getValue();
+    private Component getField(Field field, boolean forceReadOnly) {
+        if (!isReadOnly() && !forceReadOnly) return field;
         LabelField label = new LabelField(field.getCaption());
         label.setIcon(field.getIcon());
         if (field instanceof TextArea) {
             label.setWidth(100, Unit.PERCENTAGE);
         }
         if (field.getValue() != null) label.setValue(field.getValue().toString());
-        label.addStyleName(ValoTheme.LABEL_SMALL);
+//        label.addStyleName(ValoTheme.LABEL_SMALL);
         return label;
     }
 
@@ -140,22 +133,22 @@ public class UserForm extends Form {
         final RoleComboBox roleField = new RoleComboBox(I18N.getString("user.role"));
         final PasswordField passwordField = new PasswordField(I18N.getString("user.password"));
         final PasswordField confirmField = new PasswordField(I18N.getString("user.confirmation"));
-        final CheckBox professionalField = new CheckBox(I18N.getString("user.professional.question"));
-        final CheckBox newsletterField = new CheckBox(I18N.getString("check.newsletter"));
-        final CheckBox termsField = new CheckBox(I18N.getString("check.terms"));
+        final CustomCheckBoxField professionalField = new CustomCheckBoxField(I18N.getString("user.professional.question"));
+        final CustomCheckBoxField newsletterField = new CustomCheckBoxField(I18N.getString("check.newsletter"));
+        final CustomCheckBoxField termsField = new CustomCheckBoxField(I18N.getString("check.terms"));
 
         public CustomFieldFactory() {
+            emailField.setRequired(true);
+            emailField.setRequiredError(I18N.getString("validator.required"));
             emailField.setIcon(FontAwesome.ENVELOPE);
             emailField.addValidator(new EmailValidator(I18N.getString("validator.email")));
             emailField.addValidator(new ExistsEmailValidator(emailField));
-            passwordField.setIcon(FontAwesome.LOCK);
-            confirmField.setIcon(FontAwesome.LOCK);
-            professionalField.addStyleName(ValoTheme.CHECKBOX_SMALL);
-            newsletterField.addStyleName(ValoTheme.CHECKBOX_SMALL);
-            termsField.addStyleName(ValoTheme.CHECKBOX_SMALL);
-            termsField.setRequired(true);
-            termsField.setRequiredError("Vous devez accepter les conditions générales");
 
+            passwordField.setRequired(true);
+            passwordField.setRequiredError(I18N.getString("validator.required"));
+            passwordField.setIcon(FontAwesome.LOCK);
+
+            confirmField.setIcon(FontAwesome.LOCK);
             confirmField.addValidator(new Validator() {
                 @Override
                 public void validate(Object value) throws InvalidValueException {
@@ -164,12 +157,27 @@ public class UserForm extends Form {
                         if (passwordValue != null) {
                             String confirmValue = confirmField.getValue();
                             if (!passwordValue.equals(confirmValue)) {
-                                throw new InvalidValueException("La confirmation doit être identique au mot de passe");
+                                throw new InvalidValueException(I18N.getString("validator.confirm.password"));
                             }
                         }
                     }
                 }
             });
+
+            professionalField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+            newsletterField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+            termsField.setRequired(true);
+            termsField.setRequiredError(I18N.getString("validator.terms"));
+            termsField.addValidator(new Validator() {
+                @Override
+                public void validate(Object value) throws InvalidValueException {
+                    if (!Boolean.TRUE.equals(value)) {
+                        throw new InvalidValueException(I18N.getString("validator.terms"));
+                    }
+                }
+            });
+            termsField.addStyleName(ValoTheme.CHECKBOX_SMALL);
+            termsField.setCaptionAsHtml(true);
         }
 
         @Override
@@ -200,6 +208,8 @@ public class UserForm extends Form {
                         }
                     };
                 }
+                field.setRequired(true);
+                field.setRequiredError(I18N.getString("validator.required"));
                 field.setCaption(I18N.getString("user.lastname"));
                 ((AbstractTextField) field).setDescription(I18N.getString("user.lastname.description"));
             } else if ("professional".equals(propertyId)) {
@@ -259,11 +269,10 @@ public class UserForm extends Form {
                     ((AbstractField) field).setValidationVisible(true);
                     ErrorMessage message = ((AbstractField<?>) field).getErrorMessage();
                     if (message != null) {
-                        String name = field instanceof CheckBox ? "" : field.getCaption() + ":&#32;";
+                        String name = field.getCaption() != null && field.getCaption().length() > 0 ? field.getCaption() + ":&#32;" : "";
                         String text = message.getFormattedHtmlMessage();
                         text = text.replaceAll("<div>", "");
                         text = text.replaceAll("</div>", "");
-                        System.out.println("Error: " + text);
                         setComponentError(new UserError(name + text, AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
                         field.focus();
                         throw e;

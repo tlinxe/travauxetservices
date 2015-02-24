@@ -139,7 +139,7 @@ public final class ValidationView extends Panel implements View {
                             String subject = I18N.getString("message.ad.online.subject", new String[]{title});
                             String text = I18N.getString("message.ad.online.text", new String[]{title, url});
                             applyFilters();
-                            Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", user.getEmail(), subject, text, false);
+                            Mail.sendMail(user.getEmail(), subject, text, false);
                         }
                     }
                 });
@@ -209,7 +209,7 @@ public final class ValidationView extends Panel implements View {
                             String subject = I18N.getString("message.ad.online.subject", new String[]{title});
                             String text = I18N.getString("message.ad.online.text", new String[]{title, url});
                             System.out.println("title: " + title + " url: " + url);
-                            Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", user.getEmail(), subject, text, false);
+                            Mail.sendMail(user.getEmail(), subject, text, false);
                             applyFilters();
                         }
                     }
@@ -292,7 +292,7 @@ public final class ValidationView extends Panel implements View {
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
         final User user = getCurrentUser();
-        if (user == null) {
+        if (user == null || !user.isAdmin()) {
             UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
             return;
         }

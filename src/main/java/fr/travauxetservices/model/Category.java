@@ -72,7 +72,12 @@ public class Category implements Serializable {
 
     @Override
     public String toString() {
-        return name;
+        StringBuilder text = new StringBuilder();
+        if (parent != null) {
+            text.append(parent.getName()).append("/");
+        }
+        text.append(name);
+        return text.toString();
     }
 
     @Override

@@ -49,7 +49,6 @@ public class Division implements Serializable {
         this.name = name;
     }
 
-
     public Division getParent() {
         return parent;
     }

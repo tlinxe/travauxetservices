@@ -1,5 +1,8 @@
 package fr.travauxetservices.services;
 
+import fr.travauxetservices.AppUI;
+import fr.travauxetservices.model.Configuration;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -13,15 +16,16 @@ import java.util.Properties;
 public class Mail {
     private final static String MAILER_VERSION = "Java";
 
-    static public boolean sendMail(String server, String from, String to, String subject, String html, boolean debug) {
+    static public boolean sendMail(String to, String subject, String html, boolean debug) {
         boolean result = false;
         try {
+            Configuration configuration = AppUI.getConfiguration();
             Properties props = new Properties();
-            props.put("mail.smtp.host", server);
+            props.put("mail.smtp.host", configuration.getMailSmtpHost());
             Session session = Session.getDefaultInstance(props, null);
             session.setDebug(debug);
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(from));
+            msg.setFrom(new InternetAddress(configuration.getMailSmtpAddress()));
             InternetAddress toAddress = new InternetAddress(to);
             msg.addRecipient(Message.RecipientType.TO, toAddress);
             msg.setSubject(subject);
@@ -46,6 +50,6 @@ public class Mail {
 
     public static void main(String[] args) {
         String html = "<html><head><title>Java Mail</title></head><body>Test envoie email.</body></html>";
-        Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", "tlinxe@numericable.fr", "test", html, true);
+        Mail.sendMail("tlinxe@numericable.fr", "test", html, true);
     }
 }

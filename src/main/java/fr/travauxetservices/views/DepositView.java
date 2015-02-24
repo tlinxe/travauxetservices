@@ -58,20 +58,32 @@ public final class DepositView extends Panel implements View {
     }
 
     private Component buildAdForm() {
+        HorizontalLayout root = new HorizontalLayout();
+        root.setWidth(100, Unit.PERCENTAGE);
+        root.setMargin(true);
+        root.setSpacing(true);
+
         final Ad newAd = new Ad();
         final BeanItem<Ad> newItem = new BeanItem<Ad>(newAd);
         formAd = new AdForm(newItem, false);
+        root.addComponent(formAd);
 
-        return new WrapperLayout("Votre annonce", formAd);
+        return new WrapperLayout("Votre annonce", root);
     }
 
     private Component buildUserForm() {
+        HorizontalLayout root = new HorizontalLayout();
+        root.setWidth(100, Unit.PERCENTAGE);
+        root.setMargin(true);
+        root.setSpacing(true);
+
         User user = getCurrentUser();
 
         final BeanItem<User> newItem = new BeanItem<User>(user != null ? user : new User());
         formUser = new UserForm(getCurrentUser(), newItem, user != null, true);
+        root.addComponent(formUser);
 
-        return new WrapperLayout("Vos informations", formUser);
+        return new WrapperLayout("Vos informations", root);
     }
 
     private Component buildFooter() {

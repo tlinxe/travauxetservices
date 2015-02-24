@@ -10,6 +10,9 @@ import fr.travauxetservices.services.Mail;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.views.ViewType;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -17,6 +20,8 @@ import java.util.Collection;
  * Created by Phobos on 13/12/14.
  */
 public class AppDataProvider implements DataProvider {
+
+    private boolean ready;
 
     private JPAContainer<Category> categories;
     private JPAContainer<Division> divisions;
@@ -27,23 +32,41 @@ public class AppDataProvider implements DataProvider {
     private JPAContainer<Rating> ratings;
 
     public AppDataProvider() {
-        categories = JPAContainerFactory.make(Category.class, AppUI.PERSISTENCE_UNIT);
-        categories.sort(new String[]{"name"}, new boolean[]{true});
-        categories.setParentProperty("parent");
+        DummyDataGenerator.create();
+        make();
+    }
 
-        divisions = JPAContainerFactory.make(Division.class, AppUI.PERSISTENCE_UNIT);
-        divisions.sort(new String[]{"name"}, new boolean[]{true});
-        divisions.setParentProperty("parent");
+    public void make() {
+        try {
+            Configuration configuration = AppUI.getConfiguration();
+            System.out.println("AppDataProvider.constructor configuration " + configuration.isSaved());
+            EntityManager em = Persistence.createEntityManagerFactory(AppUI.PERSISTENCE_UNIT, configuration.getProperties()).createEntityManager();
+            categories = JPAContainerFactory.make(Category.class, em);
+            categories.sort(new String[]{"name"}, new boolean[]{true});
+            categories.setParentProperty("parent");
 
-        requests = JPAContainerFactory.make(Request.class, AppUI.PERSISTENCE_UNIT);
-        requests.sort(new String[]{"created"}, new boolean[]{false});
+            divisions = JPAContainerFactory.make(Division.class, em);
+            divisions.sort(new String[]{"name"}, new boolean[]{true});
+            divisions.setParentProperty("parent");
 
-        offers = JPAContainerFactory.make(Offer.class, AppUI.PERSISTENCE_UNIT);
-        offers.sort(new String[]{"created"}, new boolean[]{false});
+            requests = JPAContainerFactory.make(Request.class, em);
+            requests.sort(new String[]{"created"}, new boolean[]{false});
 
-        users = JPAContainerFactory.make(User.class, AppUI.PERSISTENCE_UNIT);
-        messages = JPAContainerFactory.make(Message.class, AppUI.PERSISTENCE_UNIT);
-        ratings = JPAContainerFactory.make(Rating.class, AppUI.PERSISTENCE_UNIT);
+            offers = JPAContainerFactory.make(Offer.class, em);
+            offers.sort(new String[]{"created"}, new boolean[]{false});
+
+            users = JPAContainerFactory.make(User.class, em);
+            messages = JPAContainerFactory.make(Message.class, em);
+            ratings = JPAContainerFactory.make(Rating.class, em);
+            ready = true;
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            ready = false;
+        }
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 
     @Override
@@ -212,7 +235,7 @@ public class AppDataProvider implements DataProvider {
         String url = AppUI.getEncodedUrl() + "/#!" + ViewType.PROFILE.getViewName() + "/" + u.getId();
         String subject = I18N.getString("message.user.account.subject");
         String text = I18N.getString("message.user.account.text", new String[]{u.toString(), url});
-        Mail.sendMail("smtp.numericable.fr", "thierry.linxe@numericable.fr", u.toString(), subject, text, false);
+        Mail.sendMail(u.toString(), subject, text, false);
     }
 
     public void removeUser(final Object itemId) throws UnsupportedOperationException {

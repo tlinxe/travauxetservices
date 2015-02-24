@@ -46,43 +46,14 @@ public class AdLayout extends VerticalLayout {
     }
 
     private Component buildAdContent(final EntityItem<Ad> item) {
-        User currentUser = getCurrentUser();
-        User itemUser = (User) item.getItemProperty("user").getValue();
+        HorizontalLayout root = new HorizontalLayout();
+        root.setMargin(true);
 
         final AdForm form = new AdForm(item, true);
         form.setWidth(100, Unit.PERCENTAGE);
-        if (currentUser != null && (currentUser.isAdmin() || currentUser.equals(itemUser))) {
-            Button edit = new Button(I18N.getString("button.change"), new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    if (form.isReadOnly()) {
-                        form.setItem(item, false);
-                        event.getButton().setCaption(I18N.getString("button.save"));
-                        event.getButton().addStyleName("primary");
-                    } else {
-                        try {
-                            form.commit();
-                            item.commit();
-                            form.setItem(item, true);
-                            event.getButton().setCaption(I18N.getString("button.change"));
-                            event.getButton().removeStyleName("primary");
-                        } catch (Validator.InvalidValueException ive) {
-                            Notification.show(ive.getMessage());
-                            form.setValidationVisible(true);
-                        }
-                    }
-                }
-            });
-            edit.addStyleName("tiny");
+        root.addComponent(form);
 
-            HorizontalLayout footer = new HorizontalLayout();
-            footer.setMargin(new MarginInfo(false, true, true, true));
-            footer.setSpacing(true);
-            footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-            footer.addComponent(edit);
-            form.getFooter().addComponent(footer);
-        }
-        return new WrapperLayout((item.getEntity()).getTitle(), form);
+        return new WrapperLayout((item.getEntity()).getTitle(), root);
     }
 
     private Component buildUserContent(EntityItem<Ad> item) {
@@ -100,7 +71,7 @@ public class AdLayout extends VerticalLayout {
         layout.setSpacing(true);
         layout.addComponent(new Label(user.getCommonName()));
         if (user.getPhone() != null) {
-            Button phoneButton = new Button(I18N.getString("button.phone"), new Button.ClickListener() {
+            final Button phoneButton = new Button(I18N.getString("button.phone"), new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     Object data = event.getButton().getData();
@@ -112,7 +83,7 @@ public class AdLayout extends VerticalLayout {
             phoneButton.addStyleName(ValoTheme.BUTTON_SMALL);
             layout.addComponent(phoneButton);
         }
-        Button emailButton = new Button(I18N.getString("button.contact"), new Button.ClickListener() {
+        final Button emailButton = new Button(I18N.getString("button.contact"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 ContactWindow.open();

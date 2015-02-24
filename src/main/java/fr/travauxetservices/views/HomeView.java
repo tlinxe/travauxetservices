@@ -16,7 +16,6 @@ import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.*;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
@@ -24,7 +23,6 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
-import fr.travauxetservices.component.ConnectionWindow;
 import fr.travauxetservices.component.RegistrationWindow;
 import fr.travauxetservices.component.RichText;
 import fr.travauxetservices.event.CustomEvent;
@@ -160,11 +158,11 @@ public final class HomeView extends Panel implements View {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label titleLabel = new Label(I18N.getString("menu.home"));
-        titleLabel.setSizeUndefined();
-        titleLabel.addStyleName(ValoTheme.LABEL_H1);
-        titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        header.addComponent(titleLabel);
+        Label label = new Label(I18N.getString("menu.home"));
+        label.setSizeUndefined();
+        label.addStyleName(ValoTheme.LABEL_H1);
+        label.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        header.addComponent(label);
 
         HorizontalLayout tools = new HorizontalLayout(buildButtons());
         tools.setSpacing(true);

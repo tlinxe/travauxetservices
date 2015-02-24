@@ -10,12 +10,13 @@ import fr.travauxetservices.tools.I18N;
  */
 public enum ViewType {
     HOME("home", HomeView.class, FontAwesome.HOME, null, true, false, false, false),
-    OFFER("offers", OfferView.class, FontAwesome.SHARE_SQUARE, null, true, false, false, false),
-    REQUEST("requests", RequestView.class, FontAwesome.SHARE_SQUARE_O, null, true, false, false, false),
-    DEPOSI("deposit", DepositView.class, FontAwesome.FILE_TEXT_O, null, true, false, false, false),
+    OFFER("offers", OfferView.class, FontAwesome.TABLE, null, true, false, false, false),
+    REQUEST("requests", RequestView.class, FontAwesome.NAVICON, null, true, false, false, false),
+    DEPOSI("deposit", DepositView.class, FontAwesome.EDIT, null, true, false, false, false),
     PROFILE("profile", ProfileView.class, FontAwesome.USER, "submenu.my.account", true, false, true, false),
     PREFERENCES("preferences", PreferencesView.class, FontAwesome.COGS, null, true, false, true, false),
-    VALIDATION("validation", ValidationView.class, FontAwesome.CHECK, "submenu.administration", true, true, false, false),
+    CONFIGURATION("configuration", ConfigurationView.class, FontAwesome.FILE_CODE_O, "submenu.administration", true, true, false, false),
+    VALIDATION("validation", ValidationView.class, FontAwesome.CHECK, null, true, true, false, false),
     USER("users", UserView.class, FontAwesome.USERS, null, true, true, false, false),
     INFORMATION("information", InformationView.class, FontAwesome.INFO_CIRCLE, "submenu.abount", false, false, false, false),
     ABOUT("about", AboutView.class, FontAwesome.QUESTION, null, false, false, false, false),

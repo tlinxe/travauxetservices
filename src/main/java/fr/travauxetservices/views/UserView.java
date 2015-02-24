@@ -203,7 +203,7 @@ public final class UserView extends Panel implements View {
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
         final User user = getCurrentUser();
-        if (user == null) {
+        if (user == null || !user.isAdmin()) {
             UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
         }
         applyFilters();

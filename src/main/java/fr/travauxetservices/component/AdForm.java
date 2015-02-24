@@ -50,10 +50,6 @@ public class AdForm extends Form {
         setValidationVisibleOnCommit(false);
 
         form = new FormRowLayout(1, "100px");
-        form.setDefaultCaptionWidth("100px");
-        form.setDefaultComponentAlignment(Alignment.TOP_LEFT);
-        form.setMargin(true);
-        form.setSpacing(true);
         form.setReadOnly(this.readOnly);
 
         setLayout(form);
@@ -106,30 +102,29 @@ public class AdForm extends Form {
     }
 
     private Component getField(Field field) {
-        return getField(field, field.getCaption());
+        return getField(field, false);
     }
 
-    private Component getField(Field field, String caption) {
-        field.setCaption(caption);
-        if (!isReadOnly()) return field;
+    private Component getField(Field field, boolean forceReadOnly) {
+        if (!isReadOnly() && !forceReadOnly) return field;
         Object value = field.getValue();
         LabelField label = new LabelField(field.getCaption());
         label.setIcon(field.getIcon());
         if (field instanceof TextArea) {
-            label.setWidth(100, Unit.PERCENTAGE);
+            label.setWidth(80, Unit.PERCENTAGE);
             label.setContentMode(ContentMode.HTML);
             if (value != null) label.setValue(HtmlEscape.escapeBr(value.toString()));
         }
         if (field.getValue() != null) label.setValue(field.getValue().toString());
-        label.addStyleName(ValoTheme.LABEL_SMALL);
+        //label.addStyleName(ValoTheme.LABEL_SMALL);
         return label;
     }
 
     public class TypeComboBox extends ComboBox {
         public TypeComboBox(String caption) {
             setCaption(caption);
-            setRequired(true);
-            setNullSelectionAllowed(false);
+            setPageLength(2);
+            //setNullSelectionAllowed(false);
             addItem(Ad.Type.OFFER);
             setItemCaption(Ad.Type.OFFER, "Offre");
             addItem(Ad.Type.REQUEST);
@@ -146,11 +141,15 @@ public class AdForm extends Form {
         final ComboBox remunerationField = new RemunerationComboBox(I18N.getString("ad.remuneration"));
 
         public CustomFieldFactory() {
-            typeField.setNullSelectionAllowed(false);
-            typeField.setPageLength(2);
+            typeField.setRequired(true);
+            typeField.setRequiredError(I18N.getString("validator.required"));
 
             categoryField.setPageLength(20);
+            categoryField.setRequired(true);
+            categoryField.setRequiredError(I18N.getString("validator.required"));
 
+            divisionField.setRequired(true);
+            divisionField.setRequiredError(I18N.getString("validator.required"));
             divisionField.setInputPrompt(I18N.getString("input.division"));
             divisionField.setPageLength(20);
 
@@ -161,6 +160,8 @@ public class AdForm extends Form {
             descriptionField.setRows(15);
             descriptionField.addStyleName("notes");
 
+            remunerationField.setRequired(true);
+            remunerationField.setRequiredError(I18N.getString("validator.required"));
             remunerationField.setInputPrompt(I18N.getString("input.remuneration"));
             remunerationField.setPageLength(20);
         }
@@ -189,6 +190,8 @@ public class AdForm extends Form {
                 Property p = item.getItemProperty("city");
                 if (p != null) field.setValue(p.getValue());
             } else if ("title".equals(propertyId)) {
+                field.setRequired(true);
+                field.setRequiredError(I18N.getString("validator.required"));
                 field.setCaption(I18N.getString("ad.title"));
                 field.setWidth(100, Unit.PERCENTAGE);
             } else if ("description".equals(propertyId)) {

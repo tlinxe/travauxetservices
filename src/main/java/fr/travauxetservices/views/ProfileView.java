@@ -24,7 +24,7 @@ import java.util.UUID;
  * Created by Phobos on 12/12/14.
  */
 @SuppressWarnings("serial")
-public final class ProfileView extends Panel implements View, FormFieldFactory {
+public final class ProfileView extends Panel implements View {
     private User user;
     private UserForm form;
 
@@ -58,6 +58,11 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
     }
 
     private Component buildContent() {
+        HorizontalLayout root = new HorizontalLayout();
+        root.setWidth(100, Unit.PERCENTAGE);
+        root.setMargin(true);
+        root.setSpacing(true);
+
         User currentUser = getCurrentUser();
         final User newUser = new User();
         final BeanItem<User> newItem = new BeanItem<User>(newUser);
@@ -66,9 +71,9 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
-                    form.commit();
-                    event.getButton().setCaption(I18N.getString("button.change"));
-                    event.getButton().removeStyleName("primary");
+                    if (form.isModified()) {
+                        form.commit();
+                    }
                 } catch (Validator.InvalidValueException ive) {
                     Notification.show(ive.getMessage());
                     form.setValidationVisible(true);
@@ -84,32 +89,9 @@ public final class ProfileView extends Panel implements View, FormFieldFactory {
         footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         footer.addComponent(edit);
         form.getFooter().addComponent(footer);
+        root.addComponent(form);
 
-        return new WrapperLayout("Votre profile", form);
-    }
-
-    @Override
-    public Field createField(Item item, Object propertyId, Component uiContext) {
-        // Use the super class to create a suitable field base on the
-        // property type.
-        Field field = DefaultFieldFactory.get().createField(item, propertyId, uiContext);
-        if ("picture".equals(propertyId)) {
-            field = new PictureField(field.getCaption());
-        } else if ("email".equals(propertyId)) {
-            field.addValidator(new EmailValidator(I18N.getString("validator.email")));
-        } else if ("gender".equals(propertyId)) {
-            field = new GenderComboBox(field.getCaption());
-        } else if ("role".equals(propertyId)) {
-            field = new RoleComboBox(field.getCaption());
-        } else if ("password".equals(propertyId)) {
-            field = new PasswordField(field.getCaption());
-        }
-        if (field instanceof AbstractTextField) {
-            ((AbstractTextField) field).setNullRepresentation("");
-        }
-        field.addStyleName("tiny");
-        field.addValidator(new BeanValidator(User.class, propertyId.toString()));
-        return field;
+        return new WrapperLayout("Votre profile", root);
     }
 
     private void setItemDataSource(User user) {

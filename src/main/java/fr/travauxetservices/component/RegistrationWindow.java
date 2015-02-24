@@ -35,7 +35,7 @@ public class RegistrationWindow extends Window {
         setModal(true);
         setCloseShortcut(ShortcutAction.KeyCode.ESCAPE, null);
         setResizable(false);
-        setHeight(500, Unit.PIXELS);
+        setHeight(450, Unit.PIXELS);
         setWidth(700, Unit.PIXELS);
 
         VerticalLayout content = new VerticalLayout();

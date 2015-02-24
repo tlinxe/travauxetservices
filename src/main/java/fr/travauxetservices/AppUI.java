@@ -13,11 +13,14 @@ import fr.travauxetservices.data.DataProvider;
 import fr.travauxetservices.data.DummyDataGenerator;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
+import fr.travauxetservices.model.Configuration;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
+import fr.travauxetservices.views.ConfigurationView;
 import fr.travauxetservices.views.HomeView;
 import fr.travauxetservices.views.MainView;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -30,7 +33,7 @@ public class AppUI extends UI {
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = AppUI.class, widgetset = "fr.travauxetservices.AppWidgetSet")
-    public static class Servlet extends VaadinServlet {
+    static public class Servlet extends VaadinServlet {
         private static class MySystemMessagesProvider implements SystemMessagesProvider {
             @Override
             public SystemMessages getSystemMessages(SystemMessagesInfo systemMessagesInfo) {
@@ -55,16 +58,17 @@ public class AppUI extends UI {
         }
     }
 
-    static {
-        DummyDataGenerator.create();
-    }
+//    static {
+//        DummyDataGenerator.create();
+//    }
 
-    public static final String USERNAME_COOKIE = "username";
-    public static final String PASSWORD_COOKIE = "password";
-    public static final String REMEMBER_COOKIE = "remember";
-    public static final String PERSISTENCE_UNIT = "h2";
+    static public final String USERNAME_COOKIE = "username";
+    static public final String PASSWORD_COOKIE = "password";
+    static public final String REMEMBER_COOKIE = "remember";
+    static public final String PERSISTENCE_UNIT = "h2";
 
-    private DataProvider dataProvider;
+    private Configuration configuration;
+    private AppDataProvider dataProvider;
     private CustomEventBus eventBus = new CustomEventBus();
 
 
@@ -77,6 +81,7 @@ public class AppUI extends UI {
         Responsive.makeResponsive(this);
         addStyleName(ValoTheme.UI_WITH_MENU);
 
+        configuration = new Configuration();
         dataProvider = new AppDataProvider();
 
         String remember = getValueCookie(REMEMBER_COOKIE);
@@ -99,8 +104,15 @@ public class AppUI extends UI {
     }
 
     private void updateContent() {
-        setContent(new MainView());
-        getNavigator().navigateTo(getNavigator().getState());
+        System.out.println("AppUI.updateContent saved: "+getConfiguration().isSaved());
+        System.out.println("AppUI.updateContent ready: "+getDataProvider().isReady());
+        if (!getConfiguration().isSaved() || !getDataProvider().isReady()) {
+            setContent(new ConfigurationView());
+        }
+        else {
+            setContent(new MainView());
+            getNavigator().navigateTo(getNavigator().getState());
+        }
     }
 
     @Subscribe
@@ -166,14 +178,15 @@ public class AppUI extends UI {
         return cookie != null ? cookie.getValue() : null;
     }
 
-    /**
-     * @return An instance for accessing the (dummy) services layer.
-     */
-    public static DataProvider getDataProvider() {
+    static public Configuration getConfiguration() {
+        return ((AppUI) getCurrent()).configuration;
+    }
+
+    static public AppDataProvider getDataProvider() {
         return ((AppUI) getCurrent()).dataProvider;
     }
 
-    public static CustomEventBus geEventbus() {
+    static public CustomEventBus geEventbus() {
         return ((AppUI) getCurrent()).eventBus;
     }
 
