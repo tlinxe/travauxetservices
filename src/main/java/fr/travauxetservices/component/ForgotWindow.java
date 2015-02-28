@@ -1,42 +1,30 @@
 package fr.travauxetservices.component;
 
-import com.vaadin.data.Validator;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
-import com.vaadin.server.UserError;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.User;
-import fr.travauxetservices.services.Mail;
 import fr.travauxetservices.tools.I18N;
-import fr.travauxetservices.views.ViewType;
-
-import javax.persistence.PersistenceException;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 @SuppressWarnings("serial")
-public class RegistrationWindow extends Window {
-    public static final String ID = "resgistrationwindow";
+public class ForgotWindow extends Window {
+    public static final String ID = "connectionwindow";
 
-    private UserForm form;
-
-    private RegistrationWindow() {
-        setCaption(I18N.getString("window.registration"));
+    private ForgotWindow() {
         //addStyleName("profile-window");
         setId(ID);
         Responsive.makeResponsive(this);
 
         setModal(true);
+        setCaption(I18N.getString("window.forgot"));
         setCloseShortcut(ShortcutAction.KeyCode.ESCAPE, null);
         setResizable(false);
-        setHeight(500, Unit.PIXELS);
-        setWidth(700, Unit.PIXELS);
+        setHeight(220, Unit.PIXELS);
+        setWidth(500, Unit.PIXELS);
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -50,15 +38,22 @@ public class RegistrationWindow extends Window {
     }
 
     private Component buildForm() {
-        final HorizontalLayout layout = new HorizontalLayout();
-        layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
-        layout.setWidth(100, Unit.PERCENTAGE);
+        final FormLayout layout = new FormLayout();
+        layout.setMargin(false);
         layout.setSpacing(true);
-        Responsive.makeResponsive(layout);
 
-        final BeanItem<User> newItem = new BeanItem<User>(new User());
-        form = new UserForm(null, newItem, false, true);
-        layout.addComponent(form);
+        Label labelField = new Label(I18N.getString("forgot.label"));
+        labelField.addStyleName(ValoTheme.LABEL_SMALL);
+        labelField.addStyleName(ValoTheme.LABEL_COLORED);
+        layout.addComponent(labelField);
+
+        String username = AppUI.getValueCookie(AppUI.USERNAME_COOKIE);
+        final TextField usernameField = new TextField(I18N.getString("user.email"));
+        usernameField.setColumns(20);
+        usernameField.setIcon(FontAwesome.USER);
+        //usernameField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        usernameField.setValue(username != null ? username : "tlinxe@email.fr");
+        layout.addComponent(usernameField);
 
         return layout;
     }
@@ -72,13 +67,10 @@ public class RegistrationWindow extends Window {
         Label footerText = new Label();
         footerText.setSizeUndefined();
 
-        Button ok = new Button(I18N.getString("button.validate"), new Button.ClickListener() {
+        Button ok = new Button(I18N.getString("button.send"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
-                    form.commit();
-                    AppUI.getDataProvider().addUser(((BeanItem<User>) form.getItemDataSource()).getBean());
-                    CustomEventBus.post(new CustomEvent.CloseOpenWindowsEvent());
                 } catch (Exception e) {
                     //Ignored
                 }
@@ -101,7 +93,7 @@ public class RegistrationWindow extends Window {
 
     public static void open() {
         CustomEventBus.post(new CustomEvent.CloseOpenWindowsEvent());
-        Window w = new RegistrationWindow();
+        Window w = new ForgotWindow();
         UI.getCurrent().addWindow(w);
         w.focus();
     }

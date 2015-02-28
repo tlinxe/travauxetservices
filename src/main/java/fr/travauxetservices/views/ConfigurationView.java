@@ -110,9 +110,9 @@ public final class ConfigurationView extends Panel implements View {
         form.addComponent(home);
 
         HorizontalLayout footer = new HorizontalLayout();
+        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         footer.setMargin(new MarginInfo(true, false, true, false));
         footer.setSpacing(true);
-        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         form.addComponent(footer);
         footer.addComponent(edit);
         return form;

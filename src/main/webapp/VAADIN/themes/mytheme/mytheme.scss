@@ -75,9 +75,9 @@ $valo-menu-background-color: #414B56;
     @include valo-panel-caption-style($background-color: $color5);
   }
 
-//  .v-panel-caption.v-horizontallayout {
-//    @include valo-panel-caption-style($background-color: $color1);
-//  }
+  .v-panel-caption.v-horizontallayout {
+    @include valo-panel-caption-style($background-color: white);
+  }
 
   .v-button-color1 {
     @include valo-panel-caption-style($background-color: $color1);

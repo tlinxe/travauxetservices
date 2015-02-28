@@ -133,7 +133,7 @@ public final class HomeView extends Panel implements View {
             }
         });
 
-        final Button registration = new Button(I18N.getString("registration") + "...", new Button.ClickListener() {
+        final Button registration = new Button(I18N.getString("button.registration") + "...", new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 RegistrationWindow.open();

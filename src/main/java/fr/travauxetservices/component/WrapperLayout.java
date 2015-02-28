@@ -16,9 +16,10 @@ public class WrapperLayout extends CssLayout {
         addStyleName(ValoTheme.LAYOUT_CARD);
 
         panelCaption = new HorizontalLayout();
+        panelCaption.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         panelCaption.addStyleName("v-panel-caption");
         panelCaption.setWidth(100, Unit.PERCENTAGE);
-        panelCaption.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+
         label = new Label(caption);
         label.addStyleName(ValoTheme.LABEL_H4);
         label.addStyleName(ValoTheme.LABEL_COLORED);

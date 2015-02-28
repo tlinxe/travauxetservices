@@ -8,6 +8,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.ErrorMessage;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -16,9 +17,6 @@ import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.model.Remuneration;
 import fr.travauxetservices.tools.HtmlEscape;
 import fr.travauxetservices.tools.I18N;
-import pl.lt.vaadin.ui.FormRowLayout;
-import pl.lt.vaadin.ui.RowLayout;
-import pl.lt.vaadin.ui.client.rowlayout.RowLayoutState;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -35,7 +33,7 @@ import java.util.Locale;
 public class AdForm extends Form {
     private final Item item;
     private boolean readOnly;
-    private FormRowLayout form;
+    private WrapperFormLayout form;
 
     public AdForm(Item item, boolean readOnly) {
         this.item = item;
@@ -49,7 +47,9 @@ public class AdForm extends Form {
         setValidationVisible(false);
         setValidationVisibleOnCommit(false);
 
-        form = new FormRowLayout(1, "100px");
+        form = new WrapperFormLayout();
+        form.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+        form.setSpacing(true);
         form.setReadOnly(this.readOnly);
 
         setLayout(form);
@@ -84,21 +84,17 @@ public class AdForm extends Form {
 
     @Override
     protected void attachField(Object propertyId, Field field) {
-        if (propertyId.equals("title")) {
-            if (!isReadOnly()) {
-                form.addComponent(getField(field));
-            }
-        } else if (propertyId.equals("city")) {
-            RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
-            rowLayout.addComponent(getField(field), "100px", RowLayoutState.CaptionPos.LEFT);
-        } else if (propertyId.equals("remuneration")) {
-            if (!isReadOnly()) {
-                RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
-                rowLayout.addComponent(getField(field), "100px", RowLayoutState.CaptionPos.LEFT);
-            }
-        } else {
-            form.addComponent(getField(field));
+        Object value = field.getValue();
+        if (isReadOnly()) {
+            if (value == null) return;
+            if (propertyId.equals("title")) return;
+            if (propertyId.equals("remuneration")) return;
         }
+        if (propertyId.equals("city") || propertyId.equals("remuneration")) {
+            form.addWrapComponent(getField(field));
+            return;
+        }
+        form.addComponent(getField(field));
     }
 
     private Component getField(Field field) {
@@ -111,7 +107,7 @@ public class AdForm extends Form {
         LabelField label = new LabelField(field.getCaption());
         label.setIcon(field.getIcon());
         if (field instanceof TextArea) {
-            label.setWidth(80, Unit.PERCENTAGE);
+            label.setWidth(100, Unit.PERCENTAGE);
             label.setContentMode(ContentMode.HTML);
             if (value != null) label.setValue(HtmlEscape.escapeBr(value.toString()));
         }
@@ -156,8 +152,11 @@ public class AdForm extends Form {
             cityField.setInputPrompt(I18N.getString("input.city"));
             cityField.setPageLength(20);
 
+            descriptionField.setRequired(true);
+            descriptionField.setRequiredError(I18N.getString("validator.required"));
             descriptionField.setWidth(100, Unit.PERCENTAGE);
             descriptionField.setRows(15);
+            descriptionField.addStyleName(ValoTheme.TEXTAREA_HUGE);
             descriptionField.addStyleName("notes");
 
             remunerationField.setRequired(true);
@@ -216,6 +215,8 @@ public class AdForm extends Form {
                         }
                     };
                 }
+                field.setIcon(FontAwesome.EURO);
+                field.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
                 field.setCaption(I18N.getString("ad.price"));
             } else if ("remuneration".equals(propertyId)) {
                 field = remunerationField;
@@ -251,11 +252,12 @@ public class AdForm extends Form {
                     ((AbstractField) field).setValidationVisible(true);
                     ErrorMessage message = ((AbstractField<?>) field).getErrorMessage();
                     if (message != null) {
+                        String name = !(field instanceof CheckBox) ? field.getCaption() + ":&#32;" : "";
                         String text = message.getFormattedHtmlMessage();
                         text = text.replaceAll("<div>", "");
                         text = text.replaceAll("</div>", "");
                         System.out.println("Error: " + text);
-                        setComponentError(new UserError(field.getCaption() + ":&#32;" + text, AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
+                        setComponentError(new UserError(name + text, AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
                         field.focus();
                         throw e;
                     }

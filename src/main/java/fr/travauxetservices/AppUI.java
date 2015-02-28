@@ -74,7 +74,7 @@ public class AppUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
-        getPage().setTitle(I18N.getString("title"));
+        getPage().setTitle(I18N.getString("application.title"));
         setLocale(Locale.FRANCE);
 
         CustomEventBus.register(this);

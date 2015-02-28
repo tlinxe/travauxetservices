@@ -54,7 +54,7 @@ public final class MainMenu extends CustomComponent {
     }
 
     private Component buildTitle() {
-        Label logo = new Label("<strong>Travaux</strong> et <strong>Services</strong>", ContentMode.HTML);
+        Label logo = new Label(I18N.getString("application.title.logo"), ContentMode.HTML);
         logo.setSizeUndefined();
         HorizontalLayout logoWrapper = new HorizontalLayout(logo);
         logoWrapper.setComponentAlignment(logo, Alignment.MIDDLE_CENTER);
@@ -160,7 +160,7 @@ public final class MainMenu extends CustomComponent {
             }
             settingsItem.setIcon(resource);
             settingsItem.setText(user.getFirstName() + " " + user.getLastName());
-            settingsItem.addItem("Sign Out", new MenuBar.Command() {
+            settingsItem.addItem(I18N.getString("sign.out"), new MenuBar.Command() {
                 @Override
                 public void menuSelected(final MenuBar.MenuItem selectedItem) {
                     CustomEventBus.post(new CustomEvent.UserLoggedOutEvent());
@@ -168,7 +168,7 @@ public final class MainMenu extends CustomComponent {
             });
         } else {
             settingsItem.setIcon(resource);
-            settingsItem.setText("Se connecter");
+            settingsItem.setText(I18N.getString("sign.in"));
             settingsItem.setCommand(new MenuBar.Command() {
                 @Override
                 public void menuSelected(final MenuBar.MenuItem selectedItem) {

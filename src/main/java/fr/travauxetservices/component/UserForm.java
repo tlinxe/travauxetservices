@@ -16,9 +16,6 @@ import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.views.PictureField;
-import pl.lt.vaadin.ui.FormRowLayout;
-import pl.lt.vaadin.ui.RowLayout;
-import pl.lt.vaadin.ui.client.rowlayout.RowLayoutState;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -33,7 +30,7 @@ public class UserForm extends Form {
     private final Item item;
     private boolean readOnly;
     private boolean textual;
-    private FormRowLayout form;
+    private WrapperFormLayout form;
 
     public UserForm(User user) {
         this(user, new BeanItem<User>(user), true, false);
@@ -50,7 +47,8 @@ public class UserForm extends Form {
         setValidationVisible(false);
         setValidationVisibleOnCommit(false);
 
-        form = new FormRowLayout(1, "100px");
+        form = new WrapperFormLayout();
+        form.setSpacing(true);
         form.setReadOnly(this.readOnly);
 
         setLayout(form);
@@ -96,18 +94,13 @@ public class UserForm extends Form {
             if (value == null) return;
             if (propertyId.equals("gender")) return;
             if (propertyId.equals("firstName")) return;
-            form.addComponent(getField(field));
-        } else {
-            if (propertyId.equals("professional")) {
-                RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
-                rowLayout.addComponent(getField(field), "0px", RowLayoutState.CaptionPos.LEFT);
-            } else if (propertyId.equals("confirm")) {
-                RowLayout rowLayout = form.getRowLayouts().get(form.getComponentCount() - 1);
-                rowLayout.addComponent(getField(field), "100px", RowLayoutState.CaptionPos.LEFT);
-            } else {
-                form.addComponent(getField(field));
-            }
         }
+
+        if (propertyId.equals("professional") || propertyId.equals("confirm")) {
+            form.addWrapComponent(getField(field));
+            return;
+        }
+        form.addComponent(getField(field));
     }
 
     private Component getField(Field field) {
@@ -133,9 +126,9 @@ public class UserForm extends Form {
         final RoleComboBox roleField = new RoleComboBox(I18N.getString("user.role"));
         final PasswordField passwordField = new PasswordField(I18N.getString("user.password"));
         final PasswordField confirmField = new PasswordField(I18N.getString("user.confirmation"));
-        final CustomCheckBoxField professionalField = new CustomCheckBoxField(I18N.getString("user.professional.question"));
-        final CustomCheckBoxField newsletterField = new CustomCheckBoxField(I18N.getString("check.newsletter"));
-        final CustomCheckBoxField termsField = new CustomCheckBoxField(I18N.getString("check.terms"));
+        final CheckBox professionalField = new CheckBox(I18N.getString("user.professional.question"));
+        final CheckBox newsletterField = new CheckBox(I18N.getString("check.newsletter"));
+        final CheckBox termsField = new CheckBox(I18N.getString("check.terms"));
 
         public CustomFieldFactory() {
             emailField.setRequired(true);
@@ -269,7 +262,7 @@ public class UserForm extends Form {
                     ((AbstractField) field).setValidationVisible(true);
                     ErrorMessage message = ((AbstractField<?>) field).getErrorMessage();
                     if (message != null) {
-                        String name = field.getCaption() != null && field.getCaption().length() > 0 ? field.getCaption() + ":&#32;" : "";
+                        String name = !(field instanceof CheckBox) ? field.getCaption() + ":&#32;" : "";
                         String text = message.getFormattedHtmlMessage();
                         text = text.replaceAll("<div>", "");
                         text = text.replaceAll("</div>", "");

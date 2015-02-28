@@ -146,7 +146,11 @@
         "name": "Dons"
     },
     {
-        "name": "Troc"
+        "name": "Troc",
+        "categories": [
+            { "name": "Matériel"},
+            { "name": "Autres"}
+        ]
     },
     {
         "name": "Autres"

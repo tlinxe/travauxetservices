@@ -84,9 +84,9 @@ public final class ProfileView extends Panel implements View {
         edit.addStyleName("primary");
 
         HorizontalLayout footer = new HorizontalLayout();
+        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         footer.setMargin(new MarginInfo(false, true, true, true));
         footer.setSpacing(true);
-        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         footer.addComponent(edit);
         form.getFooter().addComponent(footer);
         root.addComponent(form);

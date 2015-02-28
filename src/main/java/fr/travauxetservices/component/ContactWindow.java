@@ -20,7 +20,7 @@ public class ContactWindow extends Window {
     private FormLayout form;
 
     private ContactWindow() {
-        setCaption("Message");
+        setCaption(I18N.getString("window.contact"));
         //addStyleName("profile-window");
         setId(ID);
         Responsive.makeResponsive(this);
@@ -44,11 +44,9 @@ public class ContactWindow extends Window {
 
     private Component buildForm() {
         final VerticalLayout layout = new VerticalLayout();
-        layout.setWidth(100, Unit.PERCENTAGE);
         layout.setDefaultComponentAlignment(Alignment.TOP_LEFT);
-        //layout.setSizeUndefined();
+        layout.setWidth(100, Unit.PERCENTAGE);
         layout.setSpacing(true);
-        Responsive.makeResponsive(layout);
 
         form = new FormLayout();
         //form.setSizeFull();
@@ -72,6 +70,7 @@ public class ContactWindow extends Window {
         textField.addStyleName(ValoTheme.TEXTFIELD_TINY);
         textField.addStyleName("notes");
         textField.setSizeFull();
+        textField.setRows(8);
 
         layout.addComponent(form);
         layout.addComponent(textField);
@@ -83,15 +82,14 @@ public class ContactWindow extends Window {
 
     private Component buildFooter() {
         HorizontalLayout footer = new HorizontalLayout();
+        footer.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
         footer.setWidth(100, Unit.PERCENTAGE);
         footer.setSpacing(true);
-        footer.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
-        //footer.addStyleName("v-window-bottom-toolbar");
 
         Label footerText = new Label();
         footerText.setSizeUndefined();
 
-        Button ok = new Button("Envoyer", new Button.ClickListener() {
+        Button ok = new Button(I18N.getString("button.send"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {

@@ -36,5 +36,5 @@
 
     <inherits name="org.vaadin.teemu.ratingstars.gwt.RatingStarsWidgetset"/>
 
-    <inherits name="pl.lt.vaadin.ui.RowLayoutWidgetSet" />
+    
 </module>

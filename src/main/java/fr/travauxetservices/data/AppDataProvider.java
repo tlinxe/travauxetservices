@@ -39,7 +39,6 @@ public class AppDataProvider implements DataProvider {
     public void make() {
         try {
             Configuration configuration = AppUI.getConfiguration();
-            System.out.println("AppDataProvider.constructor configuration " + configuration.isSaved());
             EntityManager em = Persistence.createEntityManagerFactory(AppUI.PERSISTENCE_UNIT, configuration.getProperties()).createEntityManager();
             categories = JPAContainerFactory.make(Category.class, em);
             categories.sort(new String[]{"name"}, new boolean[]{true});

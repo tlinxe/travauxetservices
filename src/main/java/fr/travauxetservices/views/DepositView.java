@@ -116,9 +116,9 @@ public final class DepositView extends Panel implements View {
         edit.addStyleName("tiny");
 
         HorizontalLayout footer = new HorizontalLayout();
+        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         footer.setMargin(new MarginInfo(false, true, true, true));
         footer.setSpacing(true);
-        footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
         footer.addComponent(edit);
         return footer;
     }

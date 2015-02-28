@@ -11714,6 +11714,24 @@ div.v-layout.v-horizontal.v-widget {
 	outline: 1px solid #d87a23;
 }
 
+.mytheme .v-panel-caption.v-horizontallayout {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 12px;
+	line-height: 36px;
+	border-bottom: 1px solid #d5d5d5;
+	background-color: white 2%;
+	background-image: -webkit-linear-gradient(top, white 2%, #fcfcfc 98%);
+	background-image: linear-gradient(to bottom,white 2%, #fcfcfc 98%);
+	
+	font-weight: 400;
+	font-size: 14px;
+	-webkit-box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #f4f4f4;
+	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #f4f4f4;
+	text-shadow: 0 -1px 0;
+}
+
 .mytheme .v-button-color1 {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
