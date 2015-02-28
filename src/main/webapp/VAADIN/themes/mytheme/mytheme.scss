@@ -176,4 +176,12 @@ $valo-menu-background-color: #414B56;
   .v-formlayout.light > table > tbody > tr > td {
     border-bottom: none;
   }
+
+  .tiny .v-button,
+  .tiny .v-button .v-button-wrap {
+    height: 28px;
+    padding: 0 13px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
 }

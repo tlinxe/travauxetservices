@@ -11924,3 +11924,10 @@ div.v-layout.v-horizontal.v-widget {
 .mytheme .v-formlayout.light > table > tbody > tr > td {
 	border-bottom: none;
 }
+
+.mytheme .tiny .v-button, .mytheme .tiny .v-button .v-button-wrap {
+	height: 28px;
+	padding: 0 13px;
+	font-size: 12px;
+	border-radius: 4px;
+}
