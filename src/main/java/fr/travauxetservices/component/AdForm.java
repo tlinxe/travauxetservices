@@ -70,8 +70,8 @@ public class AdForm extends Form {
         values.add("city");
         values.add("title");
         values.add("description");
-        values.add("price");
         values.add("remuneration");
+        values.add("price");
         return values;
     }
 
@@ -91,9 +91,9 @@ public class AdForm extends Form {
         if (isReadOnly()) {
             if (value == null) return;
             if (propertyId.equals("title")) return;
-            if (propertyId.equals("remuneration")) return;
+            if (propertyId.equals("price")) return;
         }
-        if (propertyId.equals("city") || propertyId.equals("remuneration")) {
+        if (propertyId.equals("city") || propertyId.equals("price")) {
             form.addWrapComponent(getField(field));
             return;
         }
@@ -138,6 +138,7 @@ public class AdForm extends Form {
         final ComboBox cityField = new CityComboBox(I18N.getString("ad.city"));
         final TextArea descriptionField = new TextArea(I18N.getString("ad.description"));
         final ComboBox remunerationField = new RemunerationComboBox(I18N.getString("ad.remuneration"));
+        final TextField priceField = new TextField(I18N.getString("ad.price"));
 
         public CustomFieldFactory() {
             typeField.setRequired(true);
@@ -166,6 +167,16 @@ public class AdForm extends Form {
             remunerationField.setRequiredError(I18N.getString("validator.required"));
             remunerationField.setInputPrompt(I18N.getString("input.remuneration"));
             remunerationField.setPageLength(20);
+
+            priceField.setIcon(FontAwesome.EURO);
+            priceField.setVisible(false);
+
+            remunerationField.addValueChangeListener(new Property.ValueChangeListener() {
+                public void valueChange(Property.ValueChangeEvent event) {
+                    Remuneration value = (Remuneration)event.getProperty().getValue();
+                    priceField.setVisible(value != null && value.hasPrice());
+                }
+            });
         }
 
         @Override
@@ -198,11 +209,11 @@ public class AdForm extends Form {
                 field.setWidth(100, Unit.PERCENTAGE);
             } else if ("description".equals(propertyId)) {
                 field = descriptionField;
-            } else if ("price".equals(propertyId)) {
+            } else if ("remuneration".equals(propertyId)) {
                 if (isReadOnly()) {
                     final double price = (Double) item.getItemProperty("price").getValue();
                     final Remuneration remuneration = (Remuneration) item.getItemProperty("remuneration").getValue();
-                    field = new TextField() {
+                    field = new TextField(I18N.getString("ad.price")) {
                         public String getValue() {
                             StringBuffer text = new StringBuffer();
                             if (price > 0) {
@@ -212,17 +223,14 @@ public class AdForm extends Form {
                                 text.append(cf.format(price));
                             }
                             if (remuneration != null) {
-                                text.append((price > 0) ? "/" : "").append(I18N.getString("remuneration." + remuneration.toString() + ".short"));
+                                text.append((price > 0) ? "/" : "").append(remuneration.getShortLabel());
                             }
                             return text.toString();
                         }
                     };
-                }
-                field.setIcon(FontAwesome.EURO);
-                field.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-                field.setCaption(I18N.getString("ad.price"));
-            } else if ("remuneration".equals(propertyId)) {
-                field = remunerationField;
+                } else field = remunerationField;
+            } else if ("price".equals(propertyId)) {
+                field = priceField;
             }
             if (field instanceof AbstractTextField) {
                 ((AbstractTextField) field).setNullRepresentation("");

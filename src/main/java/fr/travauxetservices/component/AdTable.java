@@ -90,10 +90,10 @@ public class AdTable extends PagedTable {
 
         public Component generateCell(Table source, Object itemId, Object columnId) {
             StringBuffer text = new StringBuffer();
-            Property value = source.getContainerProperty(itemId, columnId);
-            if (value.getValue() != null) {
+            Remuneration value = (Remuneration)source.getContainerProperty(itemId, columnId).getValue();
+            if (value != null) {
                 text.append("<nobr>");
-                if (((Remuneration) value.getValue()).hasPrice()) {
+                if (value.hasPrice()) {
                     Property p = source.getContainerProperty(itemId, "price");
                     if (p != null) {
                         double price = (Double) p.getValue();
@@ -104,7 +104,7 @@ public class AdTable extends PagedTable {
                         }
                     }
                 }
-                text.append(I18N.getString("remuneration." + value.getValue() + ".short"));
+                text.append(I18N.getString(value.getShortLabel()));
                 text.append("</nobr>");
             }
             Property division = source.getContainerProperty(itemId, "division");
