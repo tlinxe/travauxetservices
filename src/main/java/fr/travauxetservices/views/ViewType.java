@@ -12,7 +12,7 @@ public enum ViewType {
     HOME("home", HomeView.class, FontAwesome.HOME, null, true, false, false, false),
     OFFER("offers", OfferView.class, FontAwesome.TABLE, null, true, false, false, false),
     REQUEST("requests", RequestView.class, FontAwesome.NAVICON, null, true, false, false, false),
-    DEPOSI("deposit", DepositView.class, FontAwesome.EDIT, null, true, false, false, false),
+    POST("post", PostView.class, FontAwesome.EDIT, null, true, false, false, false),
     PROFILE("profile", ProfileView.class, FontAwesome.USER, "submenu.my.account", true, false, true, false),
     PREFERENCES("preferences", PreferencesView.class, FontAwesome.COGS, null, true, false, true, false),
     CONFIGURATION("configuration", ConfigurationView.class, FontAwesome.FILE_CODE_O, "submenu.administration", true, true, false, false),

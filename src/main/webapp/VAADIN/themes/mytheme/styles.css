@@ -10610,6 +10610,10 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: hidden;
 }
 
+.mytheme .v-formlayout.v-has-width > table, .mytheme .mytheme .v-formlayout.v-has-width .v-formlayout-contentcell {
+	width: auto !important;
+}
+
 .mytheme .v-ui[width-range~="0-800px"] .valo-menu-title {
 	background-color: #414B56;
 	background-image: -webkit-linear-gradient(top, #46515c 2%, #38424b 98%);
@@ -11925,7 +11929,7 @@ div.v-layout.v-horizontal.v-widget {
 	border-bottom: none;
 }
 
-.mytheme .tiny .v-button, .mytheme .tiny .v-button .v-button-wrap {
+.mytheme .upload .v-button, .mytheme .upload .v-button .v-button-wrap {
 	height: 28px;
 	padding: 0 13px;
 	font-size: 12px;

@@ -21,11 +21,11 @@ import fr.travauxetservices.tools.I18N;
  * Created by Phobos on 12/12/14.
  */
 @SuppressWarnings("serial")
-public final class DepositView extends Panel implements View {
+public final class PostView extends Panel implements View {
     private AdForm formAd;
     private UserForm formUser;
 
-    public DepositView() {
+    public PostView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         addStyleName("content-view");
         CustomEventBus.register(this);
@@ -49,7 +49,7 @@ public final class DepositView extends Panel implements View {
         header.addStyleName("viewheader");
         header.setSpacing(true);
 
-        Label label = new Label(I18N.getString("menu.deposit"));
+        Label label = new Label(I18N.getString("menu.post"));
         label.setSizeUndefined();
         label.addStyleName(ValoTheme.LABEL_H1);
         label.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -111,7 +111,7 @@ public final class DepositView extends Panel implements View {
     }
 
     private Component buildButton() {
-        Button edit = new Button("Publier cette annonce", new Button.ClickListener() {
+        Button edit = new Button(I18N.getString("button.post"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 commit();
