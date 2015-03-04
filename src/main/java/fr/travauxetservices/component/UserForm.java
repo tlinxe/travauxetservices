@@ -2,6 +2,7 @@ package fr.travauxetservices.component;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.BeanValidator;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class UserForm extends Form {
     private final User user;
-    private final Item item;
+    private Item item;
     private boolean readOnly;
     private boolean textual;
     private WrapperFormLayout form;
@@ -58,7 +59,7 @@ public class UserForm extends Form {
         setItem(item, this.readOnly);
     }
 
-    public boolean isReadOnly() {
+     public boolean isReadOnly() {
         return readOnly;
     }
 
@@ -81,9 +82,12 @@ public class UserForm extends Form {
     }
 
     public void setItem(Item item, boolean readOnly) {
+        this.item = item;
         this.readOnly = readOnly;
-        form.removeAllComponents();
-        setItemDataSource(item, getFields()); // bind to POJO via BeanItem
+        if (item != null) {
+            form.removeAllComponents();
+            setItemDataSource(item, getFields()); // bind to POJO via BeanItem
+        }
     }
 
 
@@ -157,8 +161,6 @@ public class UserForm extends Form {
                 }
             });
 
-            professionalField.addStyleName(ValoTheme.CHECKBOX_SMALL);
-            newsletterField.addStyleName(ValoTheme.CHECKBOX_SMALL);
             termsField.setRequired(true);
             termsField.setRequiredError(I18N.getString("validator.terms"));
             termsField.addValidator(new Validator() {
@@ -169,7 +171,6 @@ public class UserForm extends Form {
                     }
                 }
             });
-            termsField.addStyleName(ValoTheme.CHECKBOX_SMALL);
             termsField.setCaptionAsHtml(true);
         }
 

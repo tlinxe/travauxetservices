@@ -1,6 +1,7 @@
 package fr.travauxetservices.views;
 
 import com.google.common.eventbus.Subscribe;
+import com.vaadin.client.ui.Icon;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.ClassResource;
@@ -77,8 +78,8 @@ public class PictureField extends CustomField<byte[]> {
         layout.setSpacing(true);
 
         upload = new Upload();
-        upload.setButtonCaption(I18N.getString("button.upload") + "...");
-        upload.addStyleName(ValoTheme.BUTTON_TINY);
+        upload.setButtonCaption(I18N.getString("button.change") + "...");
+        upload.addStyleName("upload");
         ImageUploader uploader = new ImageUploader(upload);
         upload.setReceiver(uploader);
         upload.addSucceededListener(uploader);
@@ -94,6 +95,9 @@ public class PictureField extends CustomField<byte[]> {
         });
         remove.setIcon(FontAwesome.TRASH_O);
         remove.addStyleName("borderless-colored");
+        remove.setWidth(28, Unit.PIXELS);
+        remove.setHeight(28, Unit.PIXELS);
+        //remove.setSizeUndefined();
         layout.addComponent(remove);
 
         root.addComponent(layout);

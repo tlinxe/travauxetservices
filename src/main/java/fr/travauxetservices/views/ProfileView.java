@@ -2,6 +2,7 @@ package fr.travauxetservices.views;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.BeanValidator;
@@ -64,10 +65,8 @@ public final class ProfileView extends Panel implements View {
         root.setSpacing(true);
 
         User currentUser = getCurrentUser();
-        final User newUser = new User();
-        final BeanItem<User> newItem = new BeanItem<User>(newUser);
-        form = new UserForm(currentUser, newItem, false, false);
-        Button edit = new Button(I18N.getString("button.change"), new Button.ClickListener() {
+        form = new UserForm(currentUser, null, false, false);
+        final Button edit = new Button(I18N.getString("button.validate"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
@@ -75,8 +74,6 @@ public final class ProfileView extends Panel implements View {
                         form.commit();
                     }
                 } catch (Validator.InvalidValueException ive) {
-                    Notification.show(ive.getMessage());
-                    form.setValidationVisible(true);
                 }
             }
         });

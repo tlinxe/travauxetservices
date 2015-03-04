@@ -14,14 +14,16 @@ public class WrapperFormLayout extends FormLayout {
     public void addWrapComponent(final Component c) {
         final Component old = getComponent(getComponentCount() - 1);
         if (old != null) {
-            replaceComponent(old, new CompositeField(old, c));
+            WrapperField field = new WrapperField(old, c);
+            field.setSizeUndefined();
+            replaceComponent(old, field);
         }
     }
 
-    private class CompositeField extends CustomField {
+    private class WrapperField extends CustomField {
         private HorizontalLayout layout;
 
-        public CompositeField(Component c1, Component c2) {
+        public WrapperField(Component c1, Component c2) {
             setCaption(c1.getCaption());
             String stylename = c1.getStyleName();
             if (stylename == null || !stylename.contains(ValoTheme.TEXTFIELD_INLINE_ICON)) {
@@ -40,18 +42,19 @@ public class WrapperFormLayout extends FormLayout {
             }
             layout = new HorizontalLayout();
             layout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-            layout.setSizeUndefined();
+            layout.setWidthUndefined();
             layout.setSpacing(true);
             layout.addComponent(c1);
             layout.addComponent(buildForm(c2));
-
         }
 
         private FormLayout buildForm(Component c) {
-            FormLayout form = new FormLayout(c);
-            form.setWidth("30px");
+            c.setSizeUndefined();
+            FormLayout form = new FormLayout();
+            form.setSizeUndefined();
             form.setSpacing(false);
             form.setMargin(false);
+            form.addComponent(c);
             return form;
         }
 

@@ -37,8 +37,9 @@ public final class DepositView extends Panel implements View {
         root.setSpacing(true);
         root.addComponent(buildHeader());
         root.addComponent(buildAdForm());
+        root.addComponent(buildButton());
         root.addComponent(buildUserForm());
-        root.addComponent(buildFooter());
+        root.addComponent(buildButton());
         setContent(root);
         Responsive.makeResponsive(root);
     }
@@ -86,30 +87,34 @@ public final class DepositView extends Panel implements View {
         return new WrapperLayout("Vos informations", root);
     }
 
-    private Component buildFooter() {
+    private void commit() {
+        User user = getCurrentUser();
+        try {
+            formAd.commit();
+            if (user == null) {
+                formUser.commit();
+                user = ((BeanItem<User>) formUser.getItemDataSource()).getBean();
+                AppUI.getDataProvider().addUser(user);
+            }
+
+            Ad newAd = ((BeanItem<Ad>) formAd.getItemDataSource()).getBean();
+            newAd.setUser(user);
+            AppUI.getDataProvider().addAd(newAd);
+            if (newAd.getType() == Ad.Type.OFFER) {
+                UI.getCurrent().getNavigator().navigateTo(ViewType.OFFER.getViewName() + "/" + newAd.getId().toString());
+            } else {
+                UI.getCurrent().getNavigator().navigateTo(ViewType.REQUEST.getViewName() + "/" + newAd.getId().toString());
+            }
+        } catch (Exception e) {
+            //Ignored
+        }
+    }
+
+    private Component buildButton() {
         Button edit = new Button("Publier cette annonce", new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                User user = getCurrentUser();
-                try {
-                    formAd.commit();
-                    if (user == null) {
-                        formUser.commit();
-                        user = ((BeanItem<User>) formUser.getItemDataSource()).getBean();
-                        AppUI.getDataProvider().addUser(user);
-                    }
-
-                    Ad newAd = ((BeanItem<Ad>) formAd.getItemDataSource()).getBean();
-                    newAd.setUser(user);
-                    AppUI.getDataProvider().addAd(newAd);
-                    if (newAd.getType() == Ad.Type.OFFER) {
-                        UI.getCurrent().getNavigator().navigateTo(ViewType.OFFER.getViewName() + "/" + newAd.getId().toString());
-                    } else {
-                        UI.getCurrent().getNavigator().navigateTo(ViewType.REQUEST.getViewName() + "/" + newAd.getId().toString());
-                    }
-                } catch (Exception e) {
-                    //Ignored
-                }
+                commit();
             }
         });
         edit.addStyleName("primary");
@@ -117,7 +122,7 @@ public final class DepositView extends Panel implements View {
 
         HorizontalLayout footer = new HorizontalLayout();
         footer.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-        footer.setMargin(new MarginInfo(false, true, true, true));
+        //footer.setMargin(new MarginInfo(false, true, true, true));
         footer.setSpacing(true);
         footer.addComponent(edit);
         return footer;

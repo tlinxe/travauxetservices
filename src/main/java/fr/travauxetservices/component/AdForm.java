@@ -31,7 +31,7 @@ import java.util.Locale;
  * Created by Phobos on 02/01/15.
  */
 public class AdForm extends Form {
-    private final Item item;
+    private Item item;
     private boolean readOnly;
     private WrapperFormLayout form;
 
@@ -76,9 +76,12 @@ public class AdForm extends Form {
     }
 
     public void setItem(Item item, boolean readOnly) {
+        this.item = item;
         this.readOnly = readOnly;
-        form.removeAllComponents();
-        setItemDataSource(item, getFields()); // bind to POJO via BeanItem
+        if (item != null) {
+            form.removeAllComponents();
+            setItemDataSource(item, getFields()); // bind to POJO via BeanItem
+        }
     }
 
 
