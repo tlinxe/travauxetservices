@@ -5,7 +5,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.ui.ComboBox;
 import fr.travauxetservices.model.City;
-import fr.travauxetservices.services.Geonames;
+import fr.travauxetservices.services.GeoNames;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +43,7 @@ public class CityComboBox extends ComboBox {
             if ("".equals(filterPrefix) || filterPrefix == null) {
                 return Collections.emptyList();
             }
-            return Geonames.getCity(filterPrefix);
+            return GeoNames.getCity(filterPrefix);
         }
 
         private void filterItems(String filterString) {

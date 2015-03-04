@@ -36,13 +36,13 @@ public interface DataProvider {
 
     public Collection<Notice> getNotices();
 
-    public JPAContainer<Division> getDivisionContainer();
+    public JPAContainer<Location> getLocationContainer();
 
-    public EntityItem<Division> getDivition(Object itemId);
+    public EntityItem<Location> getLocation(Object itemId);
 
-    public Collection<Division> getDivisions();
+    public Collection<Location> getLocations();
 
-    public Collection<Division> getChildren(Division c);
+    public Collection<Location> getChildren(Location c);
 
     public JPAContainer<User> getUserContainer();
 

@@ -6,6 +6,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.model.Remuneration;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.DateToolkit;
@@ -43,10 +44,11 @@ public class AdTable extends PagedTable {
         setSortEnabled(false);
         setSelectable(true);
         if (formatted) {
-            addGeneratedColumn("division", new DivisionColumnGenerator());
+            addGeneratedColumn("location", new LocationColumnGenerator());
             addGeneratedColumn("remuneration", new RemunerationColumnGenerator(getLocale() != null ? getLocale() : Locale.getDefault()));
             addGeneratedColumn("title", new TitleColumnGenerator());
             addGeneratedColumn("user", new UserColumnGenerator());
+            setColumnAlignment("user", Align.CENTER);
         }
     }
 
@@ -66,18 +68,45 @@ public class AdTable extends PagedTable {
 
     public class UserColumnGenerator implements Table.ColumnGenerator {
         public Component generateCell(Table source, Object itemId, Object columnId) {
+            VerticalLayout layout = new VerticalLayout();
+            layout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+            layout.setMargin(false);
+            layout.setSpacing(false);
+
             User user = (User) source.getContainerProperty(itemId, "user").getValue();
+            if (user.isProfessional()) {
+                Label label = new Label(I18N.getString("user.pro"));
+                label.setSizeUndefined();
+                label.setDescription(I18N.getString("user.professional"));
+                label.addStyleName(ValoTheme.LABEL_COLORED);
+                label.addStyleName(ValoTheme.LABEL_BOLD);
+                layout.addComponent(label);
+            }
+
             Resource resource = new ClassResource("/images/profile-pic-300px.jpg");
-            if (user != null) {
-                if (user.getPicture() != null) {
-                    resource = new StreamResource(new IOToolkit.ByteArraySource(user.getPicture()), "picture.png");
-                }
+            if (user.getPicture() != null) {
+                resource = new StreamResource(new IOToolkit.ByteArraySource(user.getPicture()), "picture.png");
             }
             Image image = new Image(null, resource);
             image.addStyleName("border");
             image.setWidth(simplified ? 40 : 60, Unit.PIXELS);
             image.setHeight(simplified ? 40 : 60, Unit.PIXELS);
-            return image;
+            if (user.isProfessional()) {
+                image.setDescription(I18N.getString("user.professional"));
+            }
+            layout.addComponent(image);
+
+            double rating = user.getOverallRating();
+            if (rating > 0) {
+                RatingStars ratingStars = new CustomRatingStars();
+                ratingStars.setMaxValue(5);
+                ratingStars.setValue(rating);
+                ratingStars.setReadOnly(true);
+                ratingStars.addStyleName("tiny");
+                ratingStars.setImmediate(true);
+                layout.addComponent(ratingStars);
+            }
+            return layout;
         }
     }
 
@@ -107,10 +136,10 @@ public class AdTable extends PagedTable {
                 text.append(I18N.getString(value.getShortLabel()));
                 text.append("</nobr>");
             }
-            Property division = source.getContainerProperty(itemId, "division");
-            if (division.getValue() != null) {
+            Property location = source.getContainerProperty(itemId, "location");
+            if (location.getValue() != null) {
                 if (text.length() > 0) text.append("<br/>");
-                text.append(division);
+                text.append(location);
             }
             Property city = source.getContainerProperty(itemId, "city");
             if (city.getValue() != null) {
@@ -130,14 +159,10 @@ public class AdTable extends PagedTable {
         }
     }
 
-    public class DivisionColumnGenerator implements Table.ColumnGenerator {
+    public class LocationColumnGenerator implements Table.ColumnGenerator {
         public Component generateCell(Table source, Object itemId, Object columnId) {
             VerticalLayout layout = new VerticalLayout();
             StringBuffer text = new StringBuffer();
-            User user = (User) source.getContainerProperty(itemId, "user").getValue();
-            if (user.isProfessional()) {
-                text.append("<b>").append(I18N.getString("user.professional")).append("</b>");
-            }
             Property value = source.getContainerProperty(itemId, columnId);
             if (value.getValue() != null) {
                 if (text.length() > 0) text.append("<br/>");
@@ -149,16 +174,6 @@ public class AdTable extends PagedTable {
                 text.append("<nobr>").append(city.getValue()).append("</nobr>");
             }
             layout.addComponent(new Label(text.toString(), ContentMode.HTML));
-            double rating = user.getOverallRating();
-            if (rating > 0) {
-                RatingStars ratingStars = new CustomRatingStars();
-                ratingStars.setMaxValue(5);
-                ratingStars.setValue(rating);
-                ratingStars.setReadOnly(true);
-                ratingStars.addStyleName("tiny");
-                ratingStars.setImmediate(true);
-                layout.addComponent(ratingStars);
-            }
             return layout;
         }
     }

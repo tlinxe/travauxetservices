@@ -14,11 +14,11 @@ public class Offer extends Ad {
         type = Type.OFFER;
     }
 
-    public Offer(UUID id, Date created, User user, String title, String description, Category category, Division division, City city, double price, Remuneration remuneration, boolean validated, int priority) {
-        super(id, created, user, title, description, category, division, city, price, remuneration, validated, priority);
+    public Offer(UUID id, Date created, User user, String title, String description, Category category, Location location, City city, double price, Remuneration remuneration, boolean validated, int priority) {
+        super(id, created, user, title, description, category, location, city, price, remuneration, validated, priority);
     }
 
     public Offer(Ad ad) {
-        super(ad.getId(), ad.getCreated(), ad.getUser(), ad.getTitle(), ad.getDescription(), ad.getCategory(), ad.getDivision(), ad.getCity(), ad.getPrice(), ad.getRemuneration(), ad.isValidated(), ad.getPriority());
+        super(ad.getId(), ad.getCreated(), ad.getUser(), ad.getTitle(), ad.getDescription(), ad.getCategory(), ad.getLocation(), ad.getCity(), ad.getPrice(), ad.getRemuneration(), ad.isValidated(), ad.getPriority());
     }
 }

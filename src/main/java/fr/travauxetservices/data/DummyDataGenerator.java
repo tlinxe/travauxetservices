@@ -29,9 +29,9 @@ public class DummyDataGenerator {
                 em.persist(category);
             }
 
-            List<Division> divisions = getDivisions();
-            for (Division division : divisions) {
-                em.persist(division);
+            List<Location> locations = getLocations();
+            for (Location location : locations) {
+                em.persist(location);
             }
 
             byte[] image = null;
@@ -78,13 +78,13 @@ public class DummyDataGenerator {
             users.add(u5);
 
             Calendar cal = Calendar.getInstance();
-            Request r1 = new Request(UUID.randomUUID(), cal.getTime(), u1, "Jardinage", "Recherche un jardinier pour tondre ma pelouse", categories.get(0), divisions.get(0), c1, 0, Remuneration.EXCHANGE, true, 0);
+            Request r1 = new Request(UUID.randomUUID(), cal.getTime(), u1, "Jardinage", "Recherche un jardinier pour tondre ma pelouse", categories.get(0), locations.get(0), c1, 0, Remuneration.EXCHANGE, true, 0);
             em.persist(r1);
             cal.add(Calendar.DATE, -1);
-            Request r2 = new Request(UUID.randomUUID(), cal.getTime(), u3, "Peinture", "Recherche un peintre", categories.get(1), divisions.get(0), c1, (double) 30.50, Remuneration.TASK, true, 0);
+            Request r2 = new Request(UUID.randomUUID(), cal.getTime(), u3, "Peinture", "Recherche un peintre", categories.get(1), locations.get(0), c1, (double) 30.50, Remuneration.TASK, true, 0);
             em.persist(r2);
             cal.add(Calendar.DATE, -1);
-            Request r3 = new Request(UUID.randomUUID(), cal.getTime(), u4, "Garde", "Garde d'enfant pour un petit con agé de 11 ans qui me pourri la vie", categories.get(0), divisions.get(1), null, (double) 10, Remuneration.TIME, false, 0);
+            Request r3 = new Request(UUID.randomUUID(), cal.getTime(), u4, "Garde", "Garde d'enfant pour un petit con agé de 11 ans qui me pourri la vie", categories.get(0), locations.get(1), null, (double) 10, Remuneration.TIME, false, 0);
             em.persist(r3);
 
             Random random = new Random();
@@ -92,13 +92,13 @@ public class DummyDataGenerator {
                     "Tonte,rotofil,entretien des massifs,taille et rabattage de haie,petit élagage,débroussaillage,...etc.\n" +
                     "je me déplace avec matériel et assure l'évacuation en déchetterie.Travail soigné.\n" +
                     "Rémunération en CESU acceptée";
-            Offer o1 = new Offer(UUID.randomUUID(), new Date(System.currentTimeMillis()), users.get(random.nextInt(users.size())), "Offre " + 0, text, categories.get(random.nextInt(categories.size())), divisions.get(3), c1, 10.50, Remuneration.TIME, true, 5);
+            Offer o1 = new Offer(UUID.randomUUID(), new Date(System.currentTimeMillis()), users.get(random.nextInt(users.size())), "Offre " + 0, text, categories.get(random.nextInt(categories.size())), locations.get(3), c1, 10.50, Remuneration.TIME, true, 5);
             em.persist(o1);
             for (int i = 1; i < 100; i++) {
                 cal = Calendar.getInstance();
                 cal.add(Calendar.DATE, -random.nextInt(365));
                 User user = users.get(random.nextInt(users.size()));
-                Offer o2 = new Offer(UUID.randomUUID(), cal.getTime(), user, "Offre " + i, text, categories.get(random.nextInt(categories.size())), divisions.get(random.nextInt(divisions.size())), null, random.nextDouble(), Remuneration.TIME, (!user.equals(u4)), 0);
+                Offer o2 = new Offer(UUID.randomUUID(), cal.getTime(), user, "Offre " + i, text, categories.get(random.nextInt(categories.size())), locations.get(random.nextInt(locations.size())), null, random.nextDouble(), Remuneration.TIME, (!user.equals(u4)), 0);
                 em.persist(o2);
             }
 
@@ -137,21 +137,21 @@ public class DummyDataGenerator {
         return values;
     }
 
-    private static List<Division> getDivisions() {
+    private static List<Location> getLocations() {
         JSONParser parser = new JSONParser();
         try {
             Integer count = 0;
-            JSONObject jsonObject = (JSONObject) parser.parse(IOToolkit.getResourceAsText("/model/divisions.json"));
-            return getDivisions(jsonObject, count, null);
+            JSONObject jsonObject = (JSONObject) parser.parse(IOToolkit.getResourceAsText("/model/locations.json"));
+            return getLocations(jsonObject, count, null);
         } catch (ParseException pe) {
             System.out.println(pe);
         }
-        return new ArrayList<Division>();
+        return new ArrayList<Location>();
     }
 
-    private static List<Division> getDivisions(JSONObject o, int count, Division parent) throws ParseException {
-        List<Division> values = new ArrayList<Division>();
-        JSONArray jsonArray = (JSONArray) o.get("divisions");
+    private static List<Location> getLocations(JSONObject o, int count, Location parent) throws ParseException {
+        List<Location> values = new ArrayList<Location>();
+        JSONArray jsonArray = (JSONArray) o.get("locations");
         if (jsonArray != null) {
             Iterator i = jsonArray.iterator();
             while (i.hasNext()) {
@@ -159,9 +159,9 @@ public class DummyDataGenerator {
                 Object id = object.get("id");
                 Object name = object.get("name");
                 if (name != null) {
-                    Division newDivision = new Division(id.toString(), name.toString(), parent);
-                    values.add(newDivision);
-                    values.addAll(getDivisions(object, count, newDivision));
+                    Location newLocation = new Location(id.toString(), name.toString(), parent);
+                    values.add(newLocation);
+                    values.addAll(getLocations(object, count, newLocation));
                 }
             }
         }

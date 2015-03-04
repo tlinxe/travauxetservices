@@ -28,8 +28,8 @@ import fr.travauxetservices.component.RichText;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.*;
-import fr.travauxetservices.services.Geonames;
-import fr.travauxetservices.services.Location;
+import fr.travauxetservices.services.GeoLocation;
+import fr.travauxetservices.services.GeoNames;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.tools.IOToolkit;
 
@@ -80,7 +80,7 @@ public final class HomeView extends Panel implements View {
 
     public void attach() {
         super.attach();
-        setPostion(Location.getLocation());
+        setPostion(GeoLocation.getLocation());
     }
 
     private Component buildSparklines() {
@@ -217,7 +217,7 @@ public final class HomeView extends Panel implements View {
         map.setSizeFull();
         map.setMinZoom(4);
         map.setMaxZoom(16);
-        LatLon postion = Location.getLocation();
+        LatLon postion = GeoLocation.getLocation();
         if (postion != null) {
             map.setCenter(postion);
             map.setZoom(11);
@@ -234,9 +234,9 @@ public final class HomeView extends Panel implements View {
         if (postion != null) {
             map.setCenter(postion);
             map.setZoom(11);
-            String region = Geonames.getRegion(postion.getLat(), postion.getLon());
+            String region = GeoNames.getRegion(postion.getLat(), postion.getLon());
             if (region != null) {
-                EntityItem<Division> item = AppUI.getDataProvider().getDivition(region);
+                EntityItem<Location> item = AppUI.getDataProvider().getLocation(region);
                 applyFilters(item != null ? item.getEntity() : null);
             }
         }
@@ -256,8 +256,8 @@ public final class HomeView extends Panel implements View {
         applyFilters(null);
         table.setContainerDataSource(getContainer());
 
-        table.setVisibleColumns("user", "title", "division");
-        table.setColumnHeaders("User", "Title", "Division");
+        table.setVisibleColumns("user", "title", "location");
+        table.setColumnHeaders("User", "Title", "Location");
         table.setColumnExpandRatio("title", 1);
 
         table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
@@ -278,18 +278,18 @@ public final class HomeView extends Panel implements View {
         return container;
     }
 
-    public void applyFilters(Division division) {
+    public void applyFilters(Location location) {
         JPAContainer container = getContainer();
         container.removeAllContainerFilters();
         container.addContainerFilter(new Compare.Equal("validated", true));
 
-        if (division == null) {
-            container.addContainerFilter(new Compare.Equal("division", null));
+        if (location == null) {
+            container.addContainerFilter(new Compare.Equal("location", null));
         }
         else {
             List<Container.Filter> filters = new ArrayList<Container.Filter>();
-            filters.add(new Compare.Equal("division", division));
-            filters.add(new JoinFilter("city", new Compare.Equal("region", division.getId())));
+            filters.add(new Compare.Equal("location", location));
+            filters.add(new JoinFilter("city", new Compare.Equal("region", location.getId())));
             container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
         }
 

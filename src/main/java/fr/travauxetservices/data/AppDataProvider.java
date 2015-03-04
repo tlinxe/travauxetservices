@@ -24,7 +24,7 @@ public class AppDataProvider implements DataProvider {
     private boolean ready;
 
     private JPAContainer<Category> categories;
-    private JPAContainer<Division> divisions;
+    private JPAContainer<Location> locations;
     private JPAContainer<Request> requests;
     private JPAContainer<Offer> offers;
     private JPAContainer<User> users;
@@ -44,9 +44,9 @@ public class AppDataProvider implements DataProvider {
             categories.sort(new String[]{"name"}, new boolean[]{true});
             categories.setParentProperty("parent");
 
-            divisions = JPAContainerFactory.make(Division.class, em);
-            divisions.sort(new String[]{"name"}, new boolean[]{true});
-            divisions.setParentProperty("parent");
+            locations = JPAContainerFactory.make(Location.class, em);
+            locations.sort(new String[]{"name"}, new boolean[]{true});
+            locations.setParentProperty("parent");
 
             requests = JPAContainerFactory.make(Request.class, em);
             requests.sort(new String[]{"created"}, new boolean[]{false});
@@ -161,34 +161,34 @@ public class AppDataProvider implements DataProvider {
     }
 
     @Override
-    public JPAContainer<Division> getDivisionContainer() {
-        divisions.removeAllContainerFilters();
-        return divisions;
+    public JPAContainer<Location> getLocationContainer() {
+        locations.removeAllContainerFilters();
+        return locations;
     }
 
     @Override
-    public EntityItem<Division> getDivition(Object itemId) {
-        return getDivisionContainer().getItem(itemId);
+    public EntityItem<Location> getLocation(Object itemId) {
+        return getLocationContainer().getItem(itemId);
     }
 
     @Override
-    public Collection<Division> getDivisions() {
-        Collection<Division> values = new ArrayList<Division>();
-        for (Object itemId : getDivisionContainer().getItemIds()) {
-            EntityItem<Division> item = getDivisionContainer().getItem(itemId);
+    public Collection<Location> getLocations() {
+        Collection<Location> values = new ArrayList<Location>();
+        for (Object itemId : getLocationContainer().getItemIds()) {
+            EntityItem<Location> item = getLocationContainer().getItem(itemId);
             values.add(item.getEntity());
         }
         return values;
     }
 
     @Override
-    public Collection<Division> getChildren(Division c) {
-        Collection<Division> values = new ArrayList<Division>();
+    public Collection<Location> getChildren(Location c) {
+        Collection<Location> values = new ArrayList<Location>();
         if (c != null) {
-            Collection<Division> divisions = getDivisions();
-            for (Division division : divisions) {
-                if (c.equals(division.getParent())) {
-                    values.add(division);
+            Collection<Location> locations = getLocations();
+            for (Location location : locations) {
+                if (c.equals(location.getParent())) {
+                    values.add(location);
                 }
             }
         }

@@ -1,14 +1,14 @@
-{ "divisions": [
+{ "locations": [
     {
         "id": "C1", "name": "Alsace",
-        "divisions": [
+        "locations": [
             { "id": "67", "name": "Bas-Rhin" },
             { "id": "68", "name": "Haut-Rhin" }
         ]
     },
     {
         "id": "97", "name": "Aquitaine",
-        "divisions": [
+        "locations": [
             { "id": "24", "name": "Dordogne" },
             { "id": "33", "name": "Gironde" },
             { "id": "40", "name": "Landes" },
@@ -18,7 +18,7 @@
     },
     {
         "id": "98", "name": "Auvergne",
-        "divisions": [
+        "locations": [
             { "id": "03", "name": "Allier" },
             { "id": "15", "name": "Cantal" },
             { "id": "43", "name": "Haute-Loire" },
@@ -27,7 +27,7 @@
     },
     {
         "id": "99", "name": "Basse-Normandie" ,
-        "divisions": [
+        "locations": [
             { "id": "14", "name": "Calvados" },
             { "id": "50", "name": "Manche" },
             { "id": "61", "name": "Orne" }
@@ -35,7 +35,7 @@
     },
     {
         "id": "A1", "name": "Bourgogne",
-        "divisions": [
+        "locations": [
             { "id": "21", "name": "Côte-d'Or" },
             { "id": "58", "name": "Nièvre" },
             { "id": "71", "name": "Saône-et-Loire" },
@@ -44,7 +44,7 @@
     },
     {
         "id": "A2", "name": "Bretagne",
-        "divisions": [
+        "locations": [
             { "id": "22", "name": "Côtes-d'Armor" },
             { "id": "29", "name": "Finistère" },
             { "id": "35", "name": "Ille-et-Vilaine" },
@@ -53,7 +53,7 @@
     },
     {
         "id": "A3", "name": "Centre",
-        "divisions": [
+        "locations": [
             { "id": "18", "name": "Cher" },
             { "id": "28", "name": "Eure-et-Loir" },
             { "id": "36", "name": "Indre" },
@@ -64,7 +64,7 @@
     },
     {
         "id": "A4", "name": "Champagne-Ardenne",
-        "divisions": [
+        "locations": [
             { "id": "08", "name": "Ardennes" },
             { "id": "10", "name": "Aube" },
             { "id": "51", "name": "Marne" },
@@ -73,14 +73,14 @@
     },
     {
         "id": "A5", "name": "Corse",
-        "divisions": [
+        "locations": [
             { "id": "2A", "name": "Corse-du-Sud" },
             { "id": "2B", "name": "Haute-Corse" }
         ]
     },
     {
         "id": "A6", "name": "Franche-Comté",
-        "divisions": [
+        "locations": [
             { "id": "25", "name": "Doubs" },
             { "id": "39", "name": "Jura" },
             { "id": "70", "name": "Haute-Saône" },
@@ -89,14 +89,14 @@
     },
     {
         "id": "A7", "name": "Haute-Normandie",
-        "divisions": [
+        "locations": [
             { "id": "27", "name": "Eure" },
             { "id": "76", "name": "Seine-Maritime" }
         ]
     },
     {
         "id": "A8", "name": "Ile-de-France",
-        "divisions": [
+        "locations": [
             { "id": "75", "name": "Paris" },
             { "id": "77", "name": "Seine-et-Marne" },
             { "id": "78", "name": "Yvelines" },
@@ -109,7 +109,7 @@
     },
     {
         "id": "A9", "name": "Languedoc-Roussillon",
-        "divisions": [
+        "locations": [
             { "id": "11", "name": "Aude" },
             { "id": "30", "name": "Gard" },
             { "id": "34", "name": "Hérault" },
@@ -119,7 +119,7 @@
     },
     {
         "id": "B1", "name": "Limousin",
-        "divisions": [
+        "locations": [
             { "id": "19", "name": "Corrèze" },
             { "id": "23", "name": "Creuse" },
             { "id": "87", "name": "Haute-Vienne" }
@@ -127,7 +127,7 @@
     },
     {
         "id": "B2", "name": "Lorraine",
-        "divisions": [
+        "locations": [
             { "id": "54", "name": "Meurthe-et-Moselle" },
             { "id": "55", "name": "Meuse" },
             { "id": "57", "name": "Moselle" },
@@ -136,7 +136,7 @@
     },
     {
         "id": "B3", "name": "Midi-Pyrénées",
-        "divisions": [
+        "locations": [
             { "id": "09", "name": "Ariège" },
             { "id": "12", "name": "Aveyron" },
             { "id": "31", "name": "Haute-Garonne" },
@@ -149,14 +149,14 @@
     },
     {
         "id": "B4", "name": "Nord-Pas-de-Calais",
-        "divisions": [
+        "locations": [
             { "id": "59", "name": "Nord" },
             { "id": "62", "name": "Pas-de-Calais" }
         ]
     },
     {
         "id": "B5", "name": "Pays de la Loire",
-        "divisions": [
+        "locations": [
             { "id": "44", "name": "Loire-Atlantique" },
             { "id": "49", "name": "Maine-et-Loire" },
             { "id": "53", "name": "Mayenne" },
@@ -166,7 +166,7 @@
     },
     {
         "id": "B6", "name": "Picardie",
-        "divisions": [
+        "locations": [
             { "id": "02", "name": "Aisne" },
             { "id": "60", "name": "Oise" },
             { "id": "80", "name": "Somme" }
@@ -174,7 +174,7 @@
     },
     {
         "id": "B7", "name": "Poitou-Charentes",
-        "divisions": [
+        "locations": [
             { "id": "16", "name": "Charente" },
             { "id": "17", "name": "Charente-Maritime" },
             { "id": "79", "name": "Deux-Sèvres" },
@@ -183,7 +183,7 @@
     },
     {
         "id": "B8", "name": "Provence-Alpes-Côte-d'Azur",
-        "divisions": [
+        "locations": [
             { "id": "04", "name": "Alpes-de-Haute-Provence" },
             { "id": "05", "name": "Hautes-Alpes" },
             { "id": "06", "name": "Alpes-Maritimes" },
@@ -194,7 +194,7 @@
     },
     {
         "id": "B9", "name": "Rhône-Alpes",
-        "divisions": [
+        "locations": [
             { "id": "01", "name": "Ain" },
             { "id": "07", "name": "Ardèche" },
             { "id": "26", "name": "Drôme" },
@@ -207,7 +207,7 @@
     },
     {
         "id": "C2", "name": "Outre-mer",
-        "divisions": [
+        "locations": [
             { "id": "971", "name": "Guadeloupe" },
             { "id": "972", "name": "Martinique" },
             { "id": "973", "name": "Guyane" },

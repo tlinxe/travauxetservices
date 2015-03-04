@@ -11,7 +11,7 @@ import fr.travauxetservices.event.CustomEventBus;
 /**
  * Created by Phobos on 28/01/15.
  */
-public class Location {
+public class GeoLocation {
     static private LatLon point;
 
     static public LatLon getLocation() {

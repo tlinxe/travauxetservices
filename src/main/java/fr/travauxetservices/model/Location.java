@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by Phobos on 05/12/14.
  */
 @Entity
-public class Division implements Serializable {
+public class Location implements Serializable {
     @Id
     @Column(length = 3)
     private String id;
@@ -19,13 +19,13 @@ public class Division implements Serializable {
 
     @ManyToOne
     @OrderBy("name")
-    private Division parent;
+    private Location parent;
 
-    public Division() {
+    public Location() {
 
     }
 
-    public Division(String id, String name, Division parent) {
+    public Location(String id, String name, Location parent) {
         super();
         this.id = id;
         this.name = name;
@@ -49,11 +49,11 @@ public class Division implements Serializable {
         this.name = name;
     }
 
-    public Division getParent() {
+    public Location getParent() {
         return parent;
     }
 
-    public void setRegion(Division parent) {
+    public void setRegion(Location parent) {
         this.parent = parent;
     }
 
@@ -74,7 +74,7 @@ public class Division implements Serializable {
             return true;
         }
         if (o != null) {
-            if (o instanceof Division) {
+            if (o instanceof Location) {
                 return o.hashCode() == this.hashCode();
             }
         }

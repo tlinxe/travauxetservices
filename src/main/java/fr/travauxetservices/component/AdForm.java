@@ -66,7 +66,7 @@ public class AdForm extends Form {
         if (!readOnly && !(item instanceof EntityItem)) values.add("type");
         if (readOnly) values.add("created");
         values.add("category");
-        values.add("division");
+        values.add("location");
         values.add("city");
         values.add("title");
         values.add("description");
@@ -134,7 +134,7 @@ public class AdForm extends Form {
     private class CustomFieldFactory extends DefaultFieldFactory {
         final ComboBox typeField = new TypeComboBox(I18N.getString("ad.type"));
         final ComboBox categoryField = new CategoryComboxBox(I18N.getString("ad.category"));
-        final ComboBox divisionField = new DivisionComboxBox(I18N.getString("ad.region"));
+        final ComboBox locationField = new LocationComboxBox(I18N.getString("ad.location"));
         final ComboBox cityField = new CityComboBox(I18N.getString("ad.city"));
         final TextArea descriptionField = new TextArea(I18N.getString("ad.description"));
         final ComboBox remunerationField = new RemunerationComboBox(I18N.getString("ad.remuneration"));
@@ -148,10 +148,10 @@ public class AdForm extends Form {
             categoryField.setRequired(true);
             categoryField.setRequiredError(I18N.getString("validator.required"));
 
-            divisionField.setRequired(true);
-            divisionField.setRequiredError(I18N.getString("validator.required"));
-            divisionField.setInputPrompt(I18N.getString("input.division"));
-            divisionField.setPageLength(20);
+            locationField.setRequired(true);
+            locationField.setRequiredError(I18N.getString("validator.required"));
+            locationField.setInputPrompt(I18N.getString("input.location"));
+            locationField.setPageLength(20);
 
             cityField.setInputPrompt(I18N.getString("input.city"));
             cityField.setPageLength(20);
@@ -188,7 +188,7 @@ public class AdForm extends Form {
                 field = typeField;
             } else if ("created".equals(propertyId)) {
                 final Date date = (Date) item.getItemProperty(propertyId).getValue();
-                field = new TextField(I18N.getString("published")) {
+                field = new TextField(I18N.getString("header.published")) {
                     public String getValue() {
                         DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, getLocale() != null ? getLocale() : Locale.getDefault());
                         return df.format(date);
@@ -196,8 +196,8 @@ public class AdForm extends Form {
                 };
             } else if ("category".equals(propertyId)) {
                 field = categoryField;
-            } else if ("division".equals(propertyId)) {
-                field = divisionField;
+            } else if ("location".equals(propertyId)) {
+                field = locationField;
             } else if ("city".equals(propertyId)) {
                 field = cityField;
                 Property p = item.getItemProperty("city");

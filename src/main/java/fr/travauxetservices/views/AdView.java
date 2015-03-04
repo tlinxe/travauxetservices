@@ -17,7 +17,7 @@ import fr.travauxetservices.component.*;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.model.Category;
-import fr.travauxetservices.model.Division;
+import fr.travauxetservices.model.Location;
 import fr.travauxetservices.tools.I18N;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public abstract class AdView extends Panel implements CustomView {
 
     private TextField keynwordField;
     private ComboBox categoryField;
-    private ComboBox divisionField;
+    private ComboBox locationField;
     private ComboBox cityField;
 
     public AdView(String viewName) {
@@ -99,13 +99,13 @@ public abstract class AdView extends Panel implements CustomView {
         categoryField.setImmediate(true);
         layout.addComponent(categoryField, 1, 0);
 
-        divisionField = new DivisionComboxBox(null);
-        divisionField.setInputPrompt(I18N.getString("input.division"));
-        divisionField.setPageLength(20);
-        divisionField.setScrollToSelectedItem(true);
-        divisionField.addStyleName(ValoTheme.COMBOBOX_TINY);
-        divisionField.setImmediate(true);
-        layout.addComponent(divisionField, 2, 0);
+        locationField = new LocationComboxBox(null);
+        locationField.setInputPrompt(I18N.getString("input.location"));
+        locationField.setPageLength(20);
+        locationField.setScrollToSelectedItem(true);
+        locationField.addStyleName(ValoTheme.COMBOBOX_TINY);
+        locationField.setImmediate(true);
+        layout.addComponent(locationField, 2, 0);
 
         cityField = new CityComboBox(null);
         cityField.setInputPrompt(I18N.getString("input.city"));
@@ -133,14 +133,14 @@ public abstract class AdView extends Panel implements CustomView {
         table.addStyleName(ValoTheme.TABLE_NO_STRIPES);
         table.addStyleName(ValoTheme.TABLE_COMPACT);
         table.addStyleName(ValoTheme.TABLE_SMALL);
-        table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
+        //table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
         table.setWidth(100, Unit.PERCENTAGE);
 
         applyFilters();
         table.setContainerDataSource(getContainer());
 
-        table.setVisibleColumns("user", "division", "title", "created");
-        table.setColumnHeaders("User", "Division", "Title", "Created");
+        table.setVisibleColumns("user", "location", "title", "created");
+        table.setColumnHeaders("", I18N.getString("header.location"), I18N.getString("header.title"), I18N.getString("header.published"));
         table.setColumnExpandRatio("title", 1);
 
         table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
@@ -201,17 +201,17 @@ public abstract class AdView extends Panel implements CustomView {
                 container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
             } else container.addContainerFilter(new Compare.Equal("category", category));
         }
-        Division division = (Division) divisionField.getValue();
-        if (division != null) {
-            Collection<Division> children = AppUI.getDataProvider().getChildren(division);
+        Location location = (Location) locationField.getValue();
+        if (location != null) {
+            Collection<Location> children = AppUI.getDataProvider().getChildren(location);
             if (children.size() > 0) {
                 List<Container.Filter> filters = new ArrayList<Container.Filter>();
-                filters.add(new Compare.Equal("division", division));
-                for (Division child : children) {
-                    filters.add(new Compare.Equal("division", child));
+                filters.add(new Compare.Equal("location", location));
+                for (Location child : children) {
+                    filters.add(new Compare.Equal("location", child));
                 }
                 container.addContainerFilter(new Or(filters.toArray(new Container.Filter[filters.size()])));
-            } else container.addContainerFilter(new Compare.Equal("division", division));
+            } else container.addContainerFilter(new Compare.Equal("location", location));
         }
         if (cityField.getValue() != null) {
             container.addContainerFilter(new Compare.Equal("city", cityField.getValue()));

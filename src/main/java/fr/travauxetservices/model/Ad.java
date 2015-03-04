@@ -41,7 +41,7 @@ public class Ad implements Serializable {
 
     @NotNull
     @ManyToOne
-    protected Division division;
+    protected Location location;
 
     @ManyToOne
     protected City city;
@@ -66,14 +66,14 @@ public class Ad implements Serializable {
     }
 
 
-    public Ad(UUID id, Date created, User user, String title, String description, Category category, Division division, City city, double price, Remuneration remuneration, boolean validated, int priority) {
+    public Ad(UUID id, Date created, User user, String title, String description, Category category, Location location, City city, double price, Remuneration remuneration, boolean validated, int priority) {
         this.id = id;
         this.created = created;
         this.user = user;
         this.title = title;
         this.description = description;
         this.category = category;
-        this.division = division;
+        this.location = location;
         this.city = city;
         this.price = price;
         this.remuneration = remuneration;
@@ -121,12 +121,12 @@ public class Ad implements Serializable {
         this.description = s;
     }
 
-    public Division getDivision() {
-        return division;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setDivision(Division division) {
-        this.division = division;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public City getCity() {
