@@ -1,7 +1,9 @@
 package fr.travauxetservices.services;
 
 import fr.travauxetservices.model.City;
-import org.geonames.*;
+import org.geonames.PostalCode;
+import org.geonames.PostalCodeSearchCriteria;
+import org.geonames.WebService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +17,15 @@ public class Geonames {
         List<City> result = new ArrayList<City>();
         try {
             WebService.setUserName("tlinxe"); // add your username here
-            ToponymSearchCriteria criteria = new ToponymSearchCriteria();
+            PostalCodeSearchCriteria criteria = new PostalCodeSearchCriteria();
             criteria.setCountryCode("FR");
-            criteria.setStyle(Style.FULL);
-            criteria.setQ(filterPrefix);
+            criteria.setPlaceName(filterPrefix);
             criteria.setMaxRows(20);
 
-            ToponymSearchResult searchResult = WebService.search(criteria);
-            for (Toponym toponym : searchResult.getToponyms()) {
-//                System.out.println("CityComboBox id: " + toponym.getGeoNameId() + " name: " + toponym.getName() + " code: " + toponym.getAdminCode1() + " code: " + toponym.getAdminCode2() + " latitude: " + toponym.getLatitude() + " latitude: " + toponym.getLongitude());
-                result.add(new City(toponym.getGeoNameId(), toponym.getName(), toponym.getAdminCode1(), toponym.getAdminCode2(), toponym.getLatitude(), toponym.getLongitude()));
+            List<PostalCode> values = WebService.postalCodeSearch(criteria);
+            for (PostalCode postalCode : values) {
+                result.add(new City(postalCode.getPlaceName(), postalCode.getPostalCode(), postalCode.getAdminCode1(), postalCode.getAdminCode2(), postalCode.getLatitude(), postalCode.getLongitude()));
+//                System.out.println("CityComboBox name: " + postalCode.getPlaceName()  + " postal: " + postalCode.getPostalCode() + " code1: " + postalCode.getAdminCode1()+ " code2: " + postalCode.getAdminCode2()+ " name1: " + postalCode.getAdminName2());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,14 +34,13 @@ public class Geonames {
     }
 
     static public String getRegion(double latitude, double longitude) {
-        List<City> result = new ArrayList<City>();
         try {
             WebService.setUserName("tlinxe"); // add your username here
             PostalCodeSearchCriteria criteria = new PostalCodeSearchCriteria();
             criteria.setLatitude(latitude);
             criteria.setLongitude(longitude);
-            List<PostalCode> toponyms = WebService.findNearbyPostalCodes(criteria);
-            for (PostalCode toponym : toponyms) {
+            List<PostalCode> values = WebService.findNearbyPostalCodes(criteria);
+            for (PostalCode toponym : values) {
                 return toponym.getPostalCode().substring(0, 2);
             }
         } catch (Exception e) {

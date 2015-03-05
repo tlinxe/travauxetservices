@@ -29,7 +29,7 @@ import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.*;
 import fr.travauxetservices.services.GeoLocation;
-import fr.travauxetservices.services.GeoNames;
+import fr.travauxetservices.services.Geonames;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.tools.IOToolkit;
 
@@ -234,7 +234,7 @@ public final class HomeView extends Panel implements View {
         if (postion != null) {
             map.setCenter(postion);
             map.setZoom(11);
-            String region = GeoNames.getRegion(postion.getLat(), postion.getLon());
+            String region = Geonames.getRegion(postion.getLat(), postion.getLon());
             if (region != null) {
                 EntityItem<Location> item = AppUI.getDataProvider().getLocation(region);
                 applyFilters(item != null ? item.getEntity() : null);
