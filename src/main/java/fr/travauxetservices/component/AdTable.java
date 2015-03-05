@@ -104,6 +104,7 @@ public class AdTable extends PagedTable {
                 ratingStars.setReadOnly(true);
                 ratingStars.addStyleName("tiny");
                 ratingStars.setImmediate(true);
+                ratingStars.setSizeUndefined();
                 layout.addComponent(ratingStars);
             }
             return layout;

@@ -7,8 +7,8 @@ import com.vaadin.ui.ComboBox;
 import fr.travauxetservices.model.City;
 import fr.travauxetservices.services.GeoNames;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -17,8 +17,9 @@ import java.util.List;
 public class CityComboBox extends ComboBox {
     public CityComboBox(String caption) {
         super(caption, new CityContainer());
-        setItemCaptionMode(ItemCaptionMode.PROPERTY);
-        setItemCaptionPropertyId("name");
+        setItemCaptionMode(ItemCaptionMode.ITEM);
+        setItemCaptionPropertyId("fullName");
+        setPageLength(20);
     }
 
     public void setValue(Object newValue) {
@@ -39,7 +40,7 @@ public class CityComboBox extends ComboBox {
             filterItems(((SimpleStringFilter) filter).getFilterString());
         }
 
-        private List<City> getCities(String filterPrefix) {
+        private Collection<City> getCities(String filterPrefix) {
             if ("".equals(filterPrefix) || filterPrefix == null) {
                 return Collections.emptyList();
             }

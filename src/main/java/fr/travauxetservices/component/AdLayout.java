@@ -1,12 +1,9 @@
 package fr.travauxetservices.component;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
-import com.vaadin.addon.jpacontainer.EntityItemProperty;
-import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.model.Ad;
@@ -69,7 +66,7 @@ public class AdLayout extends VerticalLayout {
 
         VerticalLayout layout = new VerticalLayout();
         layout.setSpacing(true);
-        layout.addComponent(new Label(user.getCommonName()));
+        layout.addComponent(new Label(user.getFullName()));
         if (user.getPhone() != null) {
             final Button phoneButton = new Button(I18N.getString("button.phone"), new Button.ClickListener() {
                 @Override

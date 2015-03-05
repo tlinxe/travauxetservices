@@ -3,6 +3,7 @@ package fr.travauxetservices.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -21,6 +22,10 @@ public class City implements Serializable {
     String name;
 
     @NotNull
+    @Column(length = 10)
+    String postalCode;
+
+    @NotNull
     @Column(length = 2)
     String department;
 
@@ -31,14 +36,19 @@ public class City implements Serializable {
     double latitude;
     double longitude;
 
-    public City() {
+    @Transient
+    String fullName;
 
+    private static final long serialVersionUID = 1L;
+
+    public City() {
+        super();
     }
 
-    public City(int id, String name, String department, String region, double latitude, double longitude) {
+    public City(String name, String postalCode, String department, String region, double latitude, double longitude) {
         super();
-        this.id = id;
         this.name = name;
+        this.postalCode = postalCode;
         this.department = department;
         this.region = region;
         this.latitude = latitude;
@@ -46,11 +56,7 @@ public class City implements Serializable {
     }
 
     public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        return hashCode();
     }
 
     public void setName(String name) {
@@ -59,6 +65,14 @@ public class City implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
     }
 
     public void setDepartment(String department) {
@@ -93,14 +107,23 @@ public class City implements Serializable {
         this.longitude = d;
     }
 
+    public String getFullName() {
+        return name + " - " + postalCode;
+    }
+
     @Override
     public int hashCode() {
-        return id;
+        final int prime = 31;
+        int hash = 17;
+        hash = hash * prime + this.getName().hashCode();
+        hash = hash * prime + this.getPostalCode().hashCode();
+
+        return hash;
     }
 
     @Override
     public String toString() {
-        return name + " (" + region + ")";
+        return getFullName();
     }
 
     @Override

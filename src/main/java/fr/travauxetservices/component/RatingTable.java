@@ -51,7 +51,7 @@ public class RatingTable extends Table {
             image.setWidth(60, Unit.PIXELS);
             image.setHeight(60, Unit.PIXELS);
             hLayout.addComponent(image);
-            hLayout.addComponent(new Label("<p>" + I18N.getString("header.published") + " " + df.format(created) + "<br> " + I18N.getString("published.by") + " " + user.getCommonName() + "</p>", ContentMode.HTML));
+            hLayout.addComponent(new Label("<p>" + I18N.getString("header.published") + " " + df.format(created) + "<br> " + I18N.getString("published.by") + " " + user.getFullName() + "</p>", ContentMode.HTML));
             vLayout.addComponent(hLayout);
 
             String value = (String) source.getContainerProperty(itemId, columnId).getValue();

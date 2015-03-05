@@ -2,7 +2,6 @@ package fr.travauxetservices.component;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.BeanValidator;
@@ -198,7 +197,7 @@ public class UserForm extends Form {
                     final User user = (User) getEntity(item);
                     field = new TextField() {
                         public String getValue() {
-                            return user != null ? user.getCommonName() : null;
+                            return user != null ? user.getFullName() : null;
                         }
                     };
                 }

@@ -53,7 +53,7 @@ public class DummyDataGenerator {
                 }
             }
 
-            City c1 = new City(3031582, "Bordeaux", "97", "33", 44.84044, -0.5805);
+            City c1 = new City("Bordeaux", "33000", "97", "33", 44.84044, -0.5805);
             em.persist(c1);
 
             List<User> users = new ArrayList<User>(3);

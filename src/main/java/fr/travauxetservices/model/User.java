@@ -223,7 +223,7 @@ public class User implements Serializable {
         return ratings.size();
     }
 
-    public String getCommonName() {
+    public String getFullName() {
         StringBuilder text = new StringBuilder();
         if (gender != null) {
             text.append(I18N.getString("gender." + gender.toString()));
