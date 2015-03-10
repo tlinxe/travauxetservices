@@ -70,7 +70,6 @@ public class PictureField extends CustomField<byte[]> {
                 byte[] bytes = fos.toByteArray();
                 setImage(bytes);
                 setValue(bytes);
-                System.out.println("PictureField.ImageUploader.uploadSucceeded length: "+fos.toByteArray().length );
             }
         }
 
@@ -94,7 +93,7 @@ public class PictureField extends CustomField<byte[]> {
             }
         });
         remove.setIcon(FontAwesome.TRASH_O);
-        remove.addStyleName("borderless-colored");
+        remove.addStyleName(ValoTheme.BUTTON_LINK);
         remove.setWidth(28, Unit.PIXELS);
         remove.setHeight(28, Unit.PIXELS);
         //remove.setSizeUndefined();

@@ -30,6 +30,7 @@ import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.*;
 import fr.travauxetservices.services.GeoLocation;
 import fr.travauxetservices.services.Geonames;
+import fr.travauxetservices.tools.DateToolkit;
 import fr.travauxetservices.tools.I18N;
 import fr.travauxetservices.tools.IOToolkit;
 
@@ -80,7 +81,7 @@ public final class HomeView extends Panel implements View {
 
     public void attach() {
         super.attach();
-        setPostion(GeoLocation.getLocation());
+        //setPostion(GeoLocation.getLocation());
     }
 
     private Component buildSparklines() {
@@ -114,7 +115,7 @@ public final class HomeView extends Panel implements View {
 
         final FieldGroup binder = new FieldGroup(item);
         binder.setBuffered(true);
-        binder.bind(text, "text");
+        binder.bind(text, "content");
         binder.setReadOnly(true);
 
         text.addEditorSavedListener(new RichText.EditorSavedListener() {
@@ -230,15 +231,24 @@ public final class HomeView extends Panel implements View {
         setPostion(event.getPostion());
     }
 
-    public void setPostion(LatLon postion) {
+    public void setPostion(final LatLon postion) {
         if (postion != null) {
             map.setCenter(postion);
             map.setZoom(11);
-            String region = Geonames.getRegion(postion.getLat(), postion.getLon());
-            if (region != null) {
-                EntityItem<Location> item = AppUI.getDataProvider().getLocation(region);
-                applyFilters(item != null ? item.getEntity() : null);
-            }
+
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String region = Geonames.getRegion(postion.getLat(), postion.getLon());
+                    if (region != null) {
+                        EntityItem<Location> item = AppUI.getDataProvider().getLocation(region);
+                        applyFilters(item != null ? item.getEntity() : null);
+                    }
+                }
+            });
+            t.start();
+
+
         }
     }
 
@@ -273,7 +283,7 @@ public final class HomeView extends Panel implements View {
 
     private JPAContainer getContainer() {
         if (container == null) {
-            container =  AppUI.getDataProvider().getOfferContainer();
+            container = AppUI.getDataProvider().getOfferContainer();
         }
         return container;
     }
@@ -285,8 +295,7 @@ public final class HomeView extends Panel implements View {
 
         if (location == null) {
             container.addContainerFilter(new Compare.Equal("location", null));
-        }
-        else {
+        } else {
             List<Container.Filter> filters = new ArrayList<Container.Filter>();
             filters.add(new Compare.Equal("location", location));
             filters.add(new JoinFilter("city", new Compare.Equal("region", location.getId())));
@@ -383,26 +392,23 @@ public final class HomeView extends Panel implements View {
         title.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         notificationsLayout.addComponent(title);
 
-        Collection<Notice> notices = AppUI.getDataProvider().getNotices();
+        Collection<Notice> notices = AppUI.getDataProvider().getNotices(getCurrentUser());
         CustomEventBus.post(new CustomEvent.NotificationsCountUpdatedEvent());
 
         for (Notice notice : notices) {
             VerticalLayout notificationLayout = new VerticalLayout();
             notificationLayout.addStyleName("notification-item");
 
-            Label titleLabel = new Label(notice.getFirstName() + " "
-                    + notice.getLastName() + " "
-                    + notice.getAction());
+            Label titleLabel = new Label(notice.getAction());
             titleLabel.addStyleName("notification-title");
 
-            Label timeLabel = new Label(notice.getPrettyTime());
+            Label timeLabel = new Label(DateToolkit.format(notice.getCreated(), getLocale() != null ? getLocale() : Locale.getDefault()));
             timeLabel.addStyleName("notification-time");
 
             Label contentLabel = new Label(notice.getContent());
             contentLabel.addStyleName("notification-content");
 
-            notificationLayout.addComponents(titleLabel, timeLabel,
-                    contentLabel);
+            notificationLayout.addComponents(titleLabel, timeLabel, contentLabel);
             notificationsLayout.addComponent(notificationLayout);
         }
 
@@ -486,7 +492,11 @@ public final class HomeView extends Panel implements View {
 
         @Subscribe
         public void updateNotificationsCount(final CustomEvent.NotificationsCountUpdatedEvent event) {
-            //setUnreadCount(MyVaadinUI.getDataProvider().getUnreadNotificationsCount());
+            setUnreadCount(AppUI.getDataProvider().getUnreadNotificationsCount(getCurrentUser()));
+        }
+
+        private User getCurrentUser() {
+            return (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
         }
 
         public void setUnreadCount(final int count) {

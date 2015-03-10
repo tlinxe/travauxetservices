@@ -8,10 +8,14 @@ import elemental.json.JsonObject;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Created by Phobos on 28/01/15.
  */
 public class GeoLocation {
+    private final static Logger logger = Logger.getLogger(GeoLocation.class.getName());
     static private LatLon point;
 
     static public LatLon getLocation() {
@@ -32,7 +36,7 @@ public class GeoLocation {
                                         //System.out.println("Location.getLocation latitude: " + point.getLat() + " longitude: " + point.getLon());
                                     }
                                 } catch (Exception e) {
-                                    e.printStackTrace();
+                                    logger.log(Level.WARNING, "Error Geo Location", e);
                                 }
                             }
                         }

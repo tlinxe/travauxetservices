@@ -1,70 +1,99 @@
 package fr.travauxetservices.model;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.UUID;
+
 /**
- * Created by Phobos on 13/12/14.
+ * Created by Phobos on 05/03/15.
  */
-public class Notice {
-    private long id;
-    private String content;
-    private boolean read;
-    private String firstName;
-    private String lastName;
-    private String prettyTime;
-    private String action;
+@Entity
+public class Notice implements Serializable {
+    @Id
+    @Column(length = 255)
+    protected UUID id;
 
-    public long getId() {
-        return id;
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date created;
+
+    @NotNull
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    protected User user;
+
+    @NotNull
+    @Size(min = 5, max = 255)
+    @Column(length = 255)
+    protected String action;
+
+    @NotNull
+    @Lob
+    protected String content;
+
+    boolean read;
+
+    public Notice() {
+        id = UUID.randomUUID();
+        created = new Date(System.currentTimeMillis());
+        read = false;
     }
 
-    public void setId(final long id) {
+    public Notice(UUID id, Date created, User user, String action, String content, boolean read) {
         this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(final String content) {
+        this.created = created;
+        this.user = user;
+        this.action = action;
         this.content = content;
-    }
-
-    public boolean isRead() {
-        return read;
-    }
-
-    public void setRead(final boolean read) {
         this.read = read;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public UUID getId() {
+        return id;
     }
 
-    public void setFirstName(final String firstName) {
-        this.firstName = firstName;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public String getLastName() {
-        return lastName;
+    public Date getCreated() {
+        return created;
     }
 
-    public void setLastName(final String lastName) {
-        this.lastName = lastName;
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
-    public String getPrettyTime() {
-        return prettyTime;
+    public User getUser() {
+        return user;
     }
 
-    public void setPrettyTime(final String prettyTime) {
-        this.prettyTime = prettyTime;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getAction() {
         return action;
     }
 
-    public void setAction(final String action) {
-        this.action = action;
+    public void setAction(String s) {
+        this.action = s;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String s) {
+        this.content = s;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean b) {
+        this.read = b;
     }
 }

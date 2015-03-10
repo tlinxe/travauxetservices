@@ -17,15 +17,17 @@ import org.vaadin.teemu.ratingstars.RatingStars;
  * Created by Phobos on 31/01/15.
  */
 public class AdLayout extends VerticalLayout {
+    private EntityItem<Ad> item;
     public AdLayout(EntityItem<Ad> item, String title) {
+        this.item = item;
         setWidth(100, Unit.PERCENTAGE);
         setSpacing(true);
         addStyleName("mytheme-view");
 
         addComponent(buildHeader(title));
-        addComponent(buildAdContent(item));
-        addComponent(buildUserContent(item));
-        addComponent(buildReviewsContent(item));
+        addComponent(buildAdContent());
+        addComponent(buildUserContent());
+        addComponent(buildReviewsContent());
     }
 
     private Component buildHeader(String title) {
@@ -42,7 +44,7 @@ public class AdLayout extends VerticalLayout {
         return header;
     }
 
-    private Component buildAdContent(final EntityItem<Ad> item) {
+    private Component buildAdContent() {
         HorizontalLayout root = new HorizontalLayout();
         root.setMargin(true);
 
@@ -53,7 +55,7 @@ public class AdLayout extends VerticalLayout {
         return new WrapperLayout((item.getEntity()).getTitle(), root);
     }
 
-    private Component buildUserContent(EntityItem<Ad> item) {
+    private Component buildUserContent() {
         HorizontalLayout root = new HorizontalLayout();
         root.setMargin(true);
         root.setSpacing(true);
@@ -71,7 +73,6 @@ public class AdLayout extends VerticalLayout {
             final Button phoneButton = new Button(I18N.getString("button.phone"), new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Object data = event.getButton().getData();
                     event.getButton().setCaption(user.getPhone());
                 }
             });
@@ -83,7 +84,7 @@ public class AdLayout extends VerticalLayout {
         final Button emailButton = new Button(I18N.getString("button.contact"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                ContactWindow.open();
+                ContactWindow.open(item);
             }
         });
         emailButton.setIcon(FontAwesome.ENVELOPE);
@@ -95,7 +96,7 @@ public class AdLayout extends VerticalLayout {
         return new WrapperLayout("Contacter l'annonceur", root);
     }
 
-    private Component buildReviewsContent(EntityItem<Ad> item) {
+    private Component buildReviewsContent() {
         User user = item.getEntity().getUser();
 
         VerticalLayout layout = new VerticalLayout();

@@ -4,7 +4,13 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.server.Page;
+import com.vaadin.shared.Position;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
+import fr.travauxetservices.event.CustomEvent;
+import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.*;
 import fr.travauxetservices.services.Mail;
 import fr.travauxetservices.tools.I18N;
@@ -23,6 +29,7 @@ public class AppDataProvider implements DataProvider {
 
     private boolean ready;
 
+    private EntityManager em;
     private JPAContainer<Category> categories;
     private JPAContainer<Location> locations;
     private JPAContainer<Request> requests;
@@ -30,6 +37,7 @@ public class AppDataProvider implements DataProvider {
     private JPAContainer<User> users;
     private JPAContainer<Message> messages;
     private JPAContainer<Rating> ratings;
+    private JPAContainer<Notice> notices;
 
     public AppDataProvider() {
         DummyDataGenerator.create();
@@ -39,7 +47,7 @@ public class AppDataProvider implements DataProvider {
     public void make() {
         try {
             Configuration configuration = AppUI.getConfiguration();
-            EntityManager em = Persistence.createEntityManagerFactory(AppUI.PERSISTENCE_UNIT, configuration.getProperties()).createEntityManager();
+            em = Persistence.createEntityManagerFactory(AppUI.PERSISTENCE_UNIT, configuration.getProperties()).createEntityManager();
             categories = JPAContainerFactory.make(Category.class, em);
             categories.sort(new String[]{"name"}, new boolean[]{true});
             categories.setParentProperty("parent");
@@ -57,6 +65,7 @@ public class AppDataProvider implements DataProvider {
             users = JPAContainerFactory.make(User.class, em);
             messages = JPAContainerFactory.make(Message.class, em);
             ratings = JPAContainerFactory.make(Rating.class, em);
+            notices = JPAContainerFactory.make(Notice.class, em);
             ready = true;
         } catch (PersistenceException e) {
             e.printStackTrace();
@@ -89,7 +98,13 @@ public class AppDataProvider implements DataProvider {
     }
 
     public void addRequest(Ad a) throws UnsupportedOperationException, IllegalStateException {
-        getRequestContainer().addEntity(new Request(a));
+        requests.addEntity(new Request(a));
+        requests.commit();
+    }
+
+    public void removeRequest(final Object itemId) throws UnsupportedOperationException {
+        requests.removeItem(itemId);
+        requests.commit();
     }
 
     @Override
@@ -113,15 +128,21 @@ public class AppDataProvider implements DataProvider {
     }
 
     public void addOffer(Ad a) throws UnsupportedOperationException, IllegalStateException {
-        getOfferContainer().addEntity(new Offer(a));
+        offers.addEntity(new Offer(a));
+        offers.commit();
+    }
+
+    public void removeOffer(final Object itemId) throws UnsupportedOperationException {
+        offers.removeItem(itemId);
+        offers.commit();
     }
 
     public void addAd(Ad a) throws UnsupportedOperationException, IllegalStateException {
         if (a instanceof Offer) {
-            AppUI.getDataProvider().addOffer(a);
+            addOffer(a);
         }
         if (a instanceof Request) {
-            AppUI.getDataProvider().addRequest(a);
+            addRequest(a);
         }
     }
 
@@ -155,9 +176,43 @@ public class AppDataProvider implements DataProvider {
         return values;
     }
 
+    public JPAContainer<Notice> getNoticeContainer() {
+        notices.removeAllContainerFilters();
+        return notices;
+    }
+
+    public void addNotice(Notice n) throws UnsupportedOperationException {
+        notices.addEntity(n);
+        notices.commit();
+        CustomEventBus.post(new CustomEvent.NotificationsCountUpdatedEvent());
+    }
+
+    public void removeNotice(final Object itemId) throws UnsupportedOperationException {
+        notices.removeItem(itemId);
+        notices.commit();
+    }
+
+    public int getUnreadNotificationsCount(User u) {
+        if (u != null) {
+            JPAContainer<Notice> container = getNoticeContainer();
+            container.addContainerFilter(new Compare.Equal("user", u));
+            return container.getItemIds().size();
+        }
+        return 0;
+    }
+
     @Override
-    public Collection<Notice> getNotices() {
-        return new ArrayList<Notice>(0);
+    public Collection<Notice> getNotices(User u) {
+        Collection<Notice> values = new ArrayList<Notice>();
+        if (u != null) {
+            JPAContainer<Notice> container = getNoticeContainer();
+            container.addContainerFilter(new Compare.Equal("user", u));
+            for (Object itemId : container.getItemIds()) {
+                EntityItem<Notice> item = container.getItem(itemId);
+                values.add(item.getEntity());
+            }
+        }
+        return values;
     }
 
     @Override
@@ -228,17 +283,43 @@ public class AppDataProvider implements DataProvider {
 
     }
 
-    public void addUser(User u) throws UnsupportedOperationException, IllegalStateException {
-        getUserContainer().addEntity(u);
+    public void addUser(final User u) throws UnsupportedOperationException, IllegalStateException {
+        users.addEntity(u);
+        users.commit();
 
-        String url = AppUI.getEncodedUrl() + "/#!" + ViewType.PROFILE.getViewName() + "/" + u.getId();
-        String subject = I18N.getString("message.user.account.subject");
-        String text = I18N.getString("message.user.account.text", new String[]{u.toString(), url});
-        Mail.sendMail(u.toString(), subject, text, false);
+        Post.addedUser(u);
     }
 
     public void removeUser(final Object itemId) throws UnsupportedOperationException {
-        getUserContainer().removeItem(itemId);
+        EntityItem<User> user = getUser(itemId);
+        if (user != null) {
+            JPAContainer<Rating> ratingContainer = getRatingContainer();
+            ratingContainer.addContainerFilter(new Compare.Equal("user", user.getEntity()));
+            for (Object id : ratingContainer.getItemIds()) {
+                removeRating(id);
+            }
+
+            JPAContainer<Notice> noticeContainer = getNoticeContainer();
+            noticeContainer.addContainerFilter(new Compare.Equal("user", user.getEntity()));
+            for (Object id : noticeContainer.getItemIds()) {
+                removeNotice(id);
+            }
+
+            JPAContainer<Offer> offerContainer = getOfferContainer();
+            offerContainer.addContainerFilter(new Compare.Equal("user", user.getEntity()));
+            for (Object id : offerContainer.getItemIds()) {
+                removeOffer(id);
+            }
+
+            JPAContainer<Request> requestContainer = getRequestContainer();
+            requestContainer.addContainerFilter(new Compare.Equal("user", user.getEntity()));
+            for (Object id : requestContainer.getItemIds()) {
+                removeRequest(id);
+            }
+
+            users.removeItem(itemId);
+            users.commit();
+        }
     }
 
     @Override
@@ -271,11 +352,22 @@ public class AppDataProvider implements DataProvider {
     }
 
     public void addMessage(Message m) throws UnsupportedOperationException {
-        getMessageContainer().addEntity(m);
+        messages.addEntity(m);
+        messages.commit();
     }
 
     public JPAContainer<Rating> getRatingContainer() {
         ratings.removeAllContainerFilters();
         return ratings;
+    }
+
+    public void addRating(Rating r) throws UnsupportedOperationException {
+        ratings.addEntity(r);
+        ratings.commit();
+    }
+
+    public void removeRating(final Object itemId) throws UnsupportedOperationException {
+        ratings.removeItem(itemId);
+        ratings.commit();
     }
 }

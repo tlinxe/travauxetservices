@@ -1,10 +1,9 @@
 package fr.travauxetservices.component;
 
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Responsive;
+import com.vaadin.server.*;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -12,6 +11,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
+import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
 
 @SuppressWarnings("serial")
@@ -37,7 +37,7 @@ public class ConnectionWindow extends Window {
 
         Component form = buildForm();
         content.addComponent(form);
-        content.setComponentAlignment(form, Alignment.MIDDLE_CENTER);
+        content.setComponentAlignment(form, Alignment.TOP_CENTER);
     }
 
     private Component buildForm() {
@@ -55,17 +55,29 @@ public class ConnectionWindow extends Window {
     }
 
     private Component buildFields() {
+        final Form form = new Form();
+        form.setSizeUndefined();
+        form.setBuffered(true);
+
         GridLayout layout = new GridLayout(3, 2);
         layout.setSpacing(true);
+        form.setLayout(layout);
 
         String username = AppUI.getValueCookie(AppUI.USERNAME_COOKIE);
         final TextField usernameField = new TextField(I18N.getString("user.email"));
+        usernameField.addStyleName(ValoTheme.TEXTFIELD_SMALL);
+        usernameField.setRequired(true);
+        usernameField.setRequiredError(I18N.getString("validator.required"));
         usernameField.setIcon(FontAwesome.USER);
+        usernameField.addValidator(new EmailValidator(I18N.getString("validator.email")));
         usernameField.setValue(username != null ? username : "tlinxe@email.fr");
         layout.addComponent(usernameField, 0, 0);
 
         String password = AppUI.getValueCookie(AppUI.PASSWORD_COOKIE);
         final PasswordField passwordField = new PasswordField(I18N.getString("user.password"));
+        passwordField.addStyleName(ValoTheme.TEXTFIELD_SMALL);
+        passwordField.setRequired(true);
+        passwordField.setRequiredError(I18N.getString("validator.required"));
         passwordField.setIcon(FontAwesome.LOCK);
         passwordField.setValue(password != null ? password : "motdepasse");
         layout.addComponent(passwordField, 1, 0);
@@ -95,10 +107,15 @@ public class ConnectionWindow extends Window {
         signinField.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(final Button.ClickEvent event) {
-                CustomEventBus.post(new CustomEvent.UserLoginRequestedEvent(usernameField.getValue(), passwordField.getValue(), rememberField.getValue()));
+                User user = AppUI.getDataProvider().authenticate(usernameField.getValue(), passwordField.getValue());
+                if (user == null) {
+                    form.setComponentError(new UserError("Votre identifiant ou mot de passe est incorrect.", AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
+                    return;
+                }
+                CustomEventBus.post(new CustomEvent.UserLoginRequestedEvent(user, rememberField.getValue()));
             }
         });
-        return layout;
+        return form;
     }
 
     private Component buildButtons() {
@@ -106,11 +123,13 @@ public class ConnectionWindow extends Window {
         layout.setSpacing(true);
 
         final Button facebook = new Button("Connexion Facebook");
+        facebook.addStyleName(ValoTheme.BUTTON_SMALL);
         facebook.addStyleName(ValoTheme.BUTTON_PRIMARY);
         facebook.setIcon(FontAwesome.FACEBOOK);
         layout.addComponent(facebook);
 
         final Button google = new Button("Connexion Google+");
+        google.addStyleName(ValoTheme.BUTTON_SMALL);
         google.addStyleName(ValoTheme.BUTTON_DANGER);
         google.setIcon(FontAwesome.GOOGLE_PLUS);
         layout.addComponent(google);

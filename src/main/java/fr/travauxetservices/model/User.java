@@ -53,7 +53,7 @@ public class User implements Serializable {
     private byte[] picture;
 
     @Pattern(regexp = "^((\\+|00)33\\s?|0)[1-9](\\s?\\d{2}){4}$")
-    String phone;
+    private String phone;
 
     private boolean professional;
     private boolean validated;
@@ -65,7 +65,7 @@ public class User implements Serializable {
     @Transient
     private String confirm;
 
-    @OneToMany(cascade=CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE)
     private Set<Rating> ratings;
 
     public User() {
@@ -228,11 +228,13 @@ public class User implements Serializable {
         if (gender != null) {
             text.append(I18N.getString("gender." + gender.toString()));
         }
-        if (firstName != null) {
-            text.append(" ").append(firstName);
+        if (firstName != null && firstName.length() > 0) {
+            if (text.length() > 0) text.append(" ");
+            text.append(firstName);
         }
         if (lastName != null) {
-            text.append(" ").append(lastName);
+            if (text.length() > 0) text.append(" ");
+            text.append(lastName);
         }
         return text.toString();
     }

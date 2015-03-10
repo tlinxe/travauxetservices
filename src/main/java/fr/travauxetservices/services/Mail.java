@@ -1,7 +1,12 @@
 package fr.travauxetservices.services;
 
+import com.vaadin.server.Page;
+import com.vaadin.shared.Position;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.model.Configuration;
+import fr.travauxetservices.tools.I18N;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -9,11 +14,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by Phobos on 25/01/15.
  */
 public class Mail {
+    private final static Logger logger = Logger.getLogger(Mail.class.getName());
     private final static String MAILER_VERSION = "Java";
 
     static public boolean sendMail(String to, String subject, String html, boolean debug) {
@@ -42,8 +50,14 @@ public class Mail {
             Transport.send(msg);
             result = true;
         } catch (MessagingException e) {
-            //Notification.show(e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Error Sending", e);
+            Notification notification = new Notification(I18N.getString("error.sending.title"));
+            notification.setDescription(I18N.getString("error.sending.content", new String[]{e.getLocalizedMessage()}));
+            notification.setHtmlContentAllowed(true);
+            notification.setStyleName(ValoTheme.NOTIFICATION_ERROR);
+            notification.setPosition(Position.BOTTOM_CENTER);
+            notification.setDelayMsec(10000);
+            notification.show(Page.getCurrent());
         }
         return result;
     }

@@ -7,11 +7,15 @@ import org.geonames.WebService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by Phobos on 23/01/15.
  */
 public class Geonames {
+
+    private final static Logger logger = Logger.getLogger(Geonames.class.getName());
 
     static public List<City> getCity(String filterPrefix) {
         List<City> result = new ArrayList<City>();
@@ -28,7 +32,7 @@ public class Geonames {
 //                System.out.println("CityComboBox name: " + postalCode.getPlaceName()  + " postal: " + postalCode.getPostalCode() + " code1: " + postalCode.getAdminCode1()+ " code2: " + postalCode.getAdminCode2()+ " name1: " + postalCode.getAdminName2());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Error Location", e);
         }
         return result;
     }
@@ -44,7 +48,7 @@ public class Geonames {
                 return toponym.getPostalCode().substring(0, 2);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Error Location", e);
         }
         return null;
     }

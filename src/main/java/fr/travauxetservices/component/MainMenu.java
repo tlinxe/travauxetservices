@@ -5,6 +5,7 @@ import com.vaadin.server.*;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
@@ -19,10 +20,10 @@ import fr.travauxetservices.views.ViewType;
 public final class MainMenu extends CustomComponent {
 
     public static final String ID = "mytheme-menu";
-    public static final String REQUESTS_BADGE_ID = "requests-badge";
-    public static final String OFFERS_BADGE_ID = "offers-badge";
+    public static final String NOTIFICATIONS_BADGE_ID = "menu-notifications-badge";
     private static final String STYLE_VISIBLE = "valo-menu-visible";
     private MenuBar.MenuItem settingsItem;
+    private Label notificationsBadge;
 
     public MainMenu() {
         addStyleName("valo-menu");
@@ -70,7 +71,6 @@ public final class MainMenu extends CustomComponent {
         final MenuBar settings = new MenuBar();
         settings.addStyleName("user-menu");
         settings.addStyleName("color1");
-        final User user = getCurrentUser();
         settingsItem = settings.addItem("", null, null);
         updateUserName(null);
         return settings;
@@ -114,8 +114,14 @@ public final class MainMenu extends CustomComponent {
                 label.setSizeUndefined();
                 menuItemsLayout.addComponent(label);
             }
-
             Component menuItemComponent = new ValoMenuItemButton(view);
+
+            if (view == ViewType.HOME) {
+                notificationsBadge = new Label();
+                notificationsBadge.setId(NOTIFICATIONS_BADGE_ID);
+                menuItemComponent = buildBadgeWrapper(menuItemComponent, notificationsBadge);
+            }
+
             menuItemsLayout.addComponent(menuItemComponent);
         }
 
@@ -138,14 +144,21 @@ public final class MainMenu extends CustomComponent {
     @Override
     public void attach() {
         super.attach();
-//        updateOffersCount(null);
-//        updateRequestsCount(null);
+        updateNotificationsCount(null);
     }
 
     @Subscribe
     public void postViewChange(final CustomEvent.PostViewChangeEvent event) {
         // After a successful view change the menu can be hidden in mobile view.
         getCompositionRoot().removeStyleName(STYLE_VISIBLE);
+    }
+
+    @Subscribe
+    public void updateNotificationsCount(
+            final CustomEvent.NotificationsCountUpdatedEvent event) {
+        int unreadNotificationsCount = AppUI.getDataProvider().getUnreadNotificationsCount(getCurrentUser());
+        notificationsBadge.setValue(String.valueOf(unreadNotificationsCount));
+        notificationsBadge.setVisible(unreadNotificationsCount > 0);
     }
 
 
@@ -159,7 +172,7 @@ public final class MainMenu extends CustomComponent {
                 resource = new StreamResource(new IOToolkit.ByteArraySource(user.getPicture()), "picture.png");
             }
             settingsItem.setIcon(resource);
-            settingsItem.setText(user.getFirstName() + " " + user.getLastName());
+            settingsItem.setText(user.getFullName());
             settingsItem.addItem(I18N.getString("sign.out"), new MenuBar.Command() {
                 @Override
                 public void menuSelected(final MenuBar.MenuItem selectedItem) {

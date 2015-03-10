@@ -102,7 +102,7 @@ public abstract class TextPageView extends Panel implements View {
 
         final FieldGroup binder = new FieldGroup(item);
         binder.setBuffered(true);
-        binder.bind(text, "text");
+        binder.bind(text, "content");
 
         text.addEditorSavedListener(new RichText.EditorSavedListener() {
             @Override

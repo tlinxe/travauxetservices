@@ -1,8 +1,8 @@
 package fr.travauxetservices.views;
 
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.event.ItemClickEvent;
@@ -16,10 +16,10 @@ import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
 import fr.travauxetservices.component.ValidatedComboBox;
-import fr.travauxetservices.component.WrapperLayout;
+import fr.travauxetservices.data.Post;
 import fr.travauxetservices.event.CustomEventBus;
+import fr.travauxetservices.model.Ad;
 import fr.travauxetservices.model.User;
-import fr.travauxetservices.services.Mail;
 import fr.travauxetservices.tools.I18N;
 
 /**
@@ -124,7 +124,7 @@ public final class ValidationView extends Panel implements View {
         offerTable.addGeneratedColumn("validated", new Table.ColumnGenerator() {
             public Object generateCell(Table source, Object itemId, Object columnId) {
                 final CheckBox field = new CheckBox();
-                final Item item = source.getItem(itemId);
+                final EntityItem<Ad> item = (EntityItem) source.getItem(itemId);
                 final Property property = item.getItemProperty(columnId);
                 field.setValue((Boolean) property.getValue());
                 field.setReadOnly((Boolean) property.getValue());
@@ -133,13 +133,8 @@ public final class ValidationView extends Panel implements View {
                         if ((Boolean) event.getProperty().getValue()) {
                             property.setValue(event.getProperty().getValue());
 
-                            String title = (String) item.getItemProperty("title").getValue();
-                            User user = (User) item.getItemProperty("user").getValue();
-                            String url = AppUI.getEncodedUrl() + "/#!" + ViewType.OFFER.getViewName() + "/" + item;
-                            String subject = I18N.getString("message.ad.online.subject", new String[]{title});
-                            String text = I18N.getString("message.ad.online.text", new String[]{title, url});
+                            Post.validatedAd(item.getEntity(), ViewType.OFFER);
                             applyFilters();
-                            Mail.sendMail(user.getEmail(), subject, text, false);
                         }
                     }
                 });
@@ -194,7 +189,7 @@ public final class ValidationView extends Panel implements View {
         requestTable.addGeneratedColumn("validated", new Table.ColumnGenerator() {
             public Object generateCell(Table source, Object itemId, Object columnId) {
                 final CheckBox field = new CheckBox();
-                final Item item = source.getItem(itemId);
+                final EntityItem<Ad> item = (EntityItem) source.getItem(itemId);
                 final Property property = item.getItemProperty(columnId);
                 field.setValue((Boolean) property.getValue());
                 field.setReadOnly((Boolean) property.getValue());
@@ -203,13 +198,7 @@ public final class ValidationView extends Panel implements View {
                         if ((Boolean) event.getProperty().getValue()) {
                             property.setValue(event.getProperty().getValue());
 
-                            String title = (String) item.getItemProperty("title").getValue();
-                            User user = (User) item.getItemProperty("user").getValue();
-                            String url = AppUI.getEncodedUrl() + "/#!" + ViewType.REQUEST.getViewName() + "/" + item;
-                            String subject = I18N.getString("message.ad.online.subject", new String[]{title});
-                            String text = I18N.getString("message.ad.online.text", new String[]{title, url});
-                            System.out.println("title: " + title + " url: " + url);
-                            Mail.sendMail(user.getEmail(), subject, text, false);
+                            Post.validatedAd(item.getEntity(), ViewType.REQUEST);
                             applyFilters();
                         }
                     }

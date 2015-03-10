@@ -5,7 +5,6 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
@@ -13,8 +12,7 @@ import fr.travauxetservices.component.AdForm;
 import fr.travauxetservices.component.UserForm;
 import fr.travauxetservices.component.WrapperLayout;
 import fr.travauxetservices.event.CustomEventBus;
-import fr.travauxetservices.model.Ad;
-import fr.travauxetservices.model.User;
+import fr.travauxetservices.model.*;
 import fr.travauxetservices.tools.I18N;
 
 /**

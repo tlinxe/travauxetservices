@@ -2,6 +2,7 @@ package fr.travauxetservices.event;
 
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import fr.travauxetservices.model.Ad;
+import fr.travauxetservices.model.User;
 import fr.travauxetservices.views.ViewType;
 
 /*
@@ -10,21 +11,16 @@ import fr.travauxetservices.views.ViewType;
 public abstract class CustomEvent {
 
     public static final class UserLoginRequestedEvent {
-        private final String userName, password;
+        private final User user;
         private final boolean remember;
 
-        public UserLoginRequestedEvent(final String userName, final String password, final boolean remember) {
-            this.userName = userName;
-            this.password = password;
+        public UserLoginRequestedEvent(final User user, final boolean remember) {
+            this.user = user;
             this.remember = remember;
         }
 
-        public String getUserName() {
-            return userName;
-        }
-
-        public String getPassword() {
-            return password;
+        public User getUser() {
+            return user;
         }
 
         public boolean isRemember() {

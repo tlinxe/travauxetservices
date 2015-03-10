@@ -30,40 +30,17 @@ import java.util.Locale;
 /**
  * Created by Phobos on 02/01/15.
  */
-public class AdForm extends Form {
-    private Item item;
-    private boolean readOnly;
-    private WrapperFormLayout form;
-
+public class AdForm extends ExtendedForm {
     public AdForm(Item item, boolean readOnly) {
-        this.item = item;
-        this.readOnly = readOnly;
+        super(readOnly);
 
-        // FieldFactory for customizing the fields and adding validators
         setFormFieldFactory(new CustomFieldFactory());
-
-        setBuffered(true);
-        setImmediate(true);
-        setValidationVisible(false);
-        setValidationVisibleOnCommit(false);
-
-        form = new WrapperFormLayout();
-        form.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-        form.setSpacing(true);
-        form.setReadOnly(this.readOnly);
-
-        setLayout(form);
-
-        setItem(item, this.readOnly);
+        setItem(item, readOnly);
     }
 
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-
-    private List<String> getFields() {
+    protected List<String> getFields() {
         List<String> values = new ArrayList<String>();
-        if (!readOnly && !(item instanceof EntityItem)) values.add("type");
+        if (!readOnly && !(getItemDataSource() instanceof EntityItem)) values.add("type");
         if (readOnly) values.add("created");
         values.add("category");
         values.add("location");
@@ -74,16 +51,6 @@ public class AdForm extends Form {
         values.add("price");
         return values;
     }
-
-    public void setItem(Item item, boolean readOnly) {
-        this.item = item;
-        this.readOnly = readOnly;
-        if (item != null) {
-            form.removeAllComponents();
-            setItemDataSource(item, getFields()); // bind to POJO via BeanItem
-        }
-    }
-
 
     @Override
     protected void attachField(Object propertyId, Field field) {
@@ -102,21 +69,6 @@ public class AdForm extends Form {
 
     private Component getField(Field field) {
         return getField(field, false);
-    }
-
-    private Component getField(Field field, boolean forceReadOnly) {
-        if (!isReadOnly() && !forceReadOnly) return field;
-        Object value = field.getValue();
-        LabelField label = new LabelField(field.getCaption());
-        label.setIcon(field.getIcon());
-        if (field instanceof TextArea) {
-            label.setWidth(100, Unit.PERCENTAGE);
-            label.setContentMode(ContentMode.HTML);
-            if (value != null) label.setValue(HtmlEscape.escapeBr(value.toString()));
-        }
-        if (field.getValue() != null) label.setValue(field.getValue().toString());
-        //label.addStyleName(ValoTheme.LABEL_SMALL);
-        return label;
     }
 
     public class TypeComboBox extends ComboBox {
@@ -248,64 +200,5 @@ public class AdForm extends Form {
             field.addValidator(new BeanValidator(Ad.class, propertyId.toString()));
             return field;
         }
-    }
-
-    @Override
-    public void commit() throws Buffered.SourceException, Validator.InvalidValueException {
-        try {
-            setComponentError(null);
-            super.commit();
-            fireEvent(new EditorSavedEvent(this, item));
-        } catch (Validator.InvalidValueException e) {
-            for (Object property : getItemPropertyIds()) {
-                Field field = getField(property);
-                if (field instanceof AbstractField) {
-                    ((AbstractField) field).setValidationVisible(true);
-                    ErrorMessage message = ((AbstractField<?>) field).getErrorMessage();
-                    if (message != null) {
-                        String name = !(field instanceof CheckBox) ? field.getCaption() + ":&#32;" : "";
-                        String text = message.getFormattedHtmlMessage();
-                        text = text.replaceAll("<div>", "");
-                        text = text.replaceAll("</div>", "");
-                        System.out.println("Error: " + text);
-                        setComponentError(new UserError(name + text, AbstractErrorMessage.ContentMode.HTML, ErrorMessage.ErrorLevel.WARNING));
-                        field.focus();
-                        throw e;
-                    }
-                }
-            }
-        }
-    }
-
-    public void addListener(EditorSavedListener listener) {
-        try {
-            Method method = EditorSavedListener.class.getDeclaredMethod("editorSaved", new Class[]{EditorSavedEvent.class});
-            addListener(EditorSavedEvent.class, listener, method);
-        } catch (final java.lang.NoSuchMethodException e) {
-            // This should never happen
-            throw new java.lang.RuntimeException("Internal error, editor saved method not found");
-        }
-    }
-
-    public void removeListener(EditorSavedListener listener) {
-        removeListener(EditorSavedEvent.class, listener);
-    }
-
-    public static class EditorSavedEvent extends Component.Event {
-
-        private Item savedItem;
-
-        public EditorSavedEvent(Component source, Item savedItem) {
-            super(source);
-            this.savedItem = savedItem;
-        }
-
-        public Item getSavedItem() {
-            return savedItem;
-        }
-    }
-
-    public interface EditorSavedListener extends Serializable {
-        public void editorSaved(EditorSavedEvent event);
     }
 }

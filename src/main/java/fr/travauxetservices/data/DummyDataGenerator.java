@@ -57,7 +57,7 @@ public class DummyDataGenerator {
             em.persist(c1);
 
             List<User> users = new ArrayList<User>(3);
-            User u1 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.ADMIN, Gender.MR, "Thierry", "Linxe", "tlinxe@email.fr", "motdepasse", "0614441385", image, true, true, false, new HashSet<Rating>());
+            User u1 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.ADMIN, Gender.MR, "Thierry", "Linxe", "tlinxe@numericable.fr", "motdepasse", "0614441385", image, true, true, false, new HashSet<Rating>());
             em.persist(u1);
             users.add(u1);
             User u2 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.CUSTOMER, null, null, "Gaz de Bordeaux", "pn2@email.fr", "motdepasse", null, null, true, true, true, new HashSet<Rating>());

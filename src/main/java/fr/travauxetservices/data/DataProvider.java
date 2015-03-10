@@ -3,6 +3,7 @@ package fr.travauxetservices.data;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import fr.travauxetservices.model.*;
+import fr.travauxetservices.model.Notice;
 
 import java.util.Collection;
 
@@ -18,6 +19,8 @@ public interface DataProvider {
 
     public void addRequest(Ad a) throws UnsupportedOperationException;
 
+    public void removeRequest(final Object itemId) throws UnsupportedOperationException;
+
     public JPAContainer<Offer> getOfferContainer();
 
     public EntityItem<Offer> getOffer(Object itemId);
@@ -25,6 +28,8 @@ public interface DataProvider {
     public Collection<Offer> getOffers();
 
     public void addOffer(Ad a) throws UnsupportedOperationException;
+
+    public void removeOffer(final Object itemId) throws UnsupportedOperationException;
 
     public void addAd(Ad a) throws UnsupportedOperationException;
 
@@ -34,7 +39,15 @@ public interface DataProvider {
 
     public Collection<Category> getChildren(Category c);
 
-    public Collection<Notice> getNotices();
+    public JPAContainer<Notice> getNoticeContainer();
+
+    public void addNotice(Notice n) throws UnsupportedOperationException;
+
+    public void removeNotice(final Object itemId) throws UnsupportedOperationException;
+
+    public int getUnreadNotificationsCount(User u);
+
+    public Collection<Notice> getNotices(User u);
 
     public JPAContainer<Location> getLocationContainer();
 
@@ -69,4 +82,8 @@ public interface DataProvider {
     public void addMessage(Message m) throws UnsupportedOperationException;
 
     public JPAContainer<Rating> getRatingContainer();
+
+    public void addRating(Rating r) throws UnsupportedOperationException;
+
+    public void removeRating(final Object itemId) throws UnsupportedOperationException;
 }

@@ -23,6 +23,6 @@ public class I18N {
     }
 
     public static void main(String[] args) {
-        System.out.println(fr.travauxetservices.tools.I18N.getString("message.ad.online.text", new String[]{"TITRE", "URL"}));
+        System.out.println(fr.travauxetservices.tools.I18N.getString("ad.message.content", new String[]{"TITRE", "URL"}));
     }
 }

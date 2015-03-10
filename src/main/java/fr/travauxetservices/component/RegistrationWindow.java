@@ -1,24 +1,15 @@
 package fr.travauxetservices.component;
 
-import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.Responsive;
-import com.vaadin.server.UserError;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
-import fr.travauxetservices.services.Mail;
 import fr.travauxetservices.tools.I18N;
-import fr.travauxetservices.views.ViewType;
-
-import javax.persistence.PersistenceException;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 @SuppressWarnings("serial")
 public class RegistrationWindow extends Window {

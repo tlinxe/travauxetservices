@@ -7,6 +7,7 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import fr.travauxetservices.model.City;
 import fr.travauxetservices.model.Remuneration;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.DateToolkit;
@@ -172,7 +173,7 @@ public class AdTable extends PagedTable {
             Property city = source.getContainerProperty(itemId, "city");
             if (city.getValue() != null) {
                 if (text.length() > 0) text.append("<br/>");
-                text.append("<nobr>").append(city.getValue()).append("</nobr>");
+                text.append("<nobr>").append(((City) city.getValue()).getName()).append("</nobr>");
             }
             layout.addComponent(new Label(text.toString(), ContentMode.HTML));
             return layout;

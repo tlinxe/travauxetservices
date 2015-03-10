@@ -18,15 +18,15 @@ public class Message implements Serializable {
 
     @NotNull
     @Lob
-    private String text;
+    private String content;
 
     public Message() {
 
     }
 
-    public Message(String name, String text) {
+    public Message(String name, String content) {
         this.name = name;
-        this.text = text;
+        this.content = content;
     }
 
     public void setName(String name) {
@@ -37,11 +37,11 @@ public class Message implements Serializable {
         return name;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setContent(String text) {
+        this.content = content;
     }
 
-    public String getText() {
-        return text;
+    public String getContent() {
+        return content;
     }
 }

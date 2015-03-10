@@ -12,9 +12,8 @@ import java.util.UUID;
  */
 @MappedSuperclass
 public class Ad implements Serializable {
-    public enum Type {OFFER, REQUEST}
+    public enum Type {OFFER, REQUEST};
 
-    ;
     @Id
     @Column(length = 255)
     protected UUID id;
@@ -23,7 +22,7 @@ public class Ad implements Serializable {
     protected Date created;
 
     @NotNull
-    @ManyToOne(cascade=CascadeType.REMOVE)
+    @ManyToOne
     protected User user;
 
     @NotNull

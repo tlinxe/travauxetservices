@@ -59,7 +59,7 @@ public class AppUI extends UI {
     }
 
 //    static {
-//        DummyDataGenerator.create();
+//        SLF4JBridgeHandler.install();
 //    }
 
     static public final String USERNAME_COOKIE = "username";
@@ -115,10 +115,14 @@ public class AppUI extends UI {
 
     @Subscribe
     public void userLoginRequested(final CustomEvent.UserLoginRequestedEvent event) {
-        signin(event.getUserName(), event.getPassword());
-        setCookie(USERNAME_COOKIE, event.getUserName());
-        setCookie(PASSWORD_COOKIE, event.getPassword());
-        setCookie(REMEMBER_COOKIE, Boolean.toString(event.isRemember()));
+        User user = event.getUser();
+        if (user != null) {
+            VaadinSession.getCurrent().setAttribute(User.class.getName(), user);
+            setCookie(USERNAME_COOKIE, user.getEmail());
+            setCookie(PASSWORD_COOKIE, user.getPassword());
+            setCookie(REMEMBER_COOKIE, Boolean.toString(event.isRemember()));
+            updateContent();
+        }
     }
 
     public void signin(String username, String password) {
