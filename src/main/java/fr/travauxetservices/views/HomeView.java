@@ -236,17 +236,17 @@ public final class HomeView extends Panel implements View {
             map.setCenter(postion);
             map.setZoom(11);
 
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
+//            Thread t = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
                     String region = Geonames.getRegion(postion.getLat(), postion.getLon());
                     if (region != null) {
                         EntityItem<Location> item = AppUI.getDataProvider().getLocation(region);
                         applyFilters(item != null ? item.getEntity() : null);
                     }
-                }
-            });
-            t.start();
+//                }
+//            });
+//            t.start();
 
 
         }

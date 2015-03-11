@@ -4,17 +4,10 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.data.util.filter.Compare;
-import com.vaadin.server.Page;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.*;
-import fr.travauxetservices.services.Mail;
-import fr.travauxetservices.tools.I18N;
-import fr.travauxetservices.views.ViewType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -138,10 +131,10 @@ public class AppDataProvider implements DataProvider {
     }
 
     public void addAd(Ad a) throws UnsupportedOperationException, IllegalStateException {
-        if (a instanceof Offer) {
+        if (a instanceof Offer || a.getType().equals(Ad.Type.OFFER)) {
             addOffer(a);
         }
-        if (a instanceof Request) {
+        if (a instanceof Request || a.getType().equals(Ad.Type.REQUEST)) {
             addRequest(a);
         }
     }
@@ -327,6 +320,7 @@ public class AppDataProvider implements DataProvider {
         JPAContainer<User> container = getUserContainer();
         container.addContainerFilter(new Compare.Equal("email", email));
         container.addContainerFilter(new Compare.Equal("password", password));
+        container.addContainerFilter(new Compare.Equal("validated", true));
         Object user = container.firstItemId();
         return user != null ? container.getItem(user).getEntity() : null;
     }

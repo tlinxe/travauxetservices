@@ -92,7 +92,6 @@ public final class ProfileView extends Panel implements View {
     }
 
     private void setItemDataSource(User user) {
-        if (user != null && !user.isValidated()) user.setValidated(true);
         form.setItem(getEntityUser(user), false);
     }
 
@@ -117,6 +116,9 @@ public final class ProfileView extends Panel implements View {
                 EntityItem<User> item = AppUI.getDataProvider().getUser(id);
                 if (item != null) {
                     user = item.getEntity();
+                    if (user != null && !user.isValidated()) {
+                        item.getItemProperty("validated").setValue(true);
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 //Ignored

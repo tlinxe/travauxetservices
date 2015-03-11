@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 public class Ad implements Serializable {
-    public enum Type {OFFER, REQUEST};
+    static public enum Type {OFFER, REQUEST};
 
     @Id
     @Column(length = 255)

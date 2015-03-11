@@ -104,7 +104,7 @@ public final class PostView extends Panel implements View {
                 UI.getCurrent().getNavigator().navigateTo(ViewType.REQUEST.getViewName() + "/" + newAd.getId().toString());
             }
         } catch (Exception e) {
-            //Ignored
+            e.printStackTrace();
         }
     }
 

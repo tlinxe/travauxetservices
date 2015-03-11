@@ -23,8 +23,8 @@ import java.text.MessageFormat;
  */
 public class Post {
     static public void addedUser(final User u) {
-        Notification notification = new Notification(I18N.getString("user.notice.title"));
-        notification.setDescription(I18N.getString("user.notice.content"));
+        Notification notification = new Notification(I18N.getString("user.notification.title"));
+        notification.setDescription(I18N.getString("user.notification.content"));
         notification.setHtmlContentAllowed(true);
         notification.setStyleName(ValoTheme.NOTIFICATION_SUCCESS);
         notification.setPosition(Position.BOTTOM_CENTER);
