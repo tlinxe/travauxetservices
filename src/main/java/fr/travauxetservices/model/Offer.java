@@ -15,7 +15,7 @@ public class Offer extends Ad {
     }
 
     public Offer(UUID id, Date created, User user, String title, String description, Category category, Location location, City city, double price, Remuneration remuneration, boolean validated, int priority) {
-        super(id, created, user, title, description, category, location, city, price, remuneration, validated, priority);
+        super(id.toString(), created, user, title, description, category, location, city, price, remuneration, validated, priority);
     }
 
     public Offer(Ad ad) {

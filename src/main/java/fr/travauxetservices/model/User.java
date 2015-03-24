@@ -1,6 +1,7 @@
 package fr.travauxetservices.model;
 
 import fr.travauxetservices.tools.I18N;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,8 +21,8 @@ import java.util.UUID;
 @UniqueConstraint(columnNames = {"email"}))
 public class User implements Serializable {
     @Id
-    @Column(length = 255)
-    private UUID id;
+    @Column(length = 36)
+    private String id;
 
     @Temporal(TemporalType.TIMESTAMP)
     protected Date created;
@@ -65,18 +66,19 @@ public class User implements Serializable {
     @Transient
     private String confirm;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.ALL})
+    @CascadeOnDelete
     private Set<Rating> ratings;
 
     public User() {
-        id = UUID.randomUUID();
+        id = UUID.randomUUID().toString();
         created = new Date(System.currentTimeMillis());
         role = Role.CUSTOMER;
         ratings = new HashSet<Rating>();
     }
 
     public User(UUID id, Date created, Role role, Gender gender, String firstName, String lastName, String email, String password, String phone, byte[] picture, boolean professional, boolean validated, boolean newsletter, Set<Rating> ratings) {
-        this.id = id;
+        this.id = id.toString();
         this.created = created;
         this.role = role;
         this.gender = gender;
@@ -92,11 +94,11 @@ public class User implements Serializable {
         this.ratings = ratings;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -204,6 +206,10 @@ public class User implements Serializable {
         return ratings;
     }
 
+    public void addRatings(Rating rating) {
+        this.ratings.add(rating);
+    }
+
     public void setRatings(Set<Rating> ratings) {
         this.ratings = ratings;
     }
@@ -257,12 +263,12 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : super.hashCode();
+        return id.hashCode();
     }
 
     @Override
     public String toString() {
-        return email;
+        return id;
     }
 
     @Override

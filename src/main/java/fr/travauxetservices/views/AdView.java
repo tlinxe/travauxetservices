@@ -3,6 +3,7 @@ package fr.travauxetservices.views;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.data.util.filter.Or;
@@ -97,6 +98,12 @@ public abstract class AdView extends Panel implements CustomView {
         categoryField.setScrollToSelectedItem(true);
         categoryField.addStyleName(ValoTheme.COMBOBOX_TINY);
         categoryField.setImmediate(true);
+        categoryField.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                applyFilters();
+            }
+        });
         layout.addComponent(categoryField, 1, 0);
 
         locationField = new LocationComboxBox(null);
@@ -105,12 +112,25 @@ public abstract class AdView extends Panel implements CustomView {
         locationField.setScrollToSelectedItem(true);
         locationField.addStyleName(ValoTheme.COMBOBOX_TINY);
         locationField.setImmediate(true);
+        locationField.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                applyFilters();
+            }
+        });
         layout.addComponent(locationField, 2, 0);
 
         cityField = new CityComboBox(null);
         cityField.setInputPrompt(I18N.getString("input.city"));
         //cityField.setPageLength(0);
+        cityField.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                applyFilters();
+            }
+        });
         cityField.addStyleName(ValoTheme.TEXTFIELD_TINY);
+
         layout.addComponent(cityField, 2, 1);
 
         Button search = new Button(I18N.getString("button.search"), FontAwesome.SEARCH);
@@ -136,8 +156,8 @@ public abstract class AdView extends Panel implements CustomView {
         //table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
         table.setWidth(100, Unit.PERCENTAGE);
 
-        applyFilters();
         table.setContainerDataSource(getContainer());
+        applyFilters();
 
         table.setVisibleColumns("user", "location", "title", "created");
         table.setColumnHeaders("", I18N.getString("header.location"), I18N.getString("header.title"), I18N.getString("header.published"));
@@ -179,10 +199,9 @@ public abstract class AdView extends Panel implements CustomView {
 
 
     private void applyFilters() {
-        JPAContainer container = getContainer();
+        JPAContainer container = (JPAContainer)((PagedTableContainer) table.getContainerDataSource()).getContainer();
         container.removeAllContainerFilters();
         container.addContainerFilter(new Compare.Equal("validated", true));
-
         if (keynwordField.getValue() != null && keynwordField.getValue().trim().length() > 0) {
             container.addContainerFilter(
                     new Or(new Like("title", "%" + keynwordField.getValue() + "%", false),
@@ -216,7 +235,6 @@ public abstract class AdView extends Panel implements CustomView {
         if (cityField.getValue() != null) {
             container.addContainerFilter(new Compare.Equal("city", cityField.getValue()));
         }
-
         table.refreshRowCache();
         table.setCurrentPage(1);
         table.firePagedChangedEvent();
@@ -230,11 +248,10 @@ public abstract class AdView extends Panel implements CustomView {
         Layout layout;
         if (!parameters.isEmpty()) {
             item = getItem(parameters);
-//            System.out.println("AdView.enter parameter: "+parameters + " item: "+item);
         }
         if (item != null) {
             layout = new AdLayout(item, getTitleLabel());
             setContent(layout);
-        } else applyFilters();
+        }
     }
 }

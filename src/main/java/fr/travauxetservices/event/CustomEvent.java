@@ -2,6 +2,7 @@ package fr.travauxetservices.event;
 
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import fr.travauxetservices.model.Ad;
+import fr.travauxetservices.model.Location;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.views.ViewType;
 

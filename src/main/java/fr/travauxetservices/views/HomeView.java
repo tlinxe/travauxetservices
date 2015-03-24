@@ -23,6 +23,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
+import fr.travauxetservices.component.PagedTableContainer;
 import fr.travauxetservices.component.RegistrationWindow;
 import fr.travauxetservices.component.RichText;
 import fr.travauxetservices.event.CustomEvent;
@@ -49,7 +50,6 @@ public final class HomeView extends Panel implements View {
     private Window notificationsWindow;
     private GoogleMap map;
     private AdTable table;
-    private JPAContainer container;
 
     public HomeView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -79,11 +79,6 @@ public final class HomeView extends Panel implements View {
         });
     }
 
-    public void attach() {
-        super.attach();
-        //setPostion(GeoLocation.getLocation());
-    }
-
     private Component buildSparklines() {
         HorizontalLayout root = new HorizontalLayout();
         root.setWidth(100, Unit.PERCENTAGE);
@@ -106,7 +101,7 @@ public final class HomeView extends Panel implements View {
 
         editForm(false);
 
-        Item item = AppUI.getDataProvider().getMessage("view.home");
+        Item item = AppUI.getDataProvider().getMessageItem("view.home");
         if (item == null) {
             String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
             FileResource resource = new FileResource(new File(basepath + "/WEB-INF/home.html"));
@@ -218,37 +213,40 @@ public final class HomeView extends Panel implements View {
         map.setSizeFull();
         map.setMinZoom(4);
         map.setMaxZoom(16);
-        LatLon postion = GeoLocation.getLocation();
-        if (postion != null) {
-            map.setCenter(postion);
-            map.setZoom(11);
-        }
+        GeoLocation.create();
         return createContentWrapper(map);
     }
 
     @Subscribe
     public void currentPostionEvent(final CustomEvent.currentPostionEvent event) {
-        setPostion(event.getPostion());
+        VaadinSession.getCurrent().setAttribute(LatLon.class.getName(), event.getPostion());
+        setPostion();
     }
 
-    public void setPostion(final LatLon postion) {
-        if (postion != null) {
-            map.setCenter(postion);
+    public void findPosition() {
+        LatLon position = getCurrentPosition();
+        if (position == null) {
+            GeoLocation.exec();
+        }
+    }
+
+    public void setPostion() {
+        LatLon position = getCurrentPosition();
+        if (position != null) {
+            map.setCenter(position);
             map.setZoom(11);
 
-//            Thread t = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-                    String region = Geonames.getRegion(postion.getLat(), postion.getLon());
-                    if (region != null) {
-                        EntityItem<Location> item = AppUI.getDataProvider().getLocation(region);
-                        applyFilters(item != null ? item.getEntity() : null);
+            Location location = getCurrentLocation();
+            if (location == null) {
+                String region = Geonames.getRegion(position.getLat(), position.getLon());
+                if (region != null) {
+                    EntityItem<Location> item = AppUI.getDataProvider().getLocationItem(region);
+                    if (item != null) {
+                        VaadinSession.getCurrent().setAttribute(Location.class.getName(), item.getEntity());
+                        applyFilters();
                     }
-//                }
-//            });
-//            t.start();
-
-
+                }
+            }
         }
     }
 
@@ -263,8 +261,8 @@ public final class HomeView extends Panel implements View {
         table.setColumnHeaderMode(Table.ColumnHeaderMode.HIDDEN);
         table.setSizeFull();
 
-        applyFilters(null);
         table.setContainerDataSource(getContainer());
+        applyFilters();
 
         table.setVisibleColumns("user", "title", "location");
         table.setColumnHeaders("User", "Title", "Location");
@@ -282,17 +280,15 @@ public final class HomeView extends Panel implements View {
     }
 
     private JPAContainer getContainer() {
-        if (container == null) {
-            container = AppUI.getDataProvider().getOfferContainer();
-        }
-        return container;
+        return AppUI.getDataProvider().getOfferContainer();
     }
 
-    public void applyFilters(Location location) {
-        JPAContainer container = getContainer();
+    public void applyFilters() {
+        JPAContainer container = (JPAContainer)((PagedTableContainer) table.getContainerDataSource()).getContainer();
         container.removeAllContainerFilters();
         container.addContainerFilter(new Compare.Equal("validated", true));
 
+        Location location = getCurrentLocation();
         if (location == null) {
             container.addContainerFilter(new Compare.Equal("location", null));
         } else {
@@ -472,9 +468,18 @@ public final class HomeView extends Panel implements View {
         return (User) VaadinSession.getCurrent().getAttribute(User.class.getName());
     }
 
+    private LatLon getCurrentPosition() {
+        return (LatLon) VaadinSession.getCurrent().getAttribute(LatLon.class.getName());
+    }
+
+    private Location getCurrentLocation() {
+        return (Location) VaadinSession.getCurrent().getAttribute(Location.class.getName());
+    }
+
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
         notificationsButton.updateNotificationsCount(null);
+        findPosition();
     }
 
 

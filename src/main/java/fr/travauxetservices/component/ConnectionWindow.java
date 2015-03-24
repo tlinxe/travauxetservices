@@ -70,7 +70,7 @@ public class ConnectionWindow extends Window {
         usernameField.setRequiredError(I18N.getString("validator.required"));
         usernameField.setIcon(FontAwesome.USER);
         usernameField.addValidator(new EmailValidator(I18N.getString("validator.email")));
-        usernameField.setValue(username != null ? username : "tlinxe@email.fr");
+        usernameField.setValue(username != null ? username : "tlinxe@numericable.fr");
         layout.addComponent(usernameField, 0, 0);
 
         String password = AppUI.getValueCookie(AppUI.PASSWORD_COOKIE);

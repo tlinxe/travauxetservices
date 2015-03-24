@@ -63,10 +63,12 @@ public class DummyDataGenerator {
             User u2 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.CUSTOMER, null, null, "Gaz de Bordeaux", "pn2@email.fr", "motdepasse", null, null, true, true, true, new HashSet<Rating>());
             em.persist(u2);
             users.add(u2);
+
             Rating s1 = new Rating(UUID.randomUUID(), new Date(System.currentTimeMillis()), u1, "Entretien annuel chaudière", "Date de rdv prise rapidement et surtout Ponctuel! Explications de ce qui est fait et doit éventuellement être fait tout au long de l'entretien de la chaudière. Le prix pour un entretien annuel est bien celui qui est indiqué sur le site (77 euros).", 2, 4, 3, 2, 3, 4);
             em.persist(s1);
             Rating s2 = new Rating(UUID.randomUUID(), new Date(System.currentTimeMillis()), u2, null, "Excellent", 5, 0, 0, 0, 0, 0);
             em.persist(s2);
+
             User u3 = new User(UUID.randomUUID(), new Date(System.currentTimeMillis()), Role.CUSTOMER, null, null, "Saunier Duval AGP Atelier Gaz Professionnel", "pn3@email.fr", "motdepasse", "0612335678", null, true, true, true, new HashSet<Rating>(Arrays.asList(s1, s2)));
             em.persist(u3);
             users.add(u3);

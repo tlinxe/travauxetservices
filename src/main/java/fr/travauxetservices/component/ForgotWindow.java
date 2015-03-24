@@ -1,18 +1,22 @@
 package fr.travauxetservices.component;
 
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
+import fr.travauxetservices.data.Post;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.tools.I18N;
 
 @SuppressWarnings("serial")
 public class ForgotWindow extends Window {
-    public static final String ID = "connectionwindow";
+    public static final String ID = "forgotwindow";
+
+    private TextField usernameField;
 
     private ForgotWindow() {
         //addStyleName("profile-window");
@@ -48,11 +52,14 @@ public class ForgotWindow extends Window {
         layout.addComponent(labelField);
 
         String username = AppUI.getValueCookie(AppUI.USERNAME_COOKIE);
-        final TextField usernameField = new TextField(I18N.getString("user.email"));
+        usernameField = new TextField(I18N.getString("user.email"));
         usernameField.setColumns(20);
         usernameField.setIcon(FontAwesome.USER);
+        usernameField.setRequired(true);
+        usernameField.setRequiredError(I18N.getString("validator.required"));
+        usernameField.addValidator(new EmailValidator(I18N.getString("validator.email")));
         //usernameField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        usernameField.setValue(username != null ? username : "tlinxe@email.fr");
+        usernameField.setValue(username);
         layout.addComponent(usernameField);
 
         return layout;
@@ -70,9 +77,8 @@ public class ForgotWindow extends Window {
         Button ok = new Button(I18N.getString("button.send"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                try {
-                } catch (Exception e) {
-                    //Ignored
+                if (Post.forgotPassword(usernameField.getValue())) {
+                    CustomEventBus.post(new CustomEvent.CloseOpenWindowsEvent());
                 }
             }
         });

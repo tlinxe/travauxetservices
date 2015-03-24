@@ -1,7 +1,6 @@
 package fr.travauxetservices.views;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.JPAContainerItem;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -16,10 +15,13 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
+import fr.travauxetservices.component.PagedTableContainer;
 import fr.travauxetservices.component.ValidatedComboBox;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.User;
 import fr.travauxetservices.tools.I18N;
+
+import java.util.UUID;
 
 /**
  * Created by Phobos on 12/12/14.
@@ -28,7 +30,6 @@ import fr.travauxetservices.tools.I18N;
 public final class UserView extends Panel implements View {
     private AdTable table;
     private ComboBox validatedField;
-    private JPAContainer container;
 
     public UserView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -112,8 +113,8 @@ public final class UserView extends Panel implements View {
         table.setWidth(100, Unit.PERCENTAGE);
         table.setAlwaysRecalculateColumnWidths(true);
 
-        applyFilters();
         table.setContainerDataSource(getContainer());
+        applyFilters();
 
         table.addGeneratedColumn("created", new AdTable.ValueColumnGenerator());
         table.addGeneratedColumn("email", new AdTable.ValueColumnGenerator());
@@ -143,8 +144,9 @@ public final class UserView extends Panel implements View {
                     public void buttonClick(Button.ClickEvent event) {
                         final Item item = source.getItem(itemId);
                         final Property property = item.getItemProperty(columnId);
-                        AppUI.getDataProvider().removeUser(property.getValue());
-                        applyFilters();
+                        if (AppUI.getDataProvider().removeUser(property.getValue())) {
+                            applyFilters();
+                        }
                     }
                 });
                 field.addStyleName(ValoTheme.BUTTON_TINY);
@@ -178,14 +180,11 @@ public final class UserView extends Panel implements View {
     }
 
     private JPAContainer getContainer() {
-        if (container == null) {
-            container =  AppUI.getDataProvider().getUserContainer();
-        }
-        return container;
+        return AppUI.getDataProvider().getUserContainer();
     }
 
     private void applyFilters() {
-        JPAContainer container = getContainer();
+        JPAContainer container = (JPAContainer)((PagedTableContainer) table.getContainerDataSource()).getContainer();
         container.removeAllContainerFilters();
         if (validatedField.getValue() != null) {
             container.addContainerFilter(new Compare.Equal("validated", validatedField.getValue()));
@@ -193,6 +192,7 @@ public final class UserView extends Panel implements View {
         if (table != null) {
             table.refreshRowCache();
             table.setCurrentPage(1);
+            table.firePagedChangedEvent();
         }
     }
 
@@ -206,6 +206,6 @@ public final class UserView extends Panel implements View {
         if (user == null || !user.isAdmin()) {
             UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
         }
-        applyFilters();
+//        applyFilters();
     }
 }

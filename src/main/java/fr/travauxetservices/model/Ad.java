@@ -15,8 +15,8 @@ public class Ad implements Serializable {
     static public enum Type {OFFER, REQUEST};
 
     @Id
-    @Column(length = 255)
-    protected UUID id;
+    @Column(length = 36)
+    protected String id;
 
     @Temporal(TemporalType.TIMESTAMP)
     protected Date created;
@@ -58,14 +58,14 @@ public class Ad implements Serializable {
 
 
     public Ad() {
-        id = UUID.randomUUID();
+        id = UUID.randomUUID().toString();
         created = new Date(System.currentTimeMillis());
         validated = false;
         priority = 0;
     }
 
 
-    public Ad(UUID id, Date created, User user, String title, String description, Category category, Location location, City city, double price, Remuneration remuneration, boolean validated, int priority) {
+    public Ad(String id, Date created, User user, String title, String description, Category category, Location location, City city, double price, Remuneration remuneration, boolean validated, int priority) {
         this.id = id;
         this.created = created;
         this.user = user;
@@ -80,11 +80,11 @@ public class Ad implements Serializable {
         this.priority = priority;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -186,12 +186,12 @@ public class Ad implements Serializable {
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : super.hashCode();
+        return id.hashCode();
     }
 
     @Override
     public String toString() {
-        return id.toString();
+        return id;
     }
 
     @Override

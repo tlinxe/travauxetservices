@@ -12,8 +12,6 @@ import java.util.UUID;
  */
 @SuppressWarnings("serial")
 public final class RequestView extends AdView {
-    private JPAContainer container;
-
     public RequestView() {
         super(ViewType.REQUEST.getViewName());
     }
@@ -25,17 +23,13 @@ public final class RequestView extends AdView {
 
     @Override
     public JPAContainer getContainer() {
-        if (container == null) {
-            container = AppUI.getDataProvider().getRequestContainer();
-        }
-        return container;
+        return AppUI.getDataProvider().getRequestContainer();
     }
 
     @Override
     public EntityItem getItem(String parameters) {
         try {
-            UUID id = UUID.fromString(parameters);
-            return AppUI.getDataProvider().getRequest(id);
+            return AppUI.getDataProvider().getRequestItem(parameters);
         } catch (IllegalArgumentException e) {
             //Ignored
         }

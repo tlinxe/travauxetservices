@@ -15,6 +15,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.AppUI;
 import fr.travauxetservices.component.AdTable;
+import fr.travauxetservices.component.PagedTableContainer;
 import fr.travauxetservices.component.ValidatedComboBox;
 import fr.travauxetservices.data.Post;
 import fr.travauxetservices.event.CustomEventBus;
@@ -30,9 +31,6 @@ public final class ValidationView extends Panel implements View {
     private AdTable offerTable;
     private AdTable requestTable;
     private ComboBox validatedField;
-
-    private JPAContainer offerContainer;
-    private JPAContainer requestContainer;
 
     public ValidationView() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -78,13 +76,14 @@ public final class ValidationView extends Panel implements View {
         validatedField.setScrollToSelectedItem(true);
         validatedField.addStyleName(ValoTheme.COMBOBOX_TINY);
         validatedField.setImmediate(true);
+        validatedField.setValue(Boolean.FALSE);
         validatedField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 applyFilters();
             }
         });
-        validatedField.setValue(Boolean.FALSE);
+
         layout.addComponent(validatedField, 1, 0);
 
         Button search = new Button(I18N.getString("button.search"), FontAwesome.SEARCH);
@@ -105,6 +104,7 @@ public final class ValidationView extends Panel implements View {
         tabsheet.addStyleName("framed");
         tabsheet.addTab(buildOfferContent(), I18N.getString("menu.offers"), FontAwesome.SHARE_SQUARE);
         tabsheet.addTab(buildRequestContent(), I18N.getString("menu.requests"), FontAwesome.SHARE_SQUARE_O);
+        applyFilters();
         return tabsheet;
     }
 
@@ -115,7 +115,6 @@ public final class ValidationView extends Panel implements View {
         offerTable.addStyleName(ValoTheme.TABLE_SMALL);
         offerTable.setWidth(100, Unit.PERCENTAGE);
 
-        applyFilters();
         offerTable.setContainerDataSource(getOfferContainer());
 
         offerTable.addGeneratedColumn("created", new AdTable.ValueColumnGenerator());
@@ -180,7 +179,6 @@ public final class ValidationView extends Panel implements View {
         requestTable.addStyleName(ValoTheme.TABLE_SMALL);
         requestTable.setWidth(100, Unit.PERCENTAGE);
 
-        applyFilters();
         requestTable.setContainerDataSource(getRequestContainer());
 
         requestTable.addGeneratedColumn("created", new AdTable.ValueColumnGenerator());
@@ -238,21 +236,15 @@ public final class ValidationView extends Panel implements View {
     }
 
     private JPAContainer getOfferContainer() {
-        if (offerContainer == null) {
-            offerContainer = AppUI.getDataProvider().getOfferContainer();
-        }
-        return offerContainer;
+        return AppUI.getDataProvider().getOfferContainer();
     }
 
     private JPAContainer getRequestContainer() {
-        if (requestContainer == null) {
-            requestContainer = AppUI.getDataProvider().getRequestContainer();
-        }
-        return requestContainer;
+        return AppUI.getDataProvider().getRequestContainer();
     }
 
-    private JPAContainer applyFilters() {
-        JPAContainer offerContainer = getOfferContainer();
+    private void applyFilters() {
+        JPAContainer offerContainer = (JPAContainer)((PagedTableContainer) offerTable.getContainerDataSource()).getContainer();
         offerContainer.removeAllContainerFilters();
         if (validatedField.getValue() != null) {
             offerContainer.addContainerFilter(new Compare.Equal("validated", validatedField.getValue()));
@@ -260,9 +252,10 @@ public final class ValidationView extends Panel implements View {
         if (offerTable != null) {
             offerTable.refreshRowCache();
             offerTable.setCurrentPage(1);
+            offerTable.firePagedChangedEvent();
         }
 
-        JPAContainer requestContainer = getRequestContainer();
+        JPAContainer requestContainer = (JPAContainer)((PagedTableContainer) requestTable.getContainerDataSource()).getContainer();
         requestContainer.removeAllContainerFilters();
         if (validatedField.getValue() != null) {
             requestContainer.addContainerFilter(new Compare.Equal("validated", validatedField.getValue()));
@@ -270,8 +263,8 @@ public final class ValidationView extends Panel implements View {
         if (requestTable != null) {
             requestTable.refreshRowCache();
             requestTable.setCurrentPage(1);
+            requestTable.firePagedChangedEvent();
         }
-        return offerContainer;
     }
 
     private User getCurrentUser() {
@@ -285,6 +278,6 @@ public final class ValidationView extends Panel implements View {
             UI.getCurrent().getNavigator().navigateTo(ViewType.HOME.getViewName());
             return;
         }
-        applyFilters();
+//        applyFilters();
     }
 }

@@ -76,7 +76,7 @@ public class AppDataProvider implements DataProvider {
         return requests;
     }
 
-    public EntityItem<Request> getRequest(Object itemId) {
+    public EntityItem<Request> getRequestItem(Object itemId) {
         return getRequestContainer().getItem(itemId);
     }
 
@@ -90,23 +90,22 @@ public class AppDataProvider implements DataProvider {
         return values;
     }
 
-    public void addRequest(Ad a) throws UnsupportedOperationException, IllegalStateException {
-        requests.addEntity(new Request(a));
-        requests.commit();
+    public Object addRequest(Ad a) throws UnsupportedOperationException, IllegalStateException {
+        return requests.addEntity(new Request(a));
     }
 
-    public void removeRequest(final Object itemId) throws UnsupportedOperationException {
-        requests.removeItem(itemId);
-        requests.commit();
+    public boolean removeRequest(final Object itemId) throws UnsupportedOperationException {
+        return requests.removeItem(itemId);
     }
 
     @Override
     public JPAContainer<Offer> getOfferContainer() {
-        offers.removeAllContainerFilters();
+        JPAContainer<Offer> offers = JPAContainerFactory.make(Offer.class, em);
+        offers.sort(new String[]{"created"}, new boolean[]{false});
         return offers;
     }
 
-    public EntityItem<Offer> getOffer(Object itemId) {
+    public EntityItem<Offer> getOfferItem(Object itemId) {
         return getOfferContainer().getItem(itemId);
     }
 
@@ -120,23 +119,22 @@ public class AppDataProvider implements DataProvider {
         return values;
     }
 
-    public void addOffer(Ad a) throws UnsupportedOperationException, IllegalStateException {
-        offers.addEntity(new Offer(a));
-        offers.commit();
+    public Object addOffer(Ad a) throws UnsupportedOperationException, IllegalStateException {
+        return offers.addEntity(new Offer(a));
     }
 
-    public void removeOffer(final Object itemId) throws UnsupportedOperationException {
-        offers.removeItem(itemId);
-        offers.commit();
+    public boolean removeOffer(final Object itemId) throws UnsupportedOperationException {
+        return offers.removeItem(itemId);
     }
 
-    public void addAd(Ad a) throws UnsupportedOperationException, IllegalStateException {
+    public Object addAd(Ad a) throws UnsupportedOperationException, IllegalStateException {
         if (a instanceof Offer || a.getType().equals(Ad.Type.OFFER)) {
-            addOffer(a);
+            return addOffer(a);
         }
         if (a instanceof Request || a.getType().equals(Ad.Type.REQUEST)) {
-            addRequest(a);
+            return addRequest(a);
         }
+        return null;
     }
 
     @Override
@@ -174,15 +172,14 @@ public class AppDataProvider implements DataProvider {
         return notices;
     }
 
-    public void addNotice(Notice n) throws UnsupportedOperationException {
-        notices.addEntity(n);
-        notices.commit();
+    public Object addNotice(Notice n) throws UnsupportedOperationException {
+        Object value = notices.addEntity(n);
         CustomEventBus.post(new CustomEvent.NotificationsCountUpdatedEvent());
+        return value;
     }
 
-    public void removeNotice(final Object itemId) throws UnsupportedOperationException {
-        notices.removeItem(itemId);
-        notices.commit();
+    public boolean removeNotice(final Object itemId) throws UnsupportedOperationException {
+        return notices.removeItem(itemId);
     }
 
     public int getUnreadNotificationsCount(User u) {
@@ -215,7 +212,7 @@ public class AppDataProvider implements DataProvider {
     }
 
     @Override
-    public EntityItem<Location> getLocation(Object itemId) {
+    public EntityItem<Location> getLocationItem(Object itemId) {
         return getLocationContainer().getItem(itemId);
     }
 
@@ -263,11 +260,20 @@ public class AppDataProvider implements DataProvider {
         return getUserContainer().getItem(user.getId());
     }
 
-    public EntityItem<User> getUser(final Object itemId) {
+    public EntityItem<User> getUserItem(final Object itemId) {
         return getUserContainer().getItem(itemId);
     }
 
-    public void setUser(final User user) {
+    public String getUser(final String email) {
+        JPAContainer<User> ratingContainer = getUserContainer();
+        ratingContainer.addContainerFilter(new Compare.Equal("email", email));
+        for (Object id : ratingContainer.getItemIds()) {
+            return (String) id;
+        }
+        return null;
+    }
+
+    public void refreshUser(final User user) {
         EntityItem<User> item = getUserContainer().getItem(user.getId());
         if (item != null) {
             getUserContainer().refreshItem(user.getId());
@@ -276,15 +282,14 @@ public class AppDataProvider implements DataProvider {
 
     }
 
-    public void addUser(final User u) throws UnsupportedOperationException, IllegalStateException {
-        users.addEntity(u);
-        users.commit();
-
+    public Object addUser(final User u) throws UnsupportedOperationException, IllegalStateException {
+        Object value = users.addEntity(u);
         Post.addedUser(u);
+        return value;
     }
 
-    public void removeUser(final Object itemId) throws UnsupportedOperationException {
-        EntityItem<User> user = getUser(itemId);
+    public boolean removeUser(final Object itemId) throws UnsupportedOperationException {
+        EntityItem<User> user = getUserItem(itemId);
         if (user != null) {
             JPAContainer<Rating> ratingContainer = getRatingContainer();
             ratingContainer.addContainerFilter(new Compare.Equal("user", user.getEntity()));
@@ -310,9 +315,9 @@ public class AppDataProvider implements DataProvider {
                 removeRequest(id);
             }
 
-            users.removeItem(itemId);
-            users.commit();
+            return users.removeItem(itemId);
         }
+        return false;
     }
 
     @Override
@@ -341,13 +346,12 @@ public class AppDataProvider implements DataProvider {
         return messages;
     }
 
-    public EntityItem<Message> getMessage(final Object itemId) {
+    public EntityItem<Message> getMessageItem(final Object itemId) {
         return getMessageContainer().getItem(itemId);
     }
 
-    public void addMessage(Message m) throws UnsupportedOperationException {
-        messages.addEntity(m);
-        messages.commit();
+    public Object addMessage(Message m) throws UnsupportedOperationException {
+        return messages.addEntity(m);
     }
 
     public JPAContainer<Rating> getRatingContainer() {
@@ -355,13 +359,11 @@ public class AppDataProvider implements DataProvider {
         return ratings;
     }
 
-    public void addRating(Rating r) throws UnsupportedOperationException {
-        ratings.addEntity(r);
-        ratings.commit();
+    public Object addRating(Rating r) throws UnsupportedOperationException {
+        return ratings.addEntity(r);
     }
 
-    public void removeRating(final Object itemId) throws UnsupportedOperationException {
-        ratings.removeItem(itemId);
-        ratings.commit();
+    public boolean removeRating(final Object itemId) throws UnsupportedOperationException {
+        return ratings.removeItem(itemId);
     }
 }

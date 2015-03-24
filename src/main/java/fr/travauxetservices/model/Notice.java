@@ -13,14 +13,14 @@ import java.util.UUID;
 @Entity
 public class Notice implements Serializable {
     @Id
-    @Column(length = 255)
-    protected UUID id;
+    @Column(length = 36)
+    protected String id;
 
     @Temporal(TemporalType.TIMESTAMP)
     protected Date created;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     protected User user;
 
     @NotNull
@@ -32,28 +32,28 @@ public class Notice implements Serializable {
     @Lob
     protected String content;
 
-    boolean read;
+    boolean reading;
 
     public Notice() {
-        id = UUID.randomUUID();
+        id = UUID.randomUUID().toString();
         created = new Date(System.currentTimeMillis());
-        read = false;
+        reading = false;
     }
 
-    public Notice(UUID id, Date created, User user, String action, String content, boolean read) {
-        this.id = id;
+    public Notice(UUID id, Date created, User user, String action, String content, boolean reading) {
+        this.id = id.toString();
         this.created = created;
         this.user = user;
         this.action = action;
         this.content = content;
-        this.read = read;
+        this.reading = reading;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -89,11 +89,34 @@ public class Notice implements Serializable {
         this.content = s;
     }
 
-    public boolean isRead() {
-        return read;
+    public boolean isReading() {
+        return reading;
     }
 
-    public void setRead(boolean b) {
-        this.read = b;
+    public void setReading(boolean b) {
+        this.reading = b;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o != null) {
+            if (o instanceof Notice) {
+                return o.hashCode() == this.hashCode();
+            }
+        }
+        return false;
     }
 }

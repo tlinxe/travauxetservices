@@ -2,11 +2,8 @@ package fr.travauxetservices.views;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.validator.BeanValidator;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Responsive;
@@ -99,7 +96,7 @@ public final class ProfileView extends Panel implements View {
         if (user == null) {
             return new BeanItem<User>(new User());
         }
-        return AppUI.getDataProvider().getUser(user.getId());
+        return AppUI.getDataProvider().getUserItem(user.getId());
     }
 
     private User getCurrentUser() {
@@ -112,8 +109,7 @@ public final class ProfileView extends Panel implements View {
         String parameters = event.getParameters();
         if (!parameters.isEmpty()) {
             try {
-                UUID id = UUID.fromString(parameters);
-                EntityItem<User> item = AppUI.getDataProvider().getUser(id);
+                EntityItem<User> item = AppUI.getDataProvider().getUserItem(parameters);
                 if (item != null) {
                     user = item.getEntity();
                     if (user != null && !user.isValidated()) {

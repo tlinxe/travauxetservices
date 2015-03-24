@@ -25,9 +25,8 @@ public class Post {
     static public void addedUser(final User u) {
         Notification notification = new Notification(I18N.getString("user.notification.title"));
         notification.setDescription(I18N.getString("user.notification.content"));
-        notification.setHtmlContentAllowed(true);
-        notification.setStyleName(ValoTheme.NOTIFICATION_SUCCESS);
-        notification.setPosition(Position.BOTTOM_CENTER);
+        notification.setStyleName(ValoTheme.NOTIFICATION_CLOSABLE + " " + ValoTheme.NOTIFICATION_TRAY + " dark");
+        notification.setPosition(Position.TOP_CENTER);
         notification.setDelayMsec(10000);
         notification.show(Page.getCurrent());
 
@@ -42,7 +41,7 @@ public class Post {
             public void run() {
                 String url = AppUI.getEncodedUrl() + "/#!" + ViewType.PROFILE.getViewName() + "/" + u.getId();
                 String subject = I18N.getString("user.message.subject");
-                Item item = AppUI.getDataProvider().getMessage("user.message");
+                Item item = AppUI.getDataProvider().getMessageItem("user.message");
                 if (item == null) {
                     String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
                     FileResource resource = new FileResource(new File(basepath + "/WEB-INF/user_message.html"));
@@ -65,7 +64,7 @@ public class Post {
                 User user = ad.getUser();
                 String url = AppUI.getEncodedUrl() + "/#!" + type.getViewName() + "/" + ad.getId();
                 String subject = I18N.getString("ad.message.subject", new String[]{title});
-                Item item = AppUI.getDataProvider().getMessage("ad.message");
+                Item item = AppUI.getDataProvider().getMessageItem("ad.message");
                 if (item == null) {
                     String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
                     FileResource resource = new FileResource(new File(basepath + "/WEB-INF/ad_message.html"));
@@ -84,7 +83,7 @@ public class Post {
             public void run() {
                 String url = AppUI.getEncodedUrl() + "/#!" + (ad.getType() == Ad.Type.OFFER ? ViewType.OFFER.getViewName() : ViewType.REQUEST.getViewName()) + "/" + ad.getId();
                 String subject = I18N.getString("contact.message.subject", new String[]{ad.getTitle()});
-                Item item = AppUI.getDataProvider().getMessage("contact.message");
+                Item item = AppUI.getDataProvider().getMessageItem("contact.message");
                 if (item == null) {
                     String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
                     FileResource resource = new FileResource(new File(basepath + "/WEB-INF/contact_message.html"));
@@ -101,5 +100,38 @@ public class Post {
             }
         });
         t.start();
+    }
+
+    static public boolean forgotPassword(final String email) {
+        final Object id = AppUI.getDataProvider().getUser(email);
+        if (id != null) {
+            Notification notification = new Notification(I18N.getString("forgot.notification.title"));
+            notification.setDescription(I18N.getString("forgot.notification.content"));
+            notification.setHtmlContentAllowed(true);
+            notification.setStyleName(ValoTheme.NOTIFICATION_CLOSABLE + " " + ValoTheme.NOTIFICATION_TRAY + " dark");
+            notification.setPosition(Position.TOP_CENTER);
+            notification.setDelayMsec(10000);
+            notification.show(Page.getCurrent());
+
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    String url = AppUI.getEncodedUrl() + "/#!" + ViewType.HOME + "/forgot/" + id.toString();
+                    String subject = I18N.getString("forgot.message.subject");
+                    Item item = AppUI.getDataProvider().getMessageItem("forgot.message");
+                    if (item == null) {
+                        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+                        FileResource resource = new FileResource(new File(basepath + "/WEB-INF/forgot_message.html"));
+                        item = new BeanItem<Message>(new Message("forgot.message", IOToolkit.getResourceAsText(resource)));
+                    }
+                    String html = MessageFormat.format((String) item.getItemProperty("content").getValue(), new String[]{url});
+                    Mail.sendMail(email, subject, html, false);
+                }
+            });
+            t.start();
+            return true;
+        }
+        return false;
     }
 }

@@ -120,7 +120,7 @@ public class AdLayout extends VerticalLayout {
         horizontalLayout.addComponent(ratingLabel);
         horizontalLayout.setComponentAlignment(ratingLabel, Alignment.MIDDLE_CENTER);
 
-        Button writeButton = new Button("Ecrire un avis", new Button.ClickListener() {
+        Button writeButton = new Button(I18N.getString("button.review"), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 

@@ -93,7 +93,7 @@ public abstract class TextPageView extends Panel implements View {
 
         editForm(false);
 
-        Item item = AppUI.getDataProvider().getMessage("view." + name);
+        Item item = AppUI.getDataProvider().getMessageItem("view." + name);
         if (item == null) {
             String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
             FileResource resource = new FileResource(new File(basepath + "/WEB-INF/" + name + ".html"));

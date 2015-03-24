@@ -11,8 +11,8 @@ import java.util.UUID;
 @Entity
 public class Rating {
     @Id
-    @Column(length = 255)
-    private UUID id;
+    @Column(length = 36)
+    private String id;
 
     @Temporal(TemporalType.TIMESTAMP)
     protected Date created;
@@ -36,11 +36,11 @@ public class Rating {
     int price;
 
     public Rating() {
-        id = UUID.randomUUID();
+        id = UUID.randomUUID().toString();
     }
 
     public Rating(UUID id, Date created, User user, String title, String description, int overall, int reception, int advice, int availability, int quality, int price) {
-        this.id = id;
+        this.id = id.toString();
         this.created = created;
         this.user = user;
         this.title = title;
@@ -53,11 +53,11 @@ public class Rating {
         this.price = price;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -139,5 +139,28 @@ public class Rating {
 
     public void setPrice(int i) {
         this.price = i;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o != null) {
+            if (o instanceof Rating) {
+                return o.hashCode() == this.hashCode();
+            }
+        }
+        return false;
     }
 }

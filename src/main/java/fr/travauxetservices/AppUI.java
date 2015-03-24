@@ -9,8 +9,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import fr.travauxetservices.data.AppDataProvider;
-import fr.travauxetservices.data.DataProvider;
-import fr.travauxetservices.data.DummyDataGenerator;
 import fr.travauxetservices.event.CustomEvent;
 import fr.travauxetservices.event.CustomEventBus;
 import fr.travauxetservices.model.Configuration;
@@ -20,7 +18,6 @@ import fr.travauxetservices.views.ConfigurationView;
 import fr.travauxetservices.views.HomeView;
 import fr.travauxetservices.views.MainView;
 
-import javax.persistence.PersistenceException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -65,7 +62,7 @@ public class AppUI extends UI {
     static public final String USERNAME_COOKIE = "username";
     static public final String PASSWORD_COOKIE = "password";
     static public final String REMEMBER_COOKIE = "remember";
-    static public final String PERSISTENCE_UNIT = "h2";
+    static public final String PERSISTENCE_UNIT = "travauxetservices";
 
     private Configuration configuration;
     private AppDataProvider dataProvider;
@@ -89,7 +86,7 @@ public class AppUI extends UI {
             signin(getValueCookie(USERNAME_COOKIE), getValueCookie(PASSWORD_COOKIE));
         }
 
-        updateContent();
+        updateContent(false);
 
         // Some views need to be aware of browser resize events so a
         // BrowserResizeEvent gets fired to the event but on every occasion.
@@ -102,13 +99,15 @@ public class AppUI extends UI {
                 });
     }
 
-    private void updateContent() {
+    private void updateContent(boolean state) {
         if (!getConfiguration().isSaved() || !getDataProvider().isReady()) {
             setContent(new ConfigurationView());
         }
         else {
             setContent(new MainView());
-            getNavigator().navigateTo(getNavigator().getState());
+            if (state) {
+                getNavigator().navigateTo(getNavigator().getState());
+            }
             getNavigator().setErrorView(HomeView.class);
         }
     }
@@ -121,7 +120,7 @@ public class AppUI extends UI {
             setCookie(USERNAME_COOKIE, user.getEmail());
             setCookie(PASSWORD_COOKIE, user.getPassword());
             setCookie(REMEMBER_COOKIE, Boolean.toString(event.isRemember()));
-            updateContent();
+            updateContent(true);
         }
     }
 
@@ -130,7 +129,7 @@ public class AppUI extends UI {
             User user = getDataProvider().authenticate(username, password);
             VaadinSession.getCurrent().setAttribute(User.class.getName(), user);
             if (user != null) {
-                updateContent();
+                updateContent(true);
             }
         }
     }
@@ -153,9 +152,9 @@ public class AppUI extends UI {
 
     private void setCookie(String name, String value) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setMaxAge(60 * 60 * 24 * 30);
+        cookie.setMaxAge(60000 * 60 * 24 * 30);
         // Set the cookie path.
-        cookie.setPath(VaadinService.getCurrentRequest().getContextPath());
+        cookie.setPath("/");
 
         // Save cookie
         VaadinService.getCurrentResponse().addCookie(cookie);

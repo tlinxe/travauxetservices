@@ -1,6 +1,7 @@
 package fr.travauxetservices.model;
 
 import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -152,11 +153,11 @@ public class Configuration {
         mailSmtpAddress = props.getProperty("mail.smtp.address", "thierry.linxe@numericable.fr");
         mailSmtpPort = new Integer(props.getProperty("mail.smtp.port", "25"));
 
-        jdbcPlatform = props.getProperty("eclipselink.jdbc.platform", "org.eclipse.persistence.platform.database.H2Platform");
-        jdbcDriver = props.getProperty("eclipselink.jdbc.driver", "org.h2.Driver");
-        jdbcUrl = props.getProperty("eclipselink.jdbc.url", "jdbc:h2:D:/Sgbd/H2/travauxetservices;AUTO_SERVER=TRUE");
-        jdbcUser = props.getProperty("eclipselink.jdbc.user", "sa");
-        jdbcPassword = props.getProperty("eclipselink.jdbc.password", "sa");
+        jdbcPlatform = props.getProperty("javax.persistence.jdbc.platform", "org.eclipse.persistence.platform.database.H2Platform");
+        jdbcDriver = props.getProperty("javax.persistence.jdbc.driver", "org.h2.Driver");
+        jdbcUrl = props.getProperty("javax.persistence.jdbc.url", "jdbc:h2:D:/Sgbd/H2/travauxetservices;AUTO_SERVER=TRUE");
+        jdbcUser = props.getProperty("javax.persistence.jdbc.user", "sa");
+        jdbcPassword = props.getProperty("javax.persistence.jdbc.password", "sa");
         loggingLevel = props.getProperty("eclipselink.logging.level", "FINE");
 //        ddlGeneration = props.getProperty("eclipselink.ddl-generation", "drop-and-create-tables");
 //        ddlGenerationOutputMode = props.getProperty("eclipselink.ddl-generation.output-mode", "database");
@@ -167,11 +168,11 @@ public class Configuration {
         props.setProperty("mail.smtp.host", mailSmtpHost);
         props.setProperty("mail.smtp.address", mailSmtpAddress);
         props.setProperty("mail.smtp.port", "" + mailSmtpPort);
-        props.setProperty("eclipselink.jdbc.platform", jdbcPlatform);
-        props.setProperty("eclipselink.jdbc.driver", jdbcDriver);
-        props.setProperty("eclipselink.jdbc.url", jdbcUrl);
-        props.setProperty("eclipselink.jdbc.user", jdbcUser);
-        props.setProperty("eclipselink.jdbc.password", jdbcPassword);
+        props.setProperty("javax.persistence.jdbc.platform", jdbcPlatform);
+        props.setProperty("javax.persistence.jdbc.driver", jdbcDriver);
+        props.setProperty("javax.persistence.jdbc.url", jdbcUrl);
+        props.setProperty("javax.persistence.jdbc.user", jdbcUser);
+        props.setProperty("javax.persistence.jdbc.password", jdbcPassword);
         props.setProperty("eclipselink.logging.level", loggingLevel);
 //        props.setProperty("eclipselink.ddl-generatione", ddlGeneration);
 //        props.setProperty("eclipselink.ddl-generation.output-mode", ddlGenerationOutputMode);
@@ -196,7 +197,7 @@ public class Configuration {
     }
 
     public static String getHomePath() {
-        return tryHomePath(System.getenv("LOCALAPPDATA") + File.separatorChar + PROPERTIES_DIR);
+        return tryHomePath( System.getProperty("user.home") + File.separatorChar + PROPERTIES_DIR);
     }
 
     private static String tryHomePath(String path) {
@@ -230,7 +231,13 @@ public class Configuration {
     }
 
     public static void main(String[] args) {
-        String path = tryHomePath(System.getenv("LOCALAPPDATA"));
-        System.out.println("path " + path);
+        Map<String, String> env = System.getenv();
+        for (String envName : env.keySet()) {
+            System.out.format("%s=%s%n",
+                    envName,
+                    env.get(envName));
+        }
+        String path = tryHomePath(System.getenv("PWD"));
+        System.out.println("localappData: " + System.getProperty("user.home") + " path: " + path);
     }
 }

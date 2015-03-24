@@ -54,8 +54,8 @@ public class Mail {
             Notification notification = new Notification(I18N.getString("error.sending.title"));
             notification.setDescription(I18N.getString("error.sending.content", new String[]{e.getLocalizedMessage()}));
             notification.setHtmlContentAllowed(true);
-            notification.setStyleName(ValoTheme.NOTIFICATION_ERROR);
-            notification.setPosition(Position.BOTTOM_CENTER);
+            notification.setStyleName(ValoTheme.NOTIFICATION_ERROR + " "+ValoTheme.NOTIFICATION_TRAY + " "+ValoTheme.NOTIFICATION_CLOSABLE);
+            notification.setPosition(Position.TOP_CENTER);
             notification.setDelayMsec(10000);
             notification.show(Page.getCurrent());
         }

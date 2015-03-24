@@ -12,7 +12,6 @@ import java.util.UUID;
  */
 @SuppressWarnings("serial")
 public final class OfferView extends AdView {
-    private JPAContainer container;
 
     public OfferView() {
         super(ViewType.OFFER.getViewName());
@@ -25,18 +24,14 @@ public final class OfferView extends AdView {
 
     @Override
     public JPAContainer getContainer() {
-        if (container == null) {
-            container =  AppUI.getDataProvider().getOfferContainer();
-        }
-        return container;
+        return AppUI.getDataProvider().getOfferContainer();
     }
 
 
     @Override
     public EntityItem getItem(String parameters) {
         try {
-            UUID id = UUID.fromString(parameters);
-            return AppUI.getDataProvider().getOffer(id);
+            return AppUI.getDataProvider().getOfferItem(parameters);
         } catch (IllegalArgumentException e) {
             //Ignored
         }
