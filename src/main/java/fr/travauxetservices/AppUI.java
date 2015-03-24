@@ -136,6 +136,7 @@ public class AppUI extends UI {
 
     @Subscribe
     public void userLoggedOut(final CustomEvent.UserLoggedOutEvent event) {
+        setCookie(REMEMBER_COOKIE, Boolean.toString(false));
         // When the user logs out, current VaadinSession gets closed and the
         // page gets reloaded on the login screen. Do notice the this doesn't
         // invalidate the current HttpSession.
